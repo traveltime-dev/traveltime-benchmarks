@@ -29,5 +29,4 @@ public class SdkSetup {
             Country.LITHUANIA, new Coordinates(50.8610222, 4.384314),
             Country.UNITED_KINGDOM, new Coordinates(56.92887900, 24.053981415)
     );
-
 }

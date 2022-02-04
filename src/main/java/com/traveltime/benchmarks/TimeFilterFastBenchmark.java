@@ -9,18 +9,29 @@ import com.traveltime.sdk.dto.requests.proto.Transportation;
 import lombok.val;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
-@BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Fork(value = 1, jvmArgs = {"-Xms2G", "-Xmx8G"})
-@Warmup(iterations = 1)
-@Measurement(iterations = 10)
 public class TimeFilterFastBenchmark {
+
+    public static void main(String[] args) throws RunnerException {
+        Options options = new OptionsBuilder()
+                .include(TimeFilterFastBenchmark.class.getSimpleName())
+                .forks(1)
+                .jvmArgs("-Xms2G", "-Xmx8G")
+                .warmupForks(2)
+                .measurementIterations(5)
+                .mode(Mode.AverageTime)
+                .timeUnit(TimeUnit.MILLISECONDS)
+                .build();
+        new Runner(options).run();
+    }
 
     private static final Country country = Country.UNITED_KINGDOM;
     private static final Transportation mode = Transportation.DRIVING_FERRY;
