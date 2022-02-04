@@ -8,8 +8,8 @@ import java.util.stream.Stream;
 
 public class Utils {
 
-    private static final double lat_bound = 0.1;
-    private static final double lng_bound = 0.2;
+    private static final double latBound = 0.1;
+    private static final double lngBound = 0.2;
 
     public static double randomDelta(double bound) {
         return Math.random() * 2 * bound - bound;
@@ -17,8 +17,8 @@ public class Utils {
 
     public static Coordinates randomizeCoordinates(Coordinates coordinates) {
         return new Coordinates(
-                coordinates.getLat() + randomDelta(lat_bound),
-                coordinates.getLng() + randomDelta(lng_bound)
+                coordinates.getLat() + randomDelta(latBound),
+                coordinates.getLng() + randomDelta(lngBound)
         );
     }
 

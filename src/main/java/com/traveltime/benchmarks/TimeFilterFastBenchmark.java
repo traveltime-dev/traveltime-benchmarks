@@ -18,9 +18,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.traveltime.benchmarks.BenchmarkSetup.*;
+
 public class TimeFilterFastBenchmark {
 
     public static void main(String[] args) throws RunnerException {
+        new BenchmarkSetup(); // Instantiating this validates whether all environment variables have been set
         Options options = new OptionsBuilder()
                 .include(TimeFilterFastBenchmark.class.getSimpleName())
                 .forks(1)
@@ -33,10 +36,6 @@ public class TimeFilterFastBenchmark {
         new Runner(options).run();
     }
 
-    private static final Country country = Country.valueOf(System.getenv("COUNTRY"));
-    private static final Transportation mode = Transportation.valueOf(System.getenv("TRANSPORT_MODE"));
-    private static final Integer travelTime = Integer.valueOf(System.getenv("TRAVEL_TIME"));
-
     /**
      * Initializes and closes an instance of the Sdk.
      */
@@ -46,7 +45,7 @@ public class TimeFilterFastBenchmark {
 
         @Setup(Level.Iteration)
         public void setup() {
-            sdk = TravelTimeSDK.builder().baseProtoUri(SdkSetup.PROTO_API).credentials(SdkSetup.credentials).build();
+            sdk = TravelTimeSDK.builder().baseProtoUri(apiUri).credentials(credentials).build();
         }
 
         @TearDown(Level.Iteration)
@@ -68,7 +67,7 @@ public class TimeFilterFastBenchmark {
         @Setup(Level.Invocation)
         public void setUpInvocation() {
 
-            val origin = Utils.randomizeCoordinates(SdkSetup.countryCapitalCoordinates.get(country));
+            val origin = Utils.randomizeCoordinates(countryCapitalCoordinates.get(country));
 
             OneToMany oneToMany = new OneToMany(
                     origin,
@@ -108,7 +107,7 @@ public class TimeFilterFastBenchmark {
 
 
     /**
-     * Serializes and sends a request to the {@link com.traveltime.benchmarks.SdkSetup#PROTO_API} endpoint
+     * Serializes and sends a request to the {@link BenchmarkSetup#apiUri} endpoint
      */
     @Benchmark
     @Group("timeRequests")
@@ -121,7 +120,7 @@ public class TimeFilterFastBenchmark {
      */
     @Benchmark
     public void serialize(ValidRequest requestSetup, Blackhole blackhole) {
-        blackhole.consume(requestSetup.request.createRequest(SdkSetup.PROTO_API, SdkSetup.credentials));
+        blackhole.consume(requestSetup.request.createRequest(apiUri, credentials));
     }
 
     /**
