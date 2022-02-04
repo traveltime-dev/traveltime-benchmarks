@@ -33,9 +33,9 @@ public class TimeFilterFastBenchmark {
         new Runner(options).run();
     }
 
-    private static final Country country = Country.UNITED_KINGDOM;
-    private static final Transportation mode = Transportation.DRIVING_FERRY;
-    private static final Integer travelTime = 7200;
+    private static final Country country = Country.valueOf(System.getenv("COUNTRY"));
+    private static final Transportation mode = Transportation.valueOf(System.getenv("TRANSPORT_MODE"));
+    private static final Integer travelTime = Integer.valueOf(System.getenv("TRAVEL_TIME"));
 
     /**
      * Initializes and closes an instance of the Sdk.

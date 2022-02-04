@@ -1,24 +1,62 @@
 # TravelTime Benchmarks
 
-This repository hosts benchmarks for measuring the performance TravelTime endpoints.
+This repository hosts benchmarks for measuring the performance of TravelTime endpoints.
 
 # Usage
 
 First, obtain an App ID and an API key from: TODO.
 
-`
-APP_ID={{YOUR_APP_ID}} API_KEY={{YOUR_API_KEY}} mvn clean install exec:exec
-`
+With docker:
 
-Or with docker:
+```
+docker run \
+-e APP_ID={{YOUR_APP_ID}} \
+-e API_KEY={{YOUR_API_KEY}} \
+-e COUNTRY=UNITED_KINGDOM \
+-e TRANSPORT_MODE=DRIVING_FERRY \
+-e TRAVEL_TIME=7200 \
+-ti igeolise/traveltime-benchmarks:latest
+```
 
-`docker run -e APP_ID={{YOUR_APP_ID}} API_KEY={{YOUR_API_KEY}} -ti igeolise/traveltime-benchmarks:latest`
+Or with maven, make sure JAVA_HOME points to JDK11:
 
-## Supported countries and transport modes:
+```
+APP_ID={{YOUR_APP_ID}} \
+API_KEY={{YOUR_API_KEY}} \
+COUNTRY=UNITED_KINGDOM \
+TRANSPORT_MODE=DRIVING_FERRY \
+TRAVEL_TIME=7200 \
+mvn clean install exec:exec
+```
+
+## Supported countries, transport modes, and travel times
 Countries:
-`nl at be de fr ie lt uk`
+```
+UNITED_KINGDOM 
+NETHERLANDS
+AUSTRIA
+BELGIUM
+GERMANY
+FRANCE
+IRELAND
+LITHUANIA
+```
 Modes:
-`pt walking+ferry cycling+ferry driving+ferry`
+```
+DRIVING_FERRY
+PUBLIC_TRANSPORT
+WALKING_FERRY
+CYCLING_FERRY
+```
+
+Maximum travel time is currently 7200 (2 hours).
+
+# Testing different scenarios
+
+Different benchmarking profiles can be defined in `com.traveltime.benchmarks.TimeFilterFastBenchmark`, different destination counts can be found in `com.traveltime.benchmarks.TimeFilterFastBenchmark.ValidRequest.destinationCount`. 
+
+A new docker image with modified benchmarks can be built by running `./build.sh`, which you can then run as described in the `Usage` section above. 
+
 # Factors we have limited control over
 
 * Network latency
