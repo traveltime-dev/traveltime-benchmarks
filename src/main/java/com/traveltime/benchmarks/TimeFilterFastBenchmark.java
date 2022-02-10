@@ -6,6 +6,8 @@ import com.traveltime.sdk.dto.requests.TimeFilterFastProtoRequest;
 import com.traveltime.sdk.dto.requests.proto.Country;
 import com.traveltime.sdk.dto.requests.proto.OneToMany;
 import com.traveltime.sdk.dto.requests.proto.Transportation;
+import com.traveltime.sdk.dto.responses.TimeFilterFastProtoResponse;
+import com.traveltime.sdk.dto.responses.errors.TravelTimeError;
 import lombok.val;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -33,6 +35,7 @@ public class TimeFilterFastBenchmark {
                 .mode(Mode.AverageTime)
                 .timeUnit(TimeUnit.MILLISECONDS)
                 .param("destinationCount", destinationCounts)
+                .shouldFailOnError(true)
                 .build();
         new Runner(options).run();
     }
@@ -112,8 +115,10 @@ public class TimeFilterFastBenchmark {
      */
     @Benchmark
     @Group("timeRequests")
-    public void sendProto(Sdk sdkSetup, ValidRequest requestSetup, Blackhole blackhole) {
-        blackhole.consume(sdkSetup.sdk.sendProtoBatched(requestSetup.request));
+    public TimeFilterFastProtoResponse sendProto(Sdk sdkSetup, ValidRequest requestSetup) {
+        val response = sdkSetup.sdk.sendProtoBatched(requestSetup.request);
+
+        return response.get();
     }
 
     /**
@@ -130,9 +135,9 @@ public class TimeFilterFastBenchmark {
      */
     @Benchmark
     @Group("checkLatency")
-    public void checkLatency(Sdk sdkSetup, InvalidRequest invalidRequestSetup) {
+    public TravelTimeError checkLatency(Sdk sdkSetup, InvalidRequest invalidRequestSetup) {
         val response = sdkSetup.sdk.sendProtoBatched(invalidRequestSetup.request);
 
-        assert (response.isLeft());
+        return response.getLeft();
     }
 }
