@@ -7,6 +7,7 @@ import com.traveltime.sdk.dto.requests.proto.Transportation;
 import lombok.val;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ public class BenchmarkSetup {
     public static final Transportation mode;
     public static final Integer travelTime;
     public static final URI apiUri;
+    public static final String[] destinationCounts;
 
     static {
         val requiredEnvVars = Set.of(
@@ -37,6 +39,21 @@ public class BenchmarkSetup {
 
         if (!nulls.isEmpty()) {
             throw new RuntimeException("Could not start benchmark. The following required environment variables were not set: " + nulls);
+        }
+
+        val destinationCountStringOrNull = System.getenv("DESTINATION_COUNTS");
+
+        if (destinationCountStringOrNull == null) {
+            destinationCounts = new String[]{"10000", "20000", "40000", "100000"};
+        } else {
+            try {
+                destinationCounts = destinationCountStringOrNull.split(",");
+                Arrays.stream(destinationCounts).forEach(Integer::valueOf);
+            } catch (Exception e) {
+                throw new RuntimeException("Could not start benchmark. Unable to parse environment variable DESTINATION_COUNTS " +
+                        "as an array of integers. Variable value was: " + destinationCountStringOrNull +
+                        " Expected a comma-separated list, for example: 10000,20000,40000,100000");
+            }
         }
 
         appId = System.getenv("APP_ID");

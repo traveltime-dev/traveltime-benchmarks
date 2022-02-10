@@ -32,6 +32,7 @@ public class TimeFilterFastBenchmark {
                 .measurementIterations(5)
                 .mode(Mode.AverageTime)
                 .timeUnit(TimeUnit.MILLISECONDS)
+                .param("destinationCount", destinationCounts)
                 .build();
         new Runner(options).run();
     }
@@ -59,7 +60,7 @@ public class TimeFilterFastBenchmark {
      */
     @State(Scope.Benchmark)
     public static class ValidRequest {
-        @Param({"10000", "20000", "40000", "100000"})
+        @Param({"0"}) // Always overridden by .param("destinationCount", destinationCounts) in the options builder
         public int destinationCount;
 
         public TimeFilterFastProtoRequest request;
@@ -82,7 +83,7 @@ public class TimeFilterFastBenchmark {
 
     @State(Scope.Benchmark)
     public static class InvalidRequest {
-        @Param({"10000", "20000", "40000", "100000"})
+        @Param({"0"}) // Always overridden by .param("destinationCount", destinationCounts) in the options builder
         public int destinationCount;
 
         public TimeFilterFastProtoRequest request;
