@@ -27,7 +27,7 @@ public class TimeFilterFastBenchmark {
         Options options = new OptionsBuilder()
                 .include(TimeFilterFastBenchmark.class.getSimpleName())
                 .forks(1)
-                .jvmArgs("-Xms2G", "-Xmx4G")
+                .jvmArgs(jmhJvmArgs)
                 .warmupForks(2)
                 .measurementIterations(5)
                 .mode(Mode.AverageTime)
