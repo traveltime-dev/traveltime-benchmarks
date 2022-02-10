@@ -6,8 +6,6 @@ import com.traveltime.sdk.dto.requests.TimeFilterFastProtoRequest;
 import com.traveltime.sdk.dto.requests.proto.Country;
 import com.traveltime.sdk.dto.requests.proto.OneToMany;
 import com.traveltime.sdk.dto.requests.proto.Transportation;
-import com.traveltime.sdk.dto.responses.TimeFilterFastProtoResponse;
-import com.traveltime.sdk.dto.responses.errors.TravelTimeError;
 import lombok.val;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -29,13 +27,12 @@ public class TimeFilterFastBenchmark {
         Options options = new OptionsBuilder()
                 .include(TimeFilterFastBenchmark.class.getSimpleName())
                 .forks(1)
-                .jvmArgs("-Xms2G", "-Xmx8G")
+                .jvmArgs("-Xms2G", "-Xmx4G")
                 .warmupForks(2)
                 .measurementIterations(5)
                 .mode(Mode.AverageTime)
                 .timeUnit(TimeUnit.MILLISECONDS)
                 .param("destinationCount", destinationCounts)
-                .shouldFailOnError(true)
                 .build();
         new Runner(options).run();
     }
@@ -115,10 +112,8 @@ public class TimeFilterFastBenchmark {
      */
     @Benchmark
     @Group("timeRequests")
-    public TimeFilterFastProtoResponse sendProto(Sdk sdkSetup, ValidRequest requestSetup) {
-        val response = sdkSetup.sdk.sendProtoBatched(requestSetup.request);
-
-        return response.get();
+    public void sendProto(Sdk sdkSetup, ValidRequest requestSetup, Blackhole blackhole) {
+        blackhole.consume(sdkSetup.sdk.sendProtoBatched(requestSetup.request));
     }
 
     /**
@@ -135,9 +130,7 @@ public class TimeFilterFastBenchmark {
      */
     @Benchmark
     @Group("checkLatency")
-    public TravelTimeError checkLatency(Sdk sdkSetup, InvalidRequest invalidRequestSetup) {
-        val response = sdkSetup.sdk.sendProtoBatched(invalidRequestSetup.request);
-
-        return response.getLeft();
+    public void checkLatency(Sdk sdkSetup, InvalidRequest invalidRequestSetup, Blackhole blackhole) {
+        blackhole.consume(sdkSetup.sdk.sendProtoBatched(invalidRequestSetup.request));
     }
 }

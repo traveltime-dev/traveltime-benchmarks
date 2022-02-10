@@ -47,6 +47,7 @@
                 <configuration>
                     <executable>${JAVA_HOME}/bin/java</executable>
                     <arguments>
+                        <argument>-ea</argument>
                         <argument>-classpath</argument>
                         <classpath />
                         <argument>com.traveltime.benchmarks.TimeFilterFastBenchmark</argument>

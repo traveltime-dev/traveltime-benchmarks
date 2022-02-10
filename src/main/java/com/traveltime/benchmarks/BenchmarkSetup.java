@@ -48,11 +48,13 @@ public class BenchmarkSetup {
         } else {
             try {
                 destinationCounts = destinationCountStringOrNull.split(",");
-                Arrays.stream(destinationCounts).forEach(Integer::valueOf);
-            } catch (Exception e) {
+                Arrays.stream(destinationCounts).forEach(str -> {
+                    assert (Integer.parseInt(str) > 0);
+                });
+            } catch (Throwable e) {
                 throw new RuntimeException("Could not start benchmark. Unable to parse environment variable DESTINATION_COUNTS " +
-                        "as an array of integers. Variable value was: " + destinationCountStringOrNull +
-                        " Expected a comma-separated list, for example: 10000,20000,40000,100000");
+                        "as an array of positive integers. Variable value was: " + destinationCountStringOrNull +
+                        " Expected a comma-separated list, for example: 10000,20000,40000,100000", e);
             }
         }
 
