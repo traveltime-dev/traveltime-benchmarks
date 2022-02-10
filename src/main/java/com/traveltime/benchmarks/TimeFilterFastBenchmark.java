@@ -27,11 +27,12 @@ public class TimeFilterFastBenchmark {
         Options options = new OptionsBuilder()
                 .include(TimeFilterFastBenchmark.class.getSimpleName())
                 .forks(1)
-                .jvmArgs("-Xms2G", "-Xmx8G")
+                .jvmArgs("-Xms2G", "-Xmx4G")
                 .warmupForks(2)
                 .measurementIterations(5)
                 .mode(Mode.AverageTime)
                 .timeUnit(TimeUnit.MILLISECONDS)
+                .param("destinationCount", destinationCounts)
                 .build();
         new Runner(options).run();
     }
@@ -59,7 +60,7 @@ public class TimeFilterFastBenchmark {
      */
     @State(Scope.Benchmark)
     public static class ValidRequest {
-        @Param({"10000", "20000", "40000", "100000"})
+        @Param({"0"}) // Always overridden by .param("destinationCount", destinationCounts) in the options builder
         public int destinationCount;
 
         public TimeFilterFastProtoRequest request;
@@ -82,7 +83,7 @@ public class TimeFilterFastBenchmark {
 
     @State(Scope.Benchmark)
     public static class InvalidRequest {
-        @Param({"10000", "20000", "40000", "100000"})
+        @Param({"0"}) // Always overridden by .param("destinationCount", destinationCounts) in the options builder
         public int destinationCount;
 
         public TimeFilterFastProtoRequest request;
@@ -129,9 +130,7 @@ public class TimeFilterFastBenchmark {
      */
     @Benchmark
     @Group("checkLatency")
-    public void checkLatency(Sdk sdkSetup, InvalidRequest invalidRequestSetup) {
-        val response = sdkSetup.sdk.sendProtoBatched(invalidRequestSetup.request);
-
-        assert (response.isLeft());
+    public void checkLatency(Sdk sdkSetup, InvalidRequest invalidRequestSetup, Blackhole blackhole) {
+        blackhole.consume(sdkSetup.sdk.sendProtoBatched(invalidRequestSetup.request));
     }
 }
