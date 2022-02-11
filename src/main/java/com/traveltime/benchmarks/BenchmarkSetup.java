@@ -21,6 +21,7 @@ public class BenchmarkSetup {
     public static final Integer travelTime;
     public static final URI apiUri;
     public static final String[] destinationCounts;
+    public static final String[] jmhJvmArgs;
 
     static {
         val requiredEnvVars = Set.of(
@@ -56,6 +57,14 @@ public class BenchmarkSetup {
                         "as an array of positive integers. Variable value was: " + destinationCountStringOrNull +
                         " Expected a comma-separated list, for example: 10000,20000,40000,100000", e);
             }
+        }
+
+        val jmhJvmArgsStringOrNull = System.getenv("JMH_JVM_ARGS");
+
+        if (jmhJvmArgsStringOrNull != null) {
+            jmhJvmArgs = jmhJvmArgsStringOrNull.split(",");
+        } else {
+            jmhJvmArgs = new String[]{};
         }
 
         appId = System.getenv("APP_ID");
