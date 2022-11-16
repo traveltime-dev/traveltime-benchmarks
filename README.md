@@ -60,6 +60,7 @@ DRIVING_FERRY
 PUBLIC_TRANSPORT
 WALKING_FERRY
 CYCLING_FERRY
+DRIVING
 ```
 
 Maximum travel time is currently 7200 (2 hours).
