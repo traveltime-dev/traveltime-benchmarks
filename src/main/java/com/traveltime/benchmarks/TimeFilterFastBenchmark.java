@@ -22,19 +22,20 @@ import static com.traveltime.benchmarks.BenchmarkSetup.*;
 
 public class TimeFilterFastBenchmark {
 
-    public static void main(String[] args) throws RunnerException {
+    public static void main(String[] args) throws RunnerException{
         new BenchmarkSetup(); // Instantiating this validates whether all environment variables have been set
-        Options options = new OptionsBuilder()
-                .include(TimeFilterFastBenchmark.class.getSimpleName())
-                .forks(1)
-                .jvmArgs(jmhJvmArgs)
-                .warmupForks(2)
-                .measurementIterations(5)
-                .mode(Mode.AverageTime)
-                .timeUnit(TimeUnit.MILLISECONDS)
-                .param("destinationCount", destinationCounts)
-                .build();
-        new Runner(options).run();
+        UriValidation.correctApiUri();
+            Options options = new OptionsBuilder()
+                    .include(TimeFilterFastBenchmark.class.getSimpleName())
+                    .forks(1)
+                    .jvmArgs(jmhJvmArgs)
+                    .warmupForks(2)
+                    .measurementIterations(5)
+                    .mode(Mode.AverageTime)
+                    .timeUnit(TimeUnit.MILLISECONDS)
+                    .param("destinationCount", destinationCounts)
+                    .build();
+            new Runner(options).run();
     }
 
     /**
