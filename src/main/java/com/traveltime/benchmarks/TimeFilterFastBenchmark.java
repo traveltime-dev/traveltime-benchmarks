@@ -24,7 +24,7 @@ public class TimeFilterFastBenchmark {
 
     public static void main(String[] args) throws RunnerException {
         new BenchmarkSetup(); // Instantiating this validates whether all environment variables have been set
-        BenchmarkSetupValidation.validateBenchmarkSetup();
+        UriValidation.validateBenchmarkSetup();
         Options options = new OptionsBuilder()
                 .include(TimeFilterFastBenchmark.class.getSimpleName())
                 .forks(1)
