@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:experimental
-FROM maven:3-openjdk-11
+FROM maven:3-openjdk-11 AS build
+COPY src /usr/src/app/src
+COPY pom.xml /usr/src/app
+RUN mvn -f /usr/src/app/pom.xml package shade:shade
 
-ADD src/ /src
-ADD pom.xml /
-RUN --mount=type=cache,target=/root/.m2 mvn install
 
-ADD docker/entrypoint.sh /
-RUN chmod +x ./entrypoint.sh
-ENTRYPOINT /entrypoint.sh
+FROM gcr.io/distroless/java
+COPY --from=build /usr/src/app/target/traveltime-benchmarks-1.0-SNAPSHOT.jar /usr/app/traveltime-benchmarks-1.0-SNAPSHOT.jar
+ENTRYPOINT ["java", "-jar", "/usr/app/traveltime-benchmarks-1.0-SNAPSHOT.jar"]
