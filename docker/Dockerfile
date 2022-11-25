@@ -7,5 +7,4 @@ RUN mvn -f /usr/src/app/pom.xml package shade:shade
 
 FROM gcr.io/distroless/java
 COPY --from=build /usr/src/app/target/traveltime-benchmarks-1.0-SNAPSHOT.jar /usr/app/traveltime-benchmarks-1.0-SNAPSHOT.jar
-EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/usr/app/traveltime-benchmarks-1.0-SNAPSHOT.jar"]
