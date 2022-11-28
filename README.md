@@ -23,7 +23,7 @@ docker run \
 -ti igeolise/traveltime-benchmarks:latest
 ```
 
-Or with maven, change run.sh script contents accordingly and run `./run.sh`
+Or with maven, change `run.sh` script contents accordingly and run `./run.sh`
 
 ```
 APP_ID={{YOUR_APP_ID}} \
