@@ -23,7 +23,7 @@ docker run \
 -ti igeolise/traveltime-benchmarks:latest
 ```
 
-Or with maven, make sure JAVA_HOME points to JDK11:
+Or with maven, change run.sh script contents accordingly and run `./run.sh`
 
 ```
 APP_ID={{YOUR_APP_ID}} \
@@ -32,7 +32,6 @@ API_URI=https://proto.api.traveltimeapp.com/api/v2/ \
 COUNTRY=UNITED_KINGDOM \
 TRANSPORT_MODE=DRIVING_FERRY \
 TRAVEL_TIME=7200 \
-mvn clean install exec:exec
 ```
 
 ## Optional environment variables
