@@ -33,7 +33,7 @@ COUNTRY=UNITED_KINGDOM \
 TRANSPORT_MODE=DRIVING_FERRY \
 TRAVEL_TIME=7200 \
 ```
-and then run ./run.sh
+and then run `./run.sh`
 
 ## Optional environment variables
 
