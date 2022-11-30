@@ -34,7 +34,6 @@ TRANSPORT_MODE=DRIVING_FERRY \
 TRAVEL_TIME=7200 \
 ./run.sh
 ```
-and then run `./run.sh`
 
 ## Optional environment variables
 
