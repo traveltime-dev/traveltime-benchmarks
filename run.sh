@@ -2,10 +2,11 @@
 
 mvn package shade:shade
 
-APP_ID={{YOUR_APP_ID}} \
-API_KEY={{YOUR_API_KEY}} \
-API_URI=https://proto.api.traveltimeapp.com/api/v2/ \
-COUNTRY=UNITED_KINGDOM \
-TRANSPORT_MODE=DRIVING_FERRY \
-TRAVEL_TIME=7200 \
+APP_ID=$APP_ID \
+API_KEY=$API_KEY \
+API_URI=$API_URI \
+COUNTRY=$COUNTRY \
+TRANSPORT_MODE=$TRANSPORT_MODE \
+TRAVEL_TIME=$TRAVEL_TIME \
 java -jar target/traveltime-benchmarks-1.0-SNAPSHOT.jar
+
