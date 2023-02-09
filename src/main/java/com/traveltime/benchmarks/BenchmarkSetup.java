@@ -69,8 +69,8 @@ public class BenchmarkSetup {
 
         appId = System.getenv("APP_ID");
         apiKey = System.getenv("API_KEY");
-        country = Country.valueOf(System.getenv("COUNTRY"));
-        mode = Transportation.valueOf(System.getenv("TRANSPORT_MODE"));
+        country = BenchmarkCountry.valueOf(System.getenv("COUNTRY"));
+        mode = Transportation.Modes.valueOf(System.getenv("TRANSPORT_MODE"));
         travelTime = Integer.valueOf(System.getenv("TRAVEL_TIME"));
         apiUri = URI.create(System.getenv("API_URI"));
     }
@@ -80,14 +80,15 @@ public class BenchmarkSetup {
             apiKey
     );
 
-    public static Map<Country, Coordinates> countryCapitalCoordinates = Map.of(
-            Country.NETHERLANDS, new Coordinates(52.3650144, 4.892851),
-            Country.AUSTRIA, new Coordinates(48.2244617, 16.326472),
-            Country.BELGIUM, new Coordinates(50.8610222, 4.384314),
-            Country.GERMANY, new Coordinates(52.5446, 13.35),
-            Country.FRANCE, new Coordinates(48.8540899, 2.325747),
-            Country.IRELAND, new Coordinates(53.3129170, -6.3308734),
-            Country.LITHUANIA, new Coordinates(54.6584053, 25.2288244),
-            Country.UNITED_KINGDOM, new Coordinates(51.509865, -0.118092)
+    public static Map<BenchmarkCountry, Coordinates> countryCapitalCoordinates = Map.of(
+            BenchmarkCountry.LATVIA, new Coordinates(56.945614, 24.120870),
+            BenchmarkCountry.NETHERLANDS, new Coordinates(52.3650144, 4.892851),
+            BenchmarkCountry.AUSTRIA, new Coordinates(48.2244617, 16.326472),
+            BenchmarkCountry.BELGIUM, new Coordinates(50.8610222, 4.384314),
+            BenchmarkCountry.GERMANY, new Coordinates(52.5446, 13.35),
+            BenchmarkCountry.FRANCE, new Coordinates(48.8540899, 2.325747),
+            BenchmarkCountry.IRELAND, new Coordinates(53.3129170, -6.3308734),
+            BenchmarkCountry.LITHUANIA, new Coordinates(54.6584053, 25.2288244),
+            BenchmarkCountry.UNITED_KINGDOM, new Coordinates(51.509865, -0.118092)
     );
 }

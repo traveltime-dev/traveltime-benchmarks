@@ -3,13 +3,11 @@ package com.traveltime.benchmarks;
 import com.traveltime.sdk.TravelTimeSDK;
 import com.traveltime.sdk.dto.requests.TimeFilterFastProtoRequest;
 import com.traveltime.sdk.dto.requests.proto.OneToMany;
-import com.traveltime.sdk.dto.responses.errors.*;
 import lombok.val;
 import static com.traveltime.benchmarks.BenchmarkSetup.*;
 
 
 public class UriValidation {
-
     public static void validateBenchmarkSetup(){
         TravelTimeSDK sdk = TravelTimeSDK.builder().baseProtoUri(apiUri).credentials(credentials).build();
         val origin = Utils.randomizeCoordinates(countryCapitalCoordinates.get(country));
