@@ -7,6 +7,7 @@ import com.traveltime.sdk.dto.requests.proto.Country;
 import com.traveltime.sdk.dto.requests.proto.OneToMany;
 import com.traveltime.sdk.dto.requests.proto.Transportation;
 import lombok.val;
+import okhttp3.HttpUrl;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
@@ -14,6 +15,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -122,7 +124,7 @@ public class TimeFilterFastBenchmark {
      */
     @Benchmark
     public void serialize(ValidRequest requestSetup, Blackhole blackhole) {
-        blackhole.consume(requestSetup.request.createRequest(apiUri, credentials));
+        blackhole.consume(requestSetup.request.createRequest(Objects.requireNonNull(HttpUrl.get(apiUri)), credentials));
     }
 
     /**
