@@ -90,13 +90,13 @@ public class BenchmarkSetup {
             Map.entry(BenchmarkCountry.IRELAND, new Coordinates(53.3129170, -6.3308734)),
             Map.entry(BenchmarkCountry.LITHUANIA, new Coordinates(54.6584053, 25.2288244)),
             Map.entry(BenchmarkCountry.UNITED_KINGDOM, new Coordinates(51.509865, -0.118092)),
-            Map.entry(BenchmarkCountry.US_AKST, new Coordinates(58.3828637319633, -134.3625809419491)),
-            Map.entry(BenchmarkCountry.US_CSTN, new Coordinates(39.78784887726749, -89.65091863127024)),
-            Map.entry(BenchmarkCountry.US_CSTS, new Coordinates(32.35525548750887, -86.27556325535791)),
-            Map.entry(BenchmarkCountry.US_ESTN, new Coordinates(41.769080365485756, -72.64558301495967)),
-            Map.entry(BenchmarkCountry.US_ESTS, new Coordinates(30.44908690400848, -84.27745526420318)),
-            Map.entry(BenchmarkCountry.US_HI, new Coordinates(21.27013682953827, -157.79422361634383)),
-            Map.entry(BenchmarkCountry.US_MST, new Coordinates(33.45373209658149, -112.06599948928424)),
-            Map.entry(BenchmarkCountry.US_PST, new Coordinates(38.56092857524395, -121.47175160988444))
+            Map.entry(BenchmarkCountry.US_AKST, new Coordinates(61.218056, -149.900284)),
+            Map.entry(BenchmarkCountry.US_CSTN, new Coordinates(41.8781136, -87.6297982)),
+            Map.entry(BenchmarkCountry.US_CSTS, new Coordinates(34.7303688, -86.5861037)),
+            Map.entry(BenchmarkCountry.US_ESTN, new Coordinates(40.712776, -74.005974)),
+            Map.entry(BenchmarkCountry.US_ESTS, new Coordinates(38.907192, -77.036873)),
+            Map.entry(BenchmarkCountry.US_HI, new Coordinates(21.3098845, -157.8581401)),
+            Map.entry(BenchmarkCountry.US_MST, new Coordinates(39.739235, -104.990250)),
+            Map.entry(BenchmarkCountry.US_PST, new Coordinates(34.052235, -118.243683))
     );
 }
