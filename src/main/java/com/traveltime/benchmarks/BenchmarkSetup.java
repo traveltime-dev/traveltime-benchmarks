@@ -80,15 +80,23 @@ public class BenchmarkSetup {
             apiKey
     );
 
-    public static Map<BenchmarkCountry, Coordinates> countryCapitalCoordinates = Map.of(
-            BenchmarkCountry.LATVIA, new Coordinates(56.945614, 24.120870),
-            BenchmarkCountry.NETHERLANDS, new Coordinates(52.3650144, 4.892851),
-            BenchmarkCountry.AUSTRIA, new Coordinates(48.2244617, 16.326472),
-            BenchmarkCountry.BELGIUM, new Coordinates(50.8610222, 4.384314),
-            BenchmarkCountry.GERMANY, new Coordinates(52.5446, 13.35),
-            BenchmarkCountry.FRANCE, new Coordinates(48.8540899, 2.325747),
-            BenchmarkCountry.IRELAND, new Coordinates(53.3129170, -6.3308734),
-            BenchmarkCountry.LITHUANIA, new Coordinates(54.6584053, 25.2288244),
-            BenchmarkCountry.UNITED_KINGDOM, new Coordinates(51.509865, -0.118092)
+    public static Map<BenchmarkCountry, Coordinates> countryCapitalCoordinates = Map.ofEntries(
+            Map.entry(BenchmarkCountry.LATVIA, new Coordinates(56.945614, 24.120870)),
+            Map.entry(BenchmarkCountry.NETHERLANDS, new Coordinates(52.3650144, 4.892851)),
+            Map.entry(BenchmarkCountry.AUSTRIA, new Coordinates(48.2244617, 16.326472)),
+            Map.entry(BenchmarkCountry.BELGIUM, new Coordinates(50.8610222, 4.384314)),
+            Map.entry(BenchmarkCountry.GERMANY, new Coordinates(52.5446, 13.35)),
+            Map.entry(BenchmarkCountry.FRANCE, new Coordinates(48.8540899, 2.325747)),
+            Map.entry(BenchmarkCountry.IRELAND, new Coordinates(53.3129170, -6.3308734)),
+            Map.entry(BenchmarkCountry.LITHUANIA, new Coordinates(54.6584053, 25.2288244)),
+            Map.entry(BenchmarkCountry.UNITED_KINGDOM, new Coordinates(51.509865, -0.118092)),
+            Map.entry(BenchmarkCountry.US_AKST, new Coordinates(58.3828637319633, -134.3625809419491)),
+            Map.entry(BenchmarkCountry.US_CSTN, new Coordinates(39.78784887726749, -89.65091863127024)),
+            Map.entry(BenchmarkCountry.US_CSTS, new Coordinates(32.35525548750887, -86.27556325535791)),
+            Map.entry(BenchmarkCountry.US_ESTN, new Coordinates(41.769080365485756, -72.64558301495967)),
+            Map.entry(BenchmarkCountry.US_ESTS, new Coordinates(30.44908690400848, -84.27745526420318)),
+            Map.entry(BenchmarkCountry.US_HI, new Coordinates(21.27013682953827, -157.79422361634383)),
+            Map.entry(BenchmarkCountry.US_MST, new Coordinates(33.45373209658149, -112.06599948928424)),
+            Map.entry(BenchmarkCountry.US_PST, new Coordinates(38.56092857524395, -121.47175160988444))
     );
 }
