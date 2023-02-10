@@ -11,7 +11,15 @@ public enum BenchmarkCountry implements Country {
     FRANCE("fr"),
     IRELAND("ie"),
     LITHUANIA("lt"),
-    UNITED_KINGDOM("uk");
+    UNITED_KINGDOM("uk"),
+    US_AKST("us_akst"),
+    US_CSTN("us_cstn"),
+    US_CSTS("us_csts"),
+    US_ESTN("us_estn"),
+    US_ESTS("us_ests"),
+    US_HI("us_hi"),
+    US_MST("us_mst"),
+    US_PST("us_pst");
 
     private final String value;
 
