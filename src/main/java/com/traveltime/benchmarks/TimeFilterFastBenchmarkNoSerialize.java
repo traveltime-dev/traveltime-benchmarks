@@ -22,27 +22,22 @@ import java.util.stream.Stream;
 
 import static com.traveltime.benchmarks.BenchmarkSetup.*;
 
-public class TimeFilterFastBenchmark {
+public class TimeFilterFastBenchmarkNoSerialize {
 
     public static void main(String[] args) throws RunnerException {
-        if(removeSerialize){
-            TimeFilterFastBenchmarkNoSerialize.main(args);
-        }
-        else {
-            new BenchmarkSetup(); // Instantiating this validates whether all environment variables have been set
-            UriValidation.validateBenchmarkSetup();
-            Options options = new OptionsBuilder()
-                    .include(TimeFilterFastBenchmarkNoSerialize.class.getSimpleName())
-                    .forks(1)
-                    .jvmArgs(jmhJvmArgs)
-                    .warmupForks(2)
-                    .measurementIterations(5)
-                    .mode(Mode.AverageTime)
-                    .timeUnit(TimeUnit.MILLISECONDS)
-                    .param("destinationCount", destinationCounts)
-                    .build();
-            new Runner(options).run();
-        }
+        new BenchmarkSetup(); // Instantiating this validates whether all environment variables have been set
+        UriValidation.validateBenchmarkSetup();
+        Options options = new OptionsBuilder()
+                .include(TimeFilterFastBenchmarkNoSerialize.class.getSimpleName())
+                .forks(1)
+                .jvmArgs(jmhJvmArgs)
+                .warmupForks(2)
+                .measurementIterations(5)
+                .mode(Mode.AverageTime)
+                .timeUnit(TimeUnit.MILLISECONDS)
+                .param("destinationCount", destinationCounts)
+                .build();
+        new Runner(options).run();
     }
 
     /**
@@ -127,10 +122,10 @@ public class TimeFilterFastBenchmark {
     /**
      * Measures the time taken to serialize a request, which depends on the machine running the benchmark
      */
-    @Benchmark
-    public void serialize(ValidRequest requestSetup, Blackhole blackhole) {
-        blackhole.consume(requestSetup.request.createRequest(Objects.requireNonNull(HttpUrl.get(apiUri)), credentials));
-    }
+//    @Benchmark
+//    public void serialize(ValidRequest requestSetup, Blackhole blackhole) {
+//        blackhole.consume(requestSetup.request.createRequest(Objects.requireNonNull(HttpUrl.get(apiUri)), credentials));
+//    }
 
     /**
      * By sending an invalid request which is of the same size as a valid one,

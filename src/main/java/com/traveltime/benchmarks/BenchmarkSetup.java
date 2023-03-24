@@ -22,6 +22,7 @@ public class BenchmarkSetup {
     public static final URI apiUri;
     public static final String[] destinationCounts;
     public static final String[] jmhJvmArgs;
+    public static final boolean removeSerialize;
 
     static {
         val requiredEnvVars = Set.of(
@@ -66,6 +67,11 @@ public class BenchmarkSetup {
         } else {
             jmhJvmArgs = new String[]{};
         }
+        val removeSerializeOrNull = System.getenv("REMOVE_SERIALIZE");
+        if(removeSerializeOrNull != null){
+            removeSerialize = true;
+        }
+        else removeSerialize = false;
 
         appId = System.getenv("APP_ID");
         apiKey = System.getenv("API_KEY");
