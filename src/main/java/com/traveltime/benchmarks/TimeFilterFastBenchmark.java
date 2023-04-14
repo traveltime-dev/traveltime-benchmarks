@@ -120,7 +120,11 @@ public class TimeFilterFastBenchmark {
     @Benchmark
     @Group("timeRequests")
     public void sendProto(Sdk sdkSetup, ValidRequest requestSetup, Blackhole blackhole) {
-        blackhole.consume(sdkSetup.sdk.sendProtoBatched(requestSetup.request));
+        if (useBatch) {
+            blackhole.consume(sdkSetup.sdk.sendProtoBatched(requestSetup.request));
+        } else {
+            blackhole.consume(sdkSetup.sdk.sendProto(requestSetup.request));
+        }
     }
 
     /**
@@ -138,6 +142,10 @@ public class TimeFilterFastBenchmark {
     @Benchmark
     @Group("checkLatency")
     public void checkLatency(Sdk sdkSetup, InvalidRequest invalidRequestSetup, Blackhole blackhole) {
-        blackhole.consume(sdkSetup.sdk.sendProtoBatched(invalidRequestSetup.request));
+        if (useBatch) {
+            blackhole.consume(sdkSetup.sdk.sendProtoBatched(invalidRequestSetup.request));
+        } else {
+            blackhole.consume(sdkSetup.sdk.sendProto(invalidRequestSetup.request));
+        }
     }
 }
