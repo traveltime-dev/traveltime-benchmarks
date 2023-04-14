@@ -6,14 +6,16 @@ import com.traveltime.sdk.dto.requests.proto.OneToMany;
 import lombok.val;
 import static com.traveltime.benchmarks.BenchmarkSetup.*;
 
+import java.util.Random;
 
 public class UriValidation {
     public static void validateBenchmarkSetup(){
         TravelTimeSDK sdk = TravelTimeSDK.builder().baseProtoUri(apiUri).credentials(credentials).build();
-        val origin = Utils.randomizeCoordinates(countryCapitalCoordinates.get(country));
+        val random = new Random(0);
+        val origin = Utils.randomizeCoordinates(random, countryCapitalCoordinates.get(country));
         OneToMany oneToMany = new OneToMany(
                 origin,
-                Utils.coordinatesAroundOrigin(origin, destinationCounts.length),
+                Utils.coordinatesAroundOrigin(random, origin, destinationCounts.length),
                 mode,
                 travelTime,
                 country

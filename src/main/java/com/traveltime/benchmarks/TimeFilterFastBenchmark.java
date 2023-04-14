@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.Random;
 
 import static com.traveltime.benchmarks.BenchmarkSetup.*;
 
@@ -68,14 +69,17 @@ public class TimeFilterFastBenchmark {
 
         public TimeFilterFastProtoRequest request;
 
+        private static int invocationId = 0;
+
         @Setup(Level.Invocation)
         public void setUpInvocation() {
-
-            val origin = Utils.randomizeCoordinates(countryCapitalCoordinates.get(country));
+            val random = new Random(seed + invocationId);
+            invocationId += 1;
+            val origin = Utils.randomizeCoordinates(random, countryCapitalCoordinates.get(country));
 
             OneToMany oneToMany = new OneToMany(
                     origin,
-                    Utils.coordinatesAroundOrigin(origin, destinationCount),
+                    Utils.coordinatesAroundOrigin(random, origin, destinationCount),
                     mode,
                     travelTime,
                     country
