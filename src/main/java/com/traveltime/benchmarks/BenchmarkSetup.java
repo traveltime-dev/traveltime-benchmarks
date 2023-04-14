@@ -22,6 +22,7 @@ public class BenchmarkSetup {
     public static final URI apiUri;
     public static final String[] destinationCounts;
     public static final String[] jmhJvmArgs;
+    public static final boolean useBatch;
     public static final long seed;
 
     static {
@@ -78,6 +79,22 @@ public class BenchmarkSetup {
             }
         } else {
             seed = System.currentTimeMillis();
+        }
+
+        val useBatchOrNull = System.getenv("USE_BATCH");
+        if (useBatchOrNull != null) {
+            val lowerCase = useBatchOrNull.toLowerCase();
+            if (Set.of("y", "yes", "true").contains(lowerCase)) {
+                useBatch = true;
+            } else if (Set.of("n", "no", "false").contains(lowerCase)) {
+                useBatch = false;
+            } else {
+                throw new RuntimeException("Could not start benchmark. Unable to parse environment variable USE_BATCH " +
+                        "as boolean value. Variable value was: " + useBatchOrNull + "\n" +
+                        "Expected values: are 'yes', 'y', 'true' for true and 'no', 'n', 'false' for false.");
+            }
+        } else {
+            useBatch = true;
         }
 
         appId = System.getenv("APP_ID");
