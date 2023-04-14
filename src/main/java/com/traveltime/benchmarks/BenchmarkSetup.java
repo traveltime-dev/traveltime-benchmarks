@@ -82,8 +82,8 @@ public class BenchmarkSetup {
 
         appId = System.getenv("APP_ID");
         apiKey = System.getenv("API_KEY");
-        country = Country.valueOf(System.getenv("COUNTRY"));
-        mode = Transportation.valueOf(System.getenv("TRANSPORT_MODE"));
+        country = BenchmarkCountry.valueOf(System.getenv("COUNTRY"));
+        mode = Transportation.Modes.valueOf(System.getenv("TRANSPORT_MODE"));
         travelTime = Integer.valueOf(System.getenv("TRAVEL_TIME"));
         apiUri = URI.create(System.getenv("API_URI"));
     }
@@ -93,14 +93,23 @@ public class BenchmarkSetup {
             apiKey
     );
 
-    public static Map<Country, Coordinates> countryCapitalCoordinates = Map.of(
-            Country.NETHERLANDS, new Coordinates(52.3650144, 4.892851),
-            Country.AUSTRIA, new Coordinates(48.2244617, 16.326472),
-            Country.BELGIUM, new Coordinates(50.8610222, 4.384314),
-            Country.GERMANY, new Coordinates(52.5446, 13.35),
-            Country.FRANCE, new Coordinates(48.8540899, 2.325747),
-            Country.IRELAND, new Coordinates(53.3129170, -6.3308734),
-            Country.LITHUANIA, new Coordinates(54.6584053, 25.2288244),
-            Country.UNITED_KINGDOM, new Coordinates(51.509865, -0.118092)
+    public static Map<BenchmarkCountry, Coordinates> countryCapitalCoordinates = Map.ofEntries(
+            Map.entry(BenchmarkCountry.LATVIA, new Coordinates(56.945614, 24.120870)),
+            Map.entry(BenchmarkCountry.NETHERLANDS, new Coordinates(52.3650144, 4.892851)),
+            Map.entry(BenchmarkCountry.AUSTRIA, new Coordinates(48.2244617, 16.326472)),
+            Map.entry(BenchmarkCountry.BELGIUM, new Coordinates(50.8610222, 4.384314)),
+            Map.entry(BenchmarkCountry.GERMANY, new Coordinates(52.5446, 13.35)),
+            Map.entry(BenchmarkCountry.FRANCE, new Coordinates(48.8540899, 2.325747)),
+            Map.entry(BenchmarkCountry.IRELAND, new Coordinates(53.3129170, -6.3308734)),
+            Map.entry(BenchmarkCountry.LITHUANIA, new Coordinates(54.6584053, 25.2288244)),
+            Map.entry(BenchmarkCountry.UNITED_KINGDOM, new Coordinates(51.509865, -0.118092)),
+            Map.entry(BenchmarkCountry.US_AKST, new Coordinates(61.218056, -149.900284)),
+            Map.entry(BenchmarkCountry.US_CSTN, new Coordinates(41.8781136, -87.6297982)),
+            Map.entry(BenchmarkCountry.US_CSTS, new Coordinates(34.7303688, -86.5861037)),
+            Map.entry(BenchmarkCountry.US_ESTN, new Coordinates(40.712776, -74.005974)),
+            Map.entry(BenchmarkCountry.US_ESTS, new Coordinates(38.907192, -77.036873)),
+            Map.entry(BenchmarkCountry.US_HI, new Coordinates(21.3098845, -157.8581401)),
+            Map.entry(BenchmarkCountry.US_MST, new Coordinates(39.739235, -104.990250)),
+            Map.entry(BenchmarkCountry.US_PST, new Coordinates(34.052235, -118.243683))
     );
 }

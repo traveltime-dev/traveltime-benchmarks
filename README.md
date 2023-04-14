@@ -1,12 +1,12 @@
 # TravelTime Benchmarks
 
-This repository hosts benchmarks for measuring the performance of the TravelTime TimeFilterFast endpoint. Find out more at https://traveltime.com/
+This repository hosts benchmarks for measuring the performance of the TravelTime TimeFilterFast(Proto) endpoint. Find out more at https://traveltime.com/
 
 # Gain access
 
 First, obtain an App ID and an API key from https://docs.traveltime.com/api/overview/getting-keys 
 
-You will need to email sales@traveltime.com or book a demo at https://traveltime.com/book-demo to gain access to TimeFilterFast.  
+You will need to email sales@traveltime.com or book a demo at https://traveltime.com/book-demo to gain access to TimeFilterFast(Proto).  
 
 # Usage
 
@@ -23,7 +23,7 @@ docker run \
 -ti igeolise/traveltime-benchmarks:latest
 ```
 
-Or with maven, make sure JAVA_HOME points to JDK11:
+Or with maven:
 
 ```
 APP_ID={{YOUR_APP_ID}} \
@@ -32,7 +32,7 @@ API_URI=https://proto.api.traveltimeapp.com/api/v2/ \
 COUNTRY=UNITED_KINGDOM \
 TRANSPORT_MODE=DRIVING_FERRY \
 TRAVEL_TIME=7200 \
-mvn clean install exec:exec
+./run.sh
 ```
 
 ## Optional environment variables
@@ -53,6 +53,14 @@ GERMANY
 FRANCE
 IRELAND
 LITHUANIA
+US_AKST
+US_CSTN
+US_CSTS
+US_ESTN
+US_ESTS
+US_HI
+US_MST
+US_PST
 ```
 Modes:
 ```
@@ -60,9 +68,12 @@ DRIVING_FERRY
 PUBLIC_TRANSPORT
 WALKING_FERRY
 CYCLING_FERRY
+DRIVING
+WALKING
+CYCLING
 ```
 
-Maximum travel time is currently 7200 (2 hours).
+Maximum travel time is currently 10800 (3 hours).
 
 # Benchmark results
 
@@ -165,6 +176,6 @@ A new docker image with modified benchmarks can be built by running `./build.sh`
 ## Factors we have limited control over
 
 * Network latency
-  * For services such as TimeFilterFast, where processing itself is expected to take 30-100ms depending on the request size, network latency can make up the lion's share of the response time.
+  * For services such as TimeFilterFast(Proto), where processing itself is expected to take 30-100ms depending on the request size, network latency can make up the lion's share of the response time.
 * What machine is running the benchmark
   * The client machine is responsible for request serialization, which can take as little as 1ms on a production-grade server, but much longer if running on a developer's laptop. 
