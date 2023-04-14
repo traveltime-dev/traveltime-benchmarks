@@ -84,7 +84,7 @@ public class TimeFilterFastBenchmark {
                     travelTime,
                     country
             );
-            request = new TimeFilterFastProtoRequest(oneToMany);
+            request = new TimeFilterFastProtoRequest(oneToMany, "#" + destinationCount);
         }
     }
 
@@ -109,7 +109,7 @@ public class TimeFilterFastBenchmark {
                     1,
                     Country.UNITED_KINGDOM
             );
-            request = new TimeFilterFastProtoRequest(invalidOneToMany);
+            request = new TimeFilterFastProtoRequest(invalidOneToMany, "#" + destinationCount);
         }
     }
 

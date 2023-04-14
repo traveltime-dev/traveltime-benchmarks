@@ -20,7 +20,7 @@ public class UriValidation {
                 travelTime,
                 country
         );
-        TimeFilterFastProtoRequest request = new TimeFilterFastProtoRequest(oneToMany);
+        TimeFilterFastProtoRequest request = new TimeFilterFastProtoRequest(oneToMany, null);
         val response = sdk.sendProtoBatched(request);
         if(response.isLeft()) throw new RuntimeException("ERROR MESSAGE: " + response.getLeft().getMessage() + "\n" +
         "This may be caused by incorrect API credentials, or unsupported transport mode.");
