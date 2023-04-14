@@ -17,6 +17,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.Random;
 
 import static com.traveltime.benchmarks.BenchmarkSetup.*;
 
@@ -65,14 +66,17 @@ public class TimeFilterFastBenchmark {
 
         public TimeFilterFastProtoRequest request;
 
+        private static int invocationId = 0;
+
         @Setup(Level.Invocation)
         public void setUpInvocation() {
-
-            val origin = Utils.randomizeCoordinates(countryCapitalCoordinates.get(country));
+            val random = new Random(seed + invocationId);
+            invocationId += 1;
+            val origin = Utils.randomizeCoordinates(random, countryCapitalCoordinates.get(country));
 
             OneToMany oneToMany = new OneToMany(
                     origin,
-                    Utils.coordinatesAroundOrigin(origin, destinationCount),
+                    Utils.coordinatesAroundOrigin(random, origin, destinationCount),
                     mode,
                     travelTime,
                     country
@@ -81,56 +85,56 @@ public class TimeFilterFastBenchmark {
         }
     }
 
-    @State(Scope.Benchmark)
-    public static class InvalidRequest {
-        @Param({"0"}) // Always overridden by .param("destinationCount", destinationCounts) in the options builder
-        public int destinationCount;
-
-        public TimeFilterFastProtoRequest request;
-
-        @Setup(Level.Invocation)
-        public void setUpInvocation() {
-            val destinations = Stream
-                    .generate(() -> new Coordinates(0.01, 0.01))
-                    .limit(destinationCount)
-                    .collect(Collectors.toList());
-
-            OneToMany invalidOneToMany = new OneToMany(
-                    new Coordinates(0.0, 0.0),
-                    destinations,
-                    Transportation.DRIVING_FERRY,
-                    1,
-                    Country.UNITED_KINGDOM
-            );
-            request = new TimeFilterFastProtoRequest(invalidOneToMany);
-        }
-    }
-
-
-    /**
-     * Serializes and sends a request to the {@link BenchmarkSetup#apiUri} endpoint
-     */
-    @Benchmark
-    @Group("timeRequests")
-    public void sendProto(Sdk sdkSetup, ValidRequest requestSetup, Blackhole blackhole) {
-        blackhole.consume(sdkSetup.sdk.sendProtoBatched(requestSetup.request));
-    }
-
-    /**
-     * Measures the time taken to serialize a request, which depends on the machine running the benchmark
-     */
-    @Benchmark
-    public void serialize(ValidRequest requestSetup, Blackhole blackhole) {
-        blackhole.consume(requestSetup.request.createRequest(apiUri, credentials));
-    }
-
-    /**
-     * By sending an invalid request which is of the same size as a valid one,
-     * we can measure the approximate latency from the machine which is running the benchmark
-     */
-    @Benchmark
-    @Group("checkLatency")
-    public void checkLatency(Sdk sdkSetup, InvalidRequest invalidRequestSetup, Blackhole blackhole) {
-        blackhole.consume(sdkSetup.sdk.sendProtoBatched(invalidRequestSetup.request));
-    }
+// @State(Scope.Benchmark)
+// public static class InvalidRequest {
+//     @Param({"0"}) // Always overridden by .param("destinationCount", destinationCounts) in the options builder
+//     public int destinationCount;
+//
+//     public TimeFilterFastProtoRequest request;
+//
+//     @Setup(Level.Invocation)
+//     public void setUpInvocation() {
+//         val destinations = Stream
+//                 .generate(() -> new Coordinates(0.01, 0.01))
+//                 .limit(destinationCount)
+//                 .collect(Collectors.toList());
+//
+//         OneToMany invalidOneToMany = new OneToMany(
+//                 new Coordinates(0.0, 0.0),
+//                 destinations,
+//                 Transportation.DRIVING_FERRY,
+//                 1,
+//                 Country.UNITED_KINGDOM
+//         );
+//         request = new TimeFilterFastProtoRequest(invalidOneToMany);
+//     }
+// }
+// */
+//
+//
+   /**
+    * Serializes and sends a request to the {@link BenchmarkSetup#apiUri} endpoint
+    */
+   @Benchmark
+   @Group("timeRequests")
+   public void sendProto(Sdk sdkSetup, ValidRequest requestSetup, Blackhole blackhole) {
+       blackhole.consume(sdkSetup.sdk.sendProtoBatched(requestSetup.request));
+   }
+  
+// /**
+//  * Measures the time taken to serialize a request, which depends on the machine running the benchmark
+// @Benchmark
+// public void serialize(ValidRequest requestSetup, Blackhole blackhole) {
+//     blackhole.consume(requestSetup.request.createRequest(apiUri, credentials));
+// }
+//
+// /**
+//  * By sending an invalid request which is of the same size as a valid one,
+//  * we can measure the approximate latency from the machine which is running the benchmark
+//  */
+// @Benchmark
+// @Group("checkLatency")
+// public void checkLatency(Sdk sdkSetup, InvalidRequest invalidRequestSetup, Blackhole blackhole) {
+//     blackhole.consume(sdkSetup.sdk.sendProtoBatched(invalidRequestSetup.request));
+// }
 }

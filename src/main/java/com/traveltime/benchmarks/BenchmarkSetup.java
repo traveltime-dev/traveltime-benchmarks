@@ -22,6 +22,7 @@ public class BenchmarkSetup {
     public static final URI apiUri;
     public static final String[] destinationCounts;
     public static final String[] jmhJvmArgs;
+    public static final long seed;
 
     static {
         val requiredEnvVars = Set.of(
@@ -65,6 +66,18 @@ public class BenchmarkSetup {
             jmhJvmArgs = jmhJvmArgsStringOrNull.split(",");
         } else {
             jmhJvmArgs = new String[]{};
+        }
+
+        val seedOrNull = System.getenv("SEED");
+        if (seedOrNull != null) {
+            try {
+                seed = Long.parseLong(seedOrNull);
+            } catch (Throwable e) {
+                throw new RuntimeException("Could not start benchmark. Unable to parse environment variable SEED " +
+                        "as long value. Variable value was: " + seedOrNull);
+            }
+        } else {
+            seed = System.currentTimeMillis();
         }
 
         appId = System.getenv("APP_ID");
