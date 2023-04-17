@@ -32,8 +32,8 @@ public class TimeFilterFastBenchmark {
                 .include(TimeFilterFastBenchmark.class.getSimpleName())
                 .forks(1)
                 .jvmArgs(jmhJvmArgs)
-                .warmupForks(2)
-                .measurementIterations(5)
+                .warmupForks(1)
+                .measurementIterations(10)
                 .mode(Mode.AverageTime)
                 .timeUnit(TimeUnit.MILLISECONDS)
                 .param("destinationCount", destinationCounts)
@@ -63,11 +63,11 @@ public class TimeFilterFastBenchmark {
      * Generates requests for timing the performance of a TimeFilterFast endpoint
      */
     @State(Scope.Benchmark)
-    public static class ValidRequest {
+    public static class ValidRequests {
         @Param({"0"}) // Always overridden by .param("destinationCount", destinationCounts) in the options builder
         public int destinationCount;
 
-        public TimeFilterFastProtoRequest request;
+        public TimeFilterFastProtoRequest[] requests;
 
         private static int invocationId = 0;
 
@@ -75,41 +75,50 @@ public class TimeFilterFastBenchmark {
         public void setUpInvocation() {
             val random = new Random(seed + invocationId);
             invocationId += 1;
-            val origin = Utils.randomizeCoordinates(random, countryCapitalCoordinates.get(country));
 
-            OneToMany oneToMany = new OneToMany(
-                    origin,
-                    Utils.coordinatesAroundOrigin(random, origin, destinationCount),
-                    mode,
-                    travelTime,
-                    country
-            );
-            request = new TimeFilterFastProtoRequest(oneToMany, "#" + destinationCount);
+            requests = new TimeFilterFastProtoRequest[requestsPerJmhInvocation];
+
+            for (int i = 0; i < requestsPerJmhInvocation; i += 1) {
+                val origin = Utils.randomizeCoordinates(random, countryCapitalCoordinates.get(country));
+
+                OneToMany oneToMany = new OneToMany(
+                        origin,
+                        Utils.coordinatesAroundOrigin(random, origin, destinationCount),
+                        mode,
+                        travelTime,
+                        country
+                );
+                requests[i] = new TimeFilterFastProtoRequest(oneToMany, "cor#" + destinationCount);
+            }
         }
     }
 
     @State(Scope.Benchmark)
-    public static class InvalidRequest {
+    public static class InvalidRequests {
         @Param({"0"}) // Always overridden by .param("destinationCount", destinationCounts) in the options builder
         public int destinationCount;
 
-        public TimeFilterFastProtoRequest request;
+        public TimeFilterFastProtoRequest[] requests;
 
         @Setup(Level.Invocation)
         public void setUpInvocation() {
-            val destinations = Stream
-                    .generate(() -> new Coordinates(0.01, 0.01))
-                    .limit(destinationCount)
-                    .collect(Collectors.toList());
+            requests = new TimeFilterFastProtoRequest[requestsPerJmhInvocation];
 
-            OneToMany invalidOneToMany = new OneToMany(
-                    new Coordinates(0.0, 0.0),
-                    destinations,
-                    Transportation.DRIVING_FERRY,
-                    1,
-                    Country.UNITED_KINGDOM
-            );
-            request = new TimeFilterFastProtoRequest(invalidOneToMany, "#" + destinationCount);
+            for (int i = 0; i < requestsPerJmhInvocation; i += 1) {
+                val destinations = Stream
+                        .generate(() -> new Coordinates(0.01, 0.01))
+                        .limit(destinationCount)
+                        .collect(Collectors.toList());
+
+                OneToMany invalidOneToMany = new OneToMany(
+                        new Coordinates(0.0, 0.0),
+                        destinations,
+                        Transportation.DRIVING_FERRY,
+                        1,
+                        Country.UNITED_KINGDOM
+                );
+                requests[i] = new TimeFilterFastProtoRequest(invalidOneToMany, "inv#" + destinationCount);
+            }
         }
     }
 
@@ -119,11 +128,15 @@ public class TimeFilterFastBenchmark {
      */
     @Benchmark
     @Group("timeRequests")
-    public void sendProto(Sdk sdkSetup, ValidRequest requestSetup, Blackhole blackhole) {
+    public void sendProto(Sdk sdkSetup, ValidRequests requestSetup, Blackhole blackhole) {
         if (useBatch) {
-            blackhole.consume(sdkSetup.sdk.sendProtoBatched(requestSetup.request));
+            for (int i = 0; i < requestsPerJmhInvocation; i += 1) {
+                blackhole.consume(sdkSetup.sdk.sendProtoBatched(requestSetup.requests[i]));
+            }
         } else {
-            blackhole.consume(sdkSetup.sdk.sendProto(requestSetup.request));
+            for (int i = 0; i < requestsPerJmhInvocation; i += 1) {
+                blackhole.consume(sdkSetup.sdk.sendProto(requestSetup.requests[i]));
+            }
         }
     }
 
@@ -131,8 +144,10 @@ public class TimeFilterFastBenchmark {
      * Measures the time taken to serialize a request, which depends on the machine running the benchmark
      */
     @Benchmark
-    public void serialize(ValidRequest requestSetup, Blackhole blackhole) {
-        blackhole.consume(requestSetup.request.createRequest(Objects.requireNonNull(HttpUrl.get(apiUri)), credentials));
+    public void serialize(ValidRequests requestSetup, Blackhole blackhole) {
+        for (int i = 0; i < requestsPerJmhInvocation; i += 1) {
+            blackhole.consume(requestSetup.requests[i].createRequest(Objects.requireNonNull(HttpUrl.get(apiUri)), credentials));
+        }
     }
 
     /**
@@ -141,11 +156,15 @@ public class TimeFilterFastBenchmark {
      */
     @Benchmark
     @Group("checkLatency")
-    public void checkLatency(Sdk sdkSetup, InvalidRequest invalidRequestSetup, Blackhole blackhole) {
+    public void checkLatency(Sdk sdkSetup, InvalidRequests invalidRequestSetup, Blackhole blackhole) {
         if (useBatch) {
-            blackhole.consume(sdkSetup.sdk.sendProtoBatched(invalidRequestSetup.request));
+            for (int i = 0; i < requestsPerJmhInvocation; i += 1) {
+                blackhole.consume(sdkSetup.sdk.sendProtoBatched(invalidRequestSetup.requests[i]));
+            }
         } else {
-            blackhole.consume(sdkSetup.sdk.sendProto(invalidRequestSetup.request));
+            for (int i = 0; i < requestsPerJmhInvocation; i += 1) {
+                blackhole.consume(sdkSetup.sdk.sendProto(invalidRequestSetup.requests[i]));
+            }
         }
     }
 }

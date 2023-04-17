@@ -24,6 +24,7 @@ public class BenchmarkSetup {
     public static final String[] jmhJvmArgs;
     public static final boolean useBatch;
     public static final long seed;
+    public static final int requestsPerJmhInvocation;
 
     static {
         val requiredEnvVars = Set.of(
@@ -79,6 +80,18 @@ public class BenchmarkSetup {
             }
         } else {
             seed = System.currentTimeMillis();
+        }
+
+        val requestsPerInvocationOrNull = System.getenv("REQUESTS_PER_INVOCATION");
+        if (requestsPerInvocationOrNull != null) {
+            try {
+                requestsPerJmhInvocation = Integer.parseInt(requestsPerInvocationOrNull);
+            } catch (Throwable e) {
+                throw new RuntimeException("Could not start benchmark. Unable to parse environment variable REQUESTS_PER_INVOCATION " +
+                        "as int value. Variable value was: " + requestsPerInvocationOrNull);
+            }
+        } else {
+            requestsPerJmhInvocation = 1;
         }
 
         val useBatchOrNull = System.getenv("USE_BATCH");
