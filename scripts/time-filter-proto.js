@@ -18,8 +18,8 @@ export default function () {
     const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
     const query = __ENV.QUERY || `api/v2/${country}/time-filter/fast/${transportation}`
     const countryCoords = countries[country]
-
     const destinationsAmount = parseInt(destinations)
+
     randomSeed(seed)
     const url = `https://${appId}:${apiKey}@${host}/${query}`
 
@@ -44,7 +44,7 @@ export default function () {
     });
 
     check(decodedResponse, {
-        'response body is not empty': (r) => r.length != 0,
+        'response body is not empty': (r) => r.length !== 0,
     });
 
 
@@ -53,17 +53,17 @@ export default function () {
 
 function transportationType(transportation) {
     switch (transportation) {
-        case "driving+ferry":
-            return "DRIVING_AND_FERRY"
-        case "pt":
-            return "PUBLIC_TRANSPORT"
+        case 'driving+ferry':
+            return 'DRIVING_AND_FERRY'
+        case 'pt':
+            return 'PUBLIC_TRANSPORT'
         default:
-            return "NONE"
+            return 'NONE'
     }
 }
 
 
-function generateBody(destinationsAmount, coord) {
+function generateBody(destinationsAmount, coord, transportation) {
     const diff = 0.005
     const departure = generateRandomCoordinate(coord.lat, coord.lng, diff)
     const destinations = generateDestinations(destinationsAmount, departure, diff)
@@ -72,7 +72,7 @@ function generateBody(destinationsAmount, coord) {
             departureLocation: departure,
             locationDeltas: destinationDeltas(departure, destinations),
             transportation: {
-                type: 'DRIVING_AND_FERRY'
+                type: transportationType(transportation)
             },
             travelTime: 7200
         }
