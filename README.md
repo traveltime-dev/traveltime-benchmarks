@@ -2,10 +2,17 @@
 
 ### Running K6 Tests with Docker
 
-The simplest way to run these benchmarks is to use docker-compose:
+The simplest way to run these benchmarks is to use docker:
 
 ```bash 
-docker-compose up
+docker run 
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY
+    -e HOST={HOST} // optional
+    -e TRANSPORTATION={TRANSPORTATION} // optional
+    -e COUNTRY={COUNTRY} // optional
+    -e TRAVEL_TIME={TRAVEL_TIME} // optional
+    -ti igeolise/traveltime-k6-benchmarks:latest
 ```
 
 ### Metrics:
