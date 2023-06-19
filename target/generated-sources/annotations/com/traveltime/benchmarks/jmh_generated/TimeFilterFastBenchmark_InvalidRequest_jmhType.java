@@ -1,0 +1,4 @@
+package com.traveltime.benchmarks.jmh_generated;
+public class TimeFilterFastBenchmark_InvalidRequest_jmhType extends TimeFilterFastBenchmark_InvalidRequest_jmhType_B3 {
+}
+
