@@ -1,5 +1,13 @@
 # traveltime-benchmarks
 
+This repository hosts benchmarks for measuring the performance of the TravelTime endpoints. Find out more at https://traveltime.com/
+
+# Gain access
+
+First, obtain an App ID and an API key from https://docs.traveltime.com/api/overview/getting-keys
+
+You will need to email sales@traveltime.com or book a demo at https://traveltime.com/book-demo to gain access to TimeFilterFast(Proto).
+
 ### Running K6 Tests with Docker
 
 The simplest way to run these benchmarks is to use docker:
