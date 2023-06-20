@@ -15,5 +15,3 @@ COPY --from=builder /app/k6 /bin/
 COPY /scripts /scripts/
 COPY /proto /proto/
 
-CMD ["k6", "run"]
-
