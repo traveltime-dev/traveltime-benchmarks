@@ -18,6 +18,7 @@ docker run
 
 ### Metrics:
 
+All used metrics are described here:
 https://k6.io/docs/using-k6/metrics/
 
 ### Running locally:
