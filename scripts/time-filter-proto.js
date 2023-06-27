@@ -1,60 +1,63 @@
 import http from 'k6/http';
 import protobuf from 'k6/x/protobuf';
-import {check, sleep, randomSeed} from 'k6';
-import {generateDestinations, destinationDeltas, generateRandomCoordinate, countries} from './common.js';
+import {check, randomSeed, sleep} from 'k6';
+import {countries, destinationDeltas, generateDestinations, generateRandomCoordinate} from './common.js';
+import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
 
 
 const configs = {
     scenarios: {
-        main_scenario: {
+        sending_5000_destinations: {
             executor: 'constant-vus',
-            duration: '4m',
-            vus: 2,
-            startTime: '20s',
-            gracefulStop: '20s',
-        },
-    }
-}
+            duration: '5s',
+            env: {DESTINATIONS: '5000'},
 
-// used for continious benchmarking
-if (__ENV.SCENARIO === 'load-test') {
-    configs.scenarios = {
-        first_scenario: {
-            executor: 'constant-vus',
-            duration: '4m',
-            vus: 2,
-            startTime: '20s',
-            gracefulStop: '20s',
+            vus: 1,
+            startTime: '1s',
+            gracefulStop: '2s',
         },
-        second_scenario: {
+        sending_10000_destinations: {
             executor: 'constant-vus',
             env: {DESTINATIONS: '10000'},
-            duration: '4m',
-            vus: 5,
-            startTime: '5m',
-            gracefulStop: '20s',
+            duration: '5s',
+            vus: 1,
+            startTime: '1s',
+            gracefulStop: '2s',
         },
-        third_scenario: {
+        sending_25000_destinations: {
             executor: 'constant-vus',
             env: {DESTINATIONS: '25000'},
-            duration: '4m',
-            vus: 5,
-            startTime: '10m',
-            gracefulStop: '20s',
+            duration: '5s',
+            vus: 1,
+            startTime: '1s',
+            gracefulStop: '2s',
         },
-        forth_scenario: {
+        sending_100000_destinations: {
             executor: 'constant-vus',
-            duration: '4m',
             env: {DESTINATIONS: '100000'},
-            vus: 5,
-            startTime: '15m',
-            gracefulStop: '20s',
-        }
+            duration: '5s',
+            vus: 1,
+            startTime: '1s',
+            gracefulStop: '2s',
+        },
+    },
+    summaryTrendStats: ['avg', 'min', 'max', 'p(90)', 'p(95)'],
+
+    thresholds: {
+        // Intentionally empty. We'll programatically define our bogus
+        // thresholds (to generate the sub-metrics) below. In your real-world
     }
 }
 
 export let options = configs
 
+for (let key in options.scenarios) {
+    options.thresholds[`http_req_duration{scenario:${key}}`] = ['max>=0']
+    options.thresholds[`http_req_receiving{scenario:${key}}`] = ['max>=0']
+    options.thresholds[`http_req_sending{scenario:${key}}`] = ['max>=0']
+    options.thresholds[`http_req_connecting{scenario:${key}}`] = ['max>=0']
+
+}
 
 export default function () {
     const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
@@ -103,9 +106,45 @@ export default function () {
     sleep(1);
 }
 
-function transportationType(transportation) {
-    console.log(transportation)
+export function handleSummary(data) {
+    delete data.metrics['http_req_duration']
+    delete data.metrics['http_req_sending']
+    delete data.metrics['http_req_receiving']
+    delete data.metrics['http_req_blocked']
+    delete data.metrics[`http_req_duration{expected_response:true}`]
+    delete data.metrics['http_req_waiting']
+    delete data.metrics['http_reqs']
+    delete data.metrics['iteration_duration']
+    delete data.metrics['iterations']
+    delete data.metrics['vus']
+    delete data.metrics['http_req_connecting']
+    delete data.metrics['http_req_failed']
+    delete data.metrics['http_req_tls_handshaking']
 
+    data = reportPerDestination(data, 5000)
+    data = reportPerDestination(data, 10000)
+    data = reportPerDestination(data, 25000)
+    data = reportPerDestination(data, 100000)
+
+    return {
+        stdout: textSummary(data, { indent: ' ', enableColors: true }),
+    }
+}
+
+function reportPerDestination(data, destinations) {
+    data.metrics[`http_req_duration(${destinations} destinations)`] = data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
+    delete data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
+    data.metrics[`http_req_sending(${destinations} destinations)`] = data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
+    delete data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
+    data.metrics[`http_req_receiving(${destinations} destinations)`] = data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
+    delete data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
+    data.metrics[`http_req_connecting(${destinations} destinations)`] = data.metrics[`http_req_connecting{scenario:sending_${destinations}_destinations}`]
+    delete data.metrics[`http_req_connecting{scenario:sending_${destinations}_destinations}`]
+    return data
+}
+
+
+function transportationType(transportation) {
     switch (transportation) {
         case 'driving+ferry':
             return 'DRIVING_AND_FERRY'
@@ -132,4 +171,6 @@ function generateBody(destinationsAmount, coord, transportation, travelTime) {
         }
     })
 }
-
+//  http_req_receiving.............: avg=7.13ms   min=32µs     med=278µs    max=27ms     p(90)=15.43ms  p(95)=16.48ms
+//  http_req_sending...............: avg=147.41µs min=63µs     med=138µs    max=525µs    p(90)=224.6µs  p(95)=245.89µs
+//
