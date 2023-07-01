@@ -125,6 +125,10 @@ function transportationType(transportation) {
     switch (transportation) {
         case 'driving+ferry':
             return 'DRIVING_AND_FERRY'
+        case 'walking+ferry':
+            return 'WALKING_FERRY'
+        case 'cycling+ferry':
+            return 'CYCLING_FERRY'
         case 'pt':
             return 'PUBLIC_TRANSPORT'
         default:

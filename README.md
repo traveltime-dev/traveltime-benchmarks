@@ -33,6 +33,35 @@ https://k6.io/docs/using-k6/metrics/
 * http_req_sending - Time spent sending data to the remote host
 * http_req_receiving - Time spent receiving response data from the remote host
 
+### Supported countries, transport modes
+Countries:
+```
+lv
+nl
+at
+be
+de
+fr
+ie
+lt
+uk
+us_akst
+us_cstn
+us_csts
+us_estn
+us_ests
+us_hi
+us_mst
+us_pst
+```
+Modes:
+```
+pt
+driving+ferry
+cycling+ferry
+walking+ferry
+```
+
 ### Running locally:
 
 Install [K6](https://k6.io/docs/get-started/installation/)
