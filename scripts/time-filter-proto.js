@@ -41,6 +41,7 @@ for (let key in options.scenarios) {
 
 export default function () {
     const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
+    const mapDate = __ENV.MAP_DATE || 'unknown'
     const appId = __ENV.APP_ID
     const apiKey = __ENV.API_KEY
     const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
@@ -67,7 +68,7 @@ export default function () {
         requestBody,
         {
             headers: {'Content-Type': 'application/octet-stream'},
-            tags: {'destinations': destinationsAmount, 'serviceImage': serviceImage}
+            tags: {'destinations': destinationsAmount, 'serviceImage': serviceImage, 'mapDate': mapDate}
         }
     );
 
