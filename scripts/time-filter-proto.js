@@ -4,19 +4,20 @@ import {check, randomSeed, sleep} from 'k6';
 import {countries, destinationDeltas, generateDestinations, generateRandomCoordinate} from './common.js';
 import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
 
-const destinations = (__ENV.DESTINATIONS || '5000,10000,25000,100000')
+const destinations = (__ENV.DESTINATIONS || '5000')
     .split(',')
     .map((curDestinations) => parseInt(curDestinations))
+
 
 const scenarios = destinations.reduce((accumulator, currentDestinations) => {
     accumulator[`sending_${currentDestinations}_destinations`] = {
         executor: 'constant-vus',
         duration: '5m',
         env: {SCENARIO_DESTINATIONS: currentDestinations.toString()},
-
-        vus: 1,
-        startTime: '20s',
-        gracefulStop: '20s',
+        rate: 5000,
+        timeUnit: '1m',
+        startTime: '10s',
+        gracefulStop: '10s',
     }
     return accumulator
 }, {})
@@ -30,14 +31,80 @@ const configs = {
     }
 }
 
-export let options = configs
+export const options = {
+    scenarios: {
+        rate_1000: {
+            executor: 'constant-arrival-rate',
+            rate: 1000,
+            env: {SCENARIO_DESTINATIONS: "5000"},
+            timeUnit: '1m',
+            duration: '3m',
+            preAllocatedVUs: 20,
+            maxVUs: 100,
+        },
+        rate_1500: {
+            executor: 'constant-arrival-rate',
+            rate: 1500,
+            env: {SCENARIO_DESTINATIONS: "5000"},
+            timeUnit: '1m',
+            duration: '3m',
+            startTime: '5m',
+
+            preAllocatedVUs: 50,
+            maxVUs: 200,
+        },
+        rate_2000: {
+            executor: 'constant-arrival-rate',
+            rate: 2000,
+            env: {SCENARIO_DESTINATIONS: "5000"},
+            timeUnit: '1m',
+            duration: '3m',
+            startTime: '10m',
+
+            preAllocatedVUs: 100,
+            maxVUs: 1000,
+        },
+        rate_2500: {
+            executor: 'constant-arrival-rate',
+            rate: 2500,
+            env: {SCENARIO_DESTINATIONS: "5000"},
+            timeUnit: '1m',
+            duration: '3m',
+            startTime: '15m',
+
+            preAllocatedVUs: 150,
+            maxVUs: 1500,
+        },
+        rate_3000: {
+            executor: 'constant-arrival-rate',
+            rate: 3000,
+            env: {SCENARIO_DESTINATIONS: "5000"},
+            timeUnit: '1m',
+            duration: '3m',
+            startTime: '20m',
+
+            preAllocatedVUs: 200,
+            maxVUs: 2000,
+        },
+        rate_3500: {
+            executor: 'constant-arrival-rate',
+            rate: 3500,
+            env: {SCENARIO_DESTINATIONS: "5000"},
+            timeUnit: '1m',
+            duration: '3m',
+            startTime: '25m',
+            preAllocatedVUs: 300,
+            maxVUs: 2500,
+        },
+    },
+};
 
 // used to create sub-metrics for each scenario
-for (let key in options.scenarios) {
+/*for (let key in options.scenarios) {
     options.thresholds[`http_req_duration{scenario:${key}}`] = ['max>=0']
     options.thresholds[`http_req_receiving{scenario:${key}}`] = ['max>=0']
     options.thresholds[`http_req_sending{scenario:${key}}`] = ['max>=0']
-}
+}*/
 
 export default function () {
     const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
