@@ -48,10 +48,9 @@ export default function () {
     const seed = __ENV.SEED || 1234567
     const country = __ENV.COUNTRY || 'uk'
     const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-    const query = __ENV.QUERY || `api/v2/us/time-filter/fast/${transportation}`
+    const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
     const protocol = __ENV.PROTOCOL || 'https'
     const travelTime = __ENV.TRAVEL_TIME || 7200
-
     const countryCoords = countries[country]
 
     randomSeed(seed)
@@ -135,6 +134,13 @@ function transportationType(transportation) {
         default:
             return null
     }
+}
+
+function countryCode(country) {
+    if (country.startsWith("us_"))
+        return "us"
+    else
+        return country
 }
 
 
