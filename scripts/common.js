@@ -21,7 +21,7 @@ export const countries = {
     'us_cstn': {lat: 41.8781136, lng: -87.6297982},
     'us_csts': {lat: 34.7303688, lng: -86.5861037},
     'us_estn': {lat: 40.712776, lng: -74.005974},
-    'us_ests': {lat: 28.5015, lng: -81.41360},
+    'us_ests': {lat: 38.907192, lng: -77.036873},
     'us_hi': {lat: 21.3098845, lng: -157.8581401},
     'us_mst': {lat: 39.739235, lng: -104.990250},
     'us_pst': {lat: 34.052235, lng: -118.243683}
