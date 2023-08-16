@@ -15,8 +15,8 @@ const scenarios = destinations.reduce((accumulator, currentDestinations) => {
         env: {SCENARIO_DESTINATIONS: currentDestinations.toString()},
 
         vus: 1,
-        startTime: '20s',
-        gracefulStop: '20s',
+        startTime: '10s',
+        gracefulStop: '10s',
     }
     return accumulator
 }, {})
@@ -49,10 +49,9 @@ export default function () {
     const seed = __ENV.SEED || 1234567
     const country = __ENV.COUNTRY || 'uk'
     const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-    const query = __ENV.QUERY || `api/v2/${country}/time-filter/fast/${transportation}`
+    const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
     const protocol = __ENV.PROTOCOL || 'https'
     const travelTime = __ENV.TRAVEL_TIME || 7200
-
     const countryCoords = countries[country]
 
     randomSeed(seed)
@@ -73,6 +72,7 @@ export default function () {
     );
 
     const decodedResponse = protobuf.load('proto/response.proto', 'TimeFilterFastResponse').decode(response.body)
+
 
     check(response, {
         'status is 200': (r) => r.status === 200,
@@ -135,6 +135,13 @@ function transportationType(transportation) {
         default:
             return null
     }
+}
+
+function countryCode(country) {
+    if (country.startsWith("us_"))
+        return "us"
+    else
+        return country
 }
 
 
