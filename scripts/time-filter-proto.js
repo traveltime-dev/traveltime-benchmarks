@@ -155,8 +155,7 @@ function generateBody(destinationsAmount, coord, transportation, travelTime) {
             transportation: {
                 type: transportationType(transportation)
             },
-            travelTime: travelTime,
-            properties: [1]
+            travelTime: travelTime
         }
     })
 }
