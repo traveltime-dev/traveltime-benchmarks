@@ -2,7 +2,7 @@ import http from 'k6/http';
 import protobuf from 'k6/x/protobuf';
 import {check, randomSeed, sleep} from 'k6';
 import {countries, destinationDeltas, generateDestinations, generateRandomCoordinate} from './common.js';
-import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
+import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js';
 
 const destinations = (__ENV.DESTINATIONS || '5000,10000,25000,100000')
     .split(',')
@@ -11,7 +11,7 @@ const destinations = (__ENV.DESTINATIONS || '5000,10000,25000,100000')
 const scenarios = destinations.reduce((accumulator, currentDestinations) => {
     accumulator[`sending_${currentDestinations}_destinations`] = {
         executor: 'constant-vus',
-        duration: '5m',
+        duration: '1m',
         env: {SCENARIO_DESTINATIONS: currentDestinations.toString()},
 
         vus: 1,

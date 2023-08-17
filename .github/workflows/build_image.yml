@@ -1,0 +1,24 @@
+name: Docker Image
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build the Docker image
+        run: docker build -t igeolise/traveltime-k6-benchmarks:$(date +%s) .
+
+      - name: Login to DockerHub
+        run: docker login -u '${{secrets.DOCKER_HUB_USER}}' -p '${{secrets.DOCKER_HUB_PASSWORD}}'
+
+      - name: Push Docker
+        run: docker push igeolise/traveltime-k6-benchmarks:$(date +%s)
