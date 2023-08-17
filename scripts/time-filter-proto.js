@@ -11,7 +11,7 @@ const destinations = (__ENV.DESTINATIONS || '5000,10000,25000,100000')
 const scenarios = destinations.reduce((accumulator, currentDestinations) => {
     accumulator[`sending_${currentDestinations}_destinations`] = {
         executor: 'constant-vus',
-        duration: '1m',
+        duration: '10m',
         env: {SCENARIO_DESTINATIONS: currentDestinations.toString()},
 
         vus: 1,
