@@ -15,10 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build the Docker image
-        run: docker build -t igeolise/traveltime-k6-benchmarks:$(date +%s) .
+        run: docker build -t igeolise/traveltime-k6-benchmarks:${GITHUB_SHA::7} .
 
       - name: Login to DockerHub
         run: docker login -u '${{secrets.DOCKER_HUB_USER}}' -p '${{secrets.DOCKER_HUB_PASSWORD}}'
 
       - name: Push Docker
-        run: docker push igeolise/traveltime-k6-benchmarks:$(date +%s)
+        run: docker push igeolise/traveltime-k6-benchmarks:${GITHUB_SHA::7}
