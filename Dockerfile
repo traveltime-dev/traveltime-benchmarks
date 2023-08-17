@@ -1,4 +1,4 @@
-FROM golang:1.18-alpine as builder
+FROM golang:1.20-alpine as builder
 
 WORKDIR /app
 
@@ -7,7 +7,8 @@ RUN go install go.k6.io/xk6/cmd/xk6@latest
 
 # Add here all extenstions
 RUN xk6 build \
-    --with github.com/traveltime-dev/xk6-protobuf@latest
+    --with github.com/traveltime-dev/xk6-protobuf@latest \
+    --with github.com/grafana/xk6-output-prometheus-remote@latest
 
 FROM alpine
 
