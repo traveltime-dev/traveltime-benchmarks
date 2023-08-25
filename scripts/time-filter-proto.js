@@ -10,12 +10,13 @@ const destinations = (__ENV.DESTINATIONS || '5000,10000,25000,100000')
 
 const scenarios = destinations.reduce((accumulator, currentDestinations) => {
     accumulator[`sending_${currentDestinations}_destinations`] = {
-        executor: 'constant-vus',
-        duration: '5m',
-        env: {SCENARIO_DESTINATIONS: currentDestinations.toString()},
-
-        vus: 1,
-        startTime: '10s',
+        executor: 'constant-arrival-rate',
+        duration: '2m',
+        rate: 110,
+        timeUnit: '1s', // 1000 iterations per second, i.e. 1000 RPS
+        preAllocatedVUs: 20,
+        maxVUs: 500,
+        startTime: '2s',
         gracefulStop: '10s',
     }
     return accumulator
@@ -48,7 +49,7 @@ export default function () {
     const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
     const seed = __ENV.SEED || 1234567
     const country = __ENV.COUNTRY || 'uk'
-    const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
+    const transportation = __ENV.TRANSPORTATION || 'walking+ferry'
     const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
     const protocol = __ENV.PROTOCOL || 'https'
     const travelTime = __ENV.TRAVEL_TIME || 7200
@@ -73,10 +74,10 @@ export default function () {
 
     const decodedResponse = protobuf.load('proto/response.proto', 'TimeFilterFastResponse').decode(response.body)
 
-
     check(response, {
         'status is 200': (r) => r.status === 200,
     });
+
 
     check(decodedResponse, {
         'response body is not empty': (r) => r.length !== 0,
@@ -127,9 +128,9 @@ function transportationType(transportation) {
         case 'driving+ferry':
             return 'DRIVING_AND_FERRY'
         case 'walking+ferry':
-            return 'WALKING_FERRY'
+            return 'WALKING_AND_FERRY'
         case 'cycling+ferry':
-            return 'CYCLING_FERRY'
+            return 'CYCLING_AND_FERRY'
         case 'pt':
             return 'PUBLIC_TRANSPORT'
         default:
