@@ -1,15 +1,28 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
-import { generateRandomCoordinate, commonOptions } from './common.js';
+import {check, sleep} from 'k6';
+import {generateRandomCoordinate} from './common.js';
 
-export let options = commonOptions
+export let options = {
+    scenarios: {
+        load_balance_scenario: {
+            executor: 'constant-arrival-rate',
+            duration: '2m',
+            rate: 10,
+            timeUnit: '1s',
+            preAllocatedVUs: 10,
+            maxVUs: 50,
+            startTime: '2s',
+            gracefulStop: '10s'
+        }
+    }
+}
+
 
 export default function () {
     const appId = __ENV.APP_ID
     const apiKey = __ENV.API_KEY
-    const host = __ENV.HOST || 'api.traveltimeapp.com'
+    const host = __ENV.HOST || 'api-dev.traveltimeapp.com'
     const url = `https://${host}/v4/time-map`;
-
     const params = {
         headers: {
             'Content-Type': 'application/json',
@@ -19,6 +32,7 @@ export default function () {
     };
 
     const response = http.post(url, generateBody(), params);
+
     check(response, {
         'status is 200': (r) => r.status === 200,
         'response body is not empty': (r) => r.body.length > 0,
@@ -28,22 +42,16 @@ export default function () {
 
 function generateBody() {
     return JSON.stringify({
-        arrival_searches: {
-            one_to_many:[
-                {
-                    id: 'Time map fast benchmark',
-                    coords: generateRandomCoordinate(51.50750,  51.50950, -0.128015, -0.128615),
-                    arrival_time_period: 'weekday_morning',
-                    travel_time: 900,
-                    transportation: {
-                        type: 'public_transport'
-                    },
-                    level_of_detail: {
-                        scale_type: 'simple',
-                        level: 'lowest'
-                    }
+        departure_searches: [
+            {
+                id: 'Time map fast benchmark',
+                coords: generateRandomCoordinate(51.507609, -0.128315, -0.128615),
+                departure_time: '2023-08-25T10:00:00Z',
+                travel_time: 3600,
+                transportation: {
+                    type: 'driving'
                 }
-            ]
-        }
+            }
+        ]
     });
 }
