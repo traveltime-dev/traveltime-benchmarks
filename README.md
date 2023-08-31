@@ -8,6 +8,46 @@ First, obtain an App ID and an API key from https://docs.traveltime.com/api/over
 
 You will need to email sales@traveltime.com or book a demo at https://traveltime.com/book-demo to gain access to TimeFilterFast(Proto).
 
+### Supported Countries
+
+To see a list of all supported countries, send **map-info** **GET** request ([Postman](https://docs.traveltime.com/api/start/postman-collection#)) to:
+- https://api-dev.traveltimeapp.com for dev
+- https://api.traveltimeapp.com for prod
+
+### Testing Each Endpoint Locally
+
+Install [K6](https://k6.io/docs/get-started/installation/)
+
+#### time-map
+
+```bash
+k6 run 
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=api-dev.traveltimeapp.com //optional
+    -e COUNTRY=gb //optional
+    -e TRANSPORTATION='driving+ferry' //optional
+    -e TRAVEL_TIME=7200 //optional
+    -e DESTINATIONS="100,150,200" // optional
+    scripts/time-map.js
+```
+
+#### time-filter
+
+```bash
+k6 run 
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=api-dev.traveltimeapp.com //optional
+    -e COUNTRY=gb //optional
+    -e TRANSPORTATION='driving+ferry' //optional
+    -e TRAVEL_TIME=7200 //optional
+    -e SCENARIO_DESTINATIONS=2000 //optional
+    -e DESTINATIONS="100,150,200" // optional
+    -e RANGE=600 //optional
+    scripts/time-filter.js
+```
+
 ### Running K6 Tests with Docker
 
 The simplest way to run these benchmarks is to use docker:
@@ -33,7 +73,7 @@ https://k6.io/docs/using-k6/metrics/
 * http_req_sending - Time spent sending data to the remote host
 * http_req_receiving - Time spent receiving response data from the remote host
 
-### Supported countries, transport modes
+### Supported countries, transport modes (deprecated, only applies to time-filter-proto)
 Countries:
 ```
 lv
@@ -60,15 +100,6 @@ pt
 driving+ferry
 cycling+ferry
 walking+ferry
-```
-
-### Running locally:
-
-Install [K6](https://k6.io/docs/get-started/installation/)
-
-#### Running json requests:
-```bash
-k6 run -e APP_ID={APP_ID} -e API_KEY={API_KEY} -e HOST={HOST} scripts/{benchmark-file}.js
 ```
 
 ### Running proto benchmarks
