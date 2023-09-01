@@ -28,7 +28,6 @@ k6 run
     -e COUNTRY=gb //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
-    -e DESTINATIONS="100,150,200" // optional
     scripts/time-map.js
 ```
 
