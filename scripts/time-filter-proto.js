@@ -1,45 +1,29 @@
 import http from 'k6/http';
 import protobuf from 'k6/x/protobuf';
-import {check, randomSeed, sleep} from 'k6';
-import {countries, destinationDeltas, generateDestinations, generateRandomCoordinate} from './common.js';
-import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js';
-
-const destinations = (__ENV.DESTINATIONS || '5000,10000,25000,100000')
-    .split(',')
-    .map((curDestinations) => parseInt(curDestinations))
-
-const scenarios = destinations.reduce((accumulator, currentDestinations) => {
-    accumulator[`sending_${currentDestinations}_destinations`] = {
-        executor: 'constant-vus',
-        duration: '5m',
-        env: {SCENARIO_DESTINATIONS: currentDestinations.toString()},
-
-        vus: 1,
-        startTime: '10s',
-        gracefulStop: '10s',
-    }
-    return accumulator
-}, {})
-
-const configs = {
-    scenarios: scenarios,
-    summaryTrendStats: ['avg', 'min', 'max', 'p(90)', 'p(95)'],
-
-    thresholds: {
-        // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
-    }
-}
+import {
+    check,
+    randomSeed,
+    sleep
+} from 'k6';
+import {
+    countries,
+    destinationDeltas,
+    generateDestinations,
+    generateRandomCoordinate,
+    destinations,
+    configs,
+    setThresholdsForScenarios,
+    summaryFormatter
+} from './common.js';
+import {
+    textSummary
+} from 'https://jslib.k6.io/k6-summary/0.0.3/index.js';
 
 export let options = configs
 
-// used to create sub-metrics for each scenario
-for (let key in options.scenarios) {
-    options.thresholds[`http_req_duration{scenario:${key}}`] = ['max>=0']
-    options.thresholds[`http_req_receiving{scenario:${key}}`] = ['max>=0']
-    options.thresholds[`http_req_sending{scenario:${key}}`] = ['max>=0']
-}
+setThresholdsForScenarios(options)
 
-export default function () {
+export default function() {
     const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
     const mapDate = __ENV.MAP_DATE || 'unknown'
     const appId = __ENV.APP_ID
@@ -64,10 +48,15 @@ export default function () {
 
     const response = http.post(
         url,
-        requestBody,
-        {
-            headers: {'Content-Type': 'application/octet-stream'},
-            tags: {'destinations': destinationsAmount, 'serviceImage': serviceImage, 'mapDate': mapDate}
+        requestBody, {
+            headers: {
+                'Content-Type': 'application/octet-stream'
+            },
+            tags: {
+                'destinations': destinationsAmount,
+                'serviceImage': serviceImage,
+                'mapDate': mapDate
+            }
         }
     );
 
@@ -87,40 +76,8 @@ export default function () {
 }
 
 export function handleSummary(data) {
-    // removing default metrics
-    delete data.metrics['http_req_duration']
-    delete data.metrics['http_req_sending']
-    delete data.metrics['http_req_receiving']
-    delete data.metrics['http_req_blocked']
-    delete data.metrics[`http_req_duration{expected_response:true}`]
-    delete data.metrics['http_req_waiting']
-    delete data.metrics['http_reqs']
-    delete data.metrics['iteration_duration']
-    delete data.metrics['iterations']
-    delete data.metrics['vus']
-    delete data.metrics['http_req_connecting']
-    delete data.metrics['http_req_failed']
-    delete data.metrics['http_req_tls_handshaking']
-
-    data = destinations.reduce((curData, curDestinations) => {
-        return reportPerDestination(curData, curDestinations)
-    }, data)
-
-    return {
-        stdout: textSummary(data, { indent: ' ', enableColors: true }),
-    }
+    return summaryFormatter(data)
 }
-
-function reportPerDestination(data, destinations) {
-    data.metrics[`http_req_sending(${destinations} destinations)`] = data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-    delete data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-    data.metrics[`http_req_receiving(${destinations} destinations)`] = data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-    delete data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-    data.metrics[`http_req_duration(${destinations} destinations)`] = data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
-    delete data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
-    return data
-}
-
 
 function transportationType(transportation) {
     switch (transportation) {
