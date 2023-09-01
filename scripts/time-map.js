@@ -60,7 +60,7 @@ function generateBody(countryCode, travelTime, transportation) {
     return JSON.stringify({
         departure_searches: [
             {
-                id: 'Time map fast benchmark',
+                id: 'Time map benchmark',
                 coords: generateRandomCoordinate(coordinates.latitude,  coordinates.longitude, 0.005),
                 departure_time: '2023-08-25T10:00:00Z',
                 travel_time: travelTime,
