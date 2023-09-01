@@ -1,3 +1,4 @@
+import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js';
 import http from 'k6/http';
 import {
     check,
@@ -5,15 +6,13 @@ import {
 } from 'k6';
 import {
     generateRandomCoordinate,
-    commonOptions,
     getCapitalCoordinates,
     destinations,
-    configs,
-    setThresholdsForScenarios,
-    summaryFormatter
+    timeFilterOptions,
+    setThresholdsForScenarios
 } from './common.js';
 
-export let options = configs
+export let options = timeFilterOptions
 
 setThresholdsForScenarios(options)
 
@@ -52,7 +51,38 @@ export default function() {
 }
 
 export function handleSummary(data) {
-    return summaryFormatter(data)
+    // removing default metrics
+    delete data.metrics['http_req_duration']
+    delete data.metrics['http_req_sending']
+    delete data.metrics['http_req_receiving']
+    delete data.metrics['http_req_blocked']
+    delete data.metrics[`http_req_duration{expected_response:true}`]
+    delete data.metrics['http_req_waiting']
+    delete data.metrics['http_reqs']
+    delete data.metrics['iteration_duration']
+    delete data.metrics['iterations']
+    delete data.metrics['vus']
+    delete data.metrics['http_req_connecting']
+    delete data.metrics['http_req_failed']
+    delete data.metrics['http_req_tls_handshaking']
+
+    data = destinations.reduce((curData, curDestinations) => {
+        return reportPerDestination(curData, curDestinations)
+    }, data)
+
+    return {
+        stdout: textSummary(data, { indent: ' ', enableColors: true }),
+    }
+}
+
+function reportPerDestination(data, destinations) {
+    data.metrics[`http_req_sending(${destinations} destinations)`] = data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
+    delete data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
+    data.metrics[`http_req_receiving(${destinations} destinations)`] = data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
+    delete data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
+    data.metrics[`http_req_duration(${destinations} destinations)`] = data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
+    delete data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
+    return data
 }
 
 function generateBody(countryCode, travelTime, transportation, destinationsAmount, rangeSettings) {

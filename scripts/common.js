@@ -1,47 +1,24 @@
-import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js';
-
-export let commonOptions = {
-    stages: [
-        {duration: '1m', target: 5}, //5 virtual users over 1 minutes
-        {duration: '3m', target: 10}, //10 virtual users over 3 minutes
-        {duration: '10s', target: 0},
-    ]
-};
-
-export function summaryFormatter(data) {
-    // removing default metrics
-    delete data.metrics['http_req_duration']
-    delete data.metrics['http_req_sending']
-    delete data.metrics['http_req_receiving']
-    delete data.metrics['http_req_blocked']
-    delete data.metrics[`http_req_duration{expected_response:true}`]
-    delete data.metrics['http_req_waiting']
-    delete data.metrics['http_reqs']
-    delete data.metrics['iteration_duration']
-    delete data.metrics['iterations']
-    delete data.metrics['vus']
-    delete data.metrics['http_req_connecting']
-    delete data.metrics['http_req_failed']
-    delete data.metrics['http_req_tls_handshaking']
-
-    data = destinations.reduce((curData, curDestinations) => {
-        return reportPerDestination(curData, curDestinations)
-    }, data)
-
-    return {
-        stdout: textSummary(data, { indent: ' ', enableColors: true }),
+export let timeMapOptions = {
+    stages: [{
+            duration: '1m',
+            target: 5
+        }, //5 virtual users over 1 minutes
+        {
+            duration: '3m',
+            target: 10
+        }, //10 virtual users over 3 minutes
+        {
+            duration: '10s',
+            target: 0
+        },
+    ],
+    summaryTrendStats: ['avg', 'min', 'max', 'p(90)', 'p(95)'],
+    thresholds: {
+        'http_req_duration': ['max>=0'],
+        'http_req_receiving': ['max>=0'],
+        'http_req_sending': ['max>=0'],
     }
-}
-
-function reportPerDestination(data, destinations) {
-    data.metrics[`http_req_sending(${destinations} destinations)`] = data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-    delete data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-    data.metrics[`http_req_receiving(${destinations} destinations)`] = data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-    delete data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-    data.metrics[`http_req_duration(${destinations} destinations)`] = data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
-    delete data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
-    return data
-}
+};
 
 export const destinations = (__ENV.DESTINATIONS || '50, 100, 150')
     .split(',')
@@ -60,7 +37,7 @@ const scenarios = destinations.reduce((accumulator, currentDestinations) => {
     return accumulator
 }, {})
 
-export const configs = {
+export const timeFilterOptions = {
     scenarios: scenarios,
     summaryTrendStats: ['avg', 'min', 'max', 'p(90)', 'p(95)'],
 
@@ -324,7 +301,7 @@ const countries = `GS,-54.283333,-36.5
 `;
 
 export function getCapitalCoordinates(countryCode) {
-  const lines = countryData.split('\n');
+  const lines = countries.split('\n');
   for (let i = 0; i < lines.length; i++) {
     const columns = lines[i].split(',');
     const currentCountryCode = columns[0].trim();

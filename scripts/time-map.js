@@ -1,23 +1,22 @@
+import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js';
 import http from 'k6/http';
 import {check, sleep} from 'k6';
 import {
     generateRandomCoordinate,
     getCapitalCoordinates,
-    destinations,
-    configs,
-    setThresholdsForScenarios,
-    summaryFormatter
+    timeMapOptions
 } from './common.js';
 
 
-export let options = configs
-setThresholdsForScenarios(options)
+export let options = timeMapOptions
+
+const country = __ENV.COUNTRY || 'gb'
 
 export default function () {
     const appId = __ENV.APP_ID
     const apiKey = __ENV.API_KEY
     const host = __ENV.HOST || 'api-dev.traveltimeapp.com'
-    const country = __ENV.COUNTRY || 'GB'
+    const country = __ENV.COUNTRY || 'gb'
     const countryCode = country.toUpperCase()
     const url = `https://${host}/v4/time-map`;
     const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
@@ -40,7 +39,20 @@ export default function () {
 }
 
 export function handleSummary(data) {
-    return summaryFormatter(data)
+    delete data.metrics['http_req_blocked']
+    delete data.metrics[`http_req_duration{expected_response:true}`]
+    delete data.metrics['http_req_waiting']
+    delete data.metrics['http_reqs']
+    delete data.metrics['iteration_duration']
+    delete data.metrics['iterations']
+    delete data.metrics['vus']
+    delete data.metrics['http_req_connecting']
+    delete data.metrics['http_req_failed']
+    delete data.metrics['http_req_tls_handshaking']
+
+    return {
+        stdout: textSummary(data, { indent: ' ', enableColors: true }),
+    }
 }
 
 function generateBody(countryCode, travelTime, transportation) {
