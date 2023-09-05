@@ -35,7 +35,6 @@ k6 run
     -e COUNTRY=gb //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
-    -e SCENARIO_DESTINATIONS=2000 //optional
     -e DESTINATIONS="100,150,200" // optional
     -e RANGE=600 //optional
     scripts/time-filter.js
@@ -69,8 +68,7 @@ https://k6.io/docs/using-k6/metrics/
 ### Supported Countries
 
 To see a list of all supported countries, send **map-info** **GET** request ([Postman](https://docs.traveltime.com/api/start/postman-collection#)) to:
-- https://api-dev.traveltimeapp.com for dev
-- https://api.traveltimeapp.com for prod
+- https://api.traveltimeapp.com
 
 ### Supported Countries for Proto
 ```
