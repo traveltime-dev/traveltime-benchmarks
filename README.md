@@ -8,12 +8,6 @@ First, obtain an App ID and an API key from https://docs.traveltime.com/api/over
 
 You will need to email sales@traveltime.com or book a demo at https://traveltime.com/book-demo to gain access to TimeFilterFast(Proto).
 
-### Supported Countries
-
-To see a list of all supported countries, send **map-info** **GET** request ([Postman](https://docs.traveltime.com/api/start/postman-collection#)) to:
-- https://api-dev.traveltimeapp.com for dev
-- https://api.traveltimeapp.com for prod
-
 ### Testing Each Endpoint Locally
 
 Install [K6](https://k6.io/docs/get-started/installation/)
@@ -72,8 +66,13 @@ https://k6.io/docs/using-k6/metrics/
 * http_req_sending - Time spent sending data to the remote host
 * http_req_receiving - Time spent receiving response data from the remote host
 
-### Supported countries, transport modes (deprecated, only applies to time-filter-proto)
-Countries:
+### Supported Countries
+
+To see a list of all supported countries, send **map-info** **GET** request ([Postman](https://docs.traveltime.com/api/start/postman-collection#)) to:
+- https://api-dev.traveltimeapp.com for dev
+- https://api.traveltimeapp.com for prod
+
+### Supported Countries for Proto
 ```
 lv
 nl
@@ -93,7 +92,25 @@ us_hi
 us_mst
 us_pst
 ```
-Modes:
+
+### Transport modes
+#### time-map, time-filter
+```
+pt
+cycling
+driving
+driving+train
+public_transport
+walking
+coach
+bus
+train
+ferry
+driving+ferry
+cycling+ferry
+```
+
+#### time-filter-proto
 ```
 pt
 driving+ferry
