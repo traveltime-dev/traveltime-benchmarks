@@ -8,11 +8,11 @@ import {
     generateRandomCoordinate,
     getCapitalCoordinates,
     destinations,
-    timeFilterOptions,
+    filterEndpointOptions,
     setThresholdsForScenarios
 } from './common.js';
 
-export let options = timeFilterOptions
+export let options = filterEndpointOptions
 
 setThresholdsForScenarios(options)
 
@@ -87,14 +87,11 @@ function reportPerDestination(data, destinations) {
 
 function generateBody(countryCode, travelTime, transportation, destinationsAmount, rangeSettings) {
     const coordinates = getCapitalCoordinates(countryCode);
-    const destinations = [];
 
-    for (let i = 1; i <= destinationsAmount; i++) {
-        destinations.push({
-            id: `destination${i}`,
-            coords: generateRandomCoordinate(coordinates.latitude, coordinates.longitude, 0.005)
-        });
-    }
+    const destinations = Array.from({ length: destinationsAmount }, (_, i) => ({
+      id: `destination${i + 1}`,
+      coords: generateRandomCoordinate(coordinates.latitude, coordinates.longitude, 0.005),
+    }));
 
     const departureSearches = [{
         id: 'Time filter benchmark',

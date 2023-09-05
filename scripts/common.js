@@ -1,4 +1,4 @@
-export let timeMapOptions = {
+export let mapEndpointOptions = {
     stages: [{
             duration: '1m',
             target: 5

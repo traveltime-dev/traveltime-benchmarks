@@ -4,11 +4,11 @@ import {check, sleep} from 'k6';
 import {
     generateRandomCoordinate,
     getCapitalCoordinates,
-    timeMapOptions
+    mapEndpointOptions
 } from './common.js';
 
 
-export let options = timeMapOptions
+export let options = mapEndpointOptions
 
 const country = __ENV.COUNTRY || 'gb'
 
