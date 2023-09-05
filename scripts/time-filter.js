@@ -6,13 +6,13 @@ import {
 } from 'k6';
 import {
     generateRandomCoordinate,
-    getCapitalCoordinates,
     destinations,
-    filterEndpointOptions,
-    setThresholdsForScenarios
+    timeFilterOptions,
+    setThresholdsForScenarios,
+    countries
 } from './common.js';
 
-export let options = filterEndpointOptions
+export let options = timeFilterOptions
 
 setThresholdsForScenarios(options)
 
@@ -22,6 +22,7 @@ export default function() {
     const host = __ENV.HOST || 'api-dev.traveltimeapp.com';
     const country = __ENV.COUNTRY || 'GB'
     const countryCode = country.toUpperCase()
+    const countryCoords = countries[countryCode]
     const url = `https://${host}/v4/time-filter`;
     const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
     const travelTime = __ENV.TRAVEL_TIME || 1900
@@ -42,7 +43,7 @@ export default function() {
     };
 
     const response = http.post(url, generateBody(countryCode, travelTime,
-        transportation, destinationsAmount, rangeSettings), params);
+        transportation, destinationsAmount, rangeSettings, countryCoords), params);
     check(response, {
         'status is 200': (r) => r.status === 200,
         'response body is not empty': (r) => r.body.length > 0,
@@ -85,12 +86,12 @@ function reportPerDestination(data, destinations) {
     return data
 }
 
-function generateBody(countryCode, travelTime, transportation, destinationsAmount, rangeSettings) {
-    const coordinates = getCapitalCoordinates(countryCode);
+function generateBody(countryCode, travelTime, transportation, destinationsAmount, rangeSettings, countryCoords) {
+    const coordinates = countryCoords
 
     const destinations = Array.from({ length: destinationsAmount }, (_, i) => ({
       id: `destination${i + 1}`,
-      coords: generateRandomCoordinate(coordinates.latitude, coordinates.longitude, 0.005),
+      coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, 0.005),
     }));
 
     const departureSearches = [{

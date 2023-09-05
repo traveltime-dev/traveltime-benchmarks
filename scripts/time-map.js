@@ -3,7 +3,7 @@ import http from 'k6/http';
 import {check, sleep} from 'k6';
 import {
     generateRandomCoordinate,
-    getCapitalCoordinates,
+    countries,
     mapEndpointOptions
 } from './common.js';
 
@@ -18,6 +18,7 @@ export default function () {
     const host = __ENV.HOST || 'api-dev.traveltimeapp.com'
     const country = __ENV.COUNTRY || 'gb'
     const countryCode = country.toUpperCase()
+    const countryCoords = countries[countryCode]
     const url = `https://${host}/v4/time-map`;
     const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
     const travelTime = __ENV.TRAVEL_TIME || 7200
@@ -29,8 +30,7 @@ export default function () {
         },
     };
 
-    const response = http.post(url, generateBody(countryCode, travelTime, transportation), params);
-
+    const response = http.post(url, generateBody(countryCode, travelTime, transportation, countryCoords), params);
     check(response, {
         'status is 200': (r) => r.status === 200,
         'response body is not empty': (r) => r.body.length > 0,
@@ -55,13 +55,13 @@ export function handleSummary(data) {
     }
 }
 
-function generateBody(countryCode, travelTime, transportation) {
-    const coordinates = getCapitalCoordinates(countryCode);
+function generateBody(countryCode, travelTime, transportation, countryCoords) {
+    const coordinates = countryCoords
     return JSON.stringify({
         departure_searches: [
             {
                 id: 'Time map benchmark',
-                coords: generateRandomCoordinate(coordinates.latitude,  coordinates.longitude, 0.005),
+                coords: generateRandomCoordinate(coordinates.lat,  coordinates.lng, 0.005),
                 departure_time: '2023-08-25T10:00:00Z',
                 travel_time: travelTime,
                 transportation: {
