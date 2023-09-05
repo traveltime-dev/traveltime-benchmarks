@@ -16,8 +16,7 @@ export default function () {
     const appId = __ENV.APP_ID
     const apiKey = __ENV.API_KEY
     const host = __ENV.HOST || 'api-dev.traveltimeapp.com'
-    const country = __ENV.COUNTRY || 'gb'
-    const countryCode = country.toUpperCase()
+    const countryCode = __ENV.COUNTRY || 'gb'
     const countryCoords = countries[countryCode]
     const url = `https://${host}/v4/time-map`;
     const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
