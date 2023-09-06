@@ -38,6 +38,7 @@ for (let key in options.scenarios) {
     options.thresholds[`http_req_receiving{scenario:${key}}`] = ['max>=0']
     options.thresholds[`http_req_sending{scenario:${key}}`] = ['max>=0']
 }
+randomSeed(__ENV.SEED || 1234567)
 
 export default function () {
     const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
@@ -46,7 +47,6 @@ export default function () {
     const apiKey = __ENV.API_KEY
     const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
     const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
-    const seed = __ENV.SEED || 1234567
     const country = __ENV.COUNTRY || 'uk'
     const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
     const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
@@ -54,7 +54,7 @@ export default function () {
     const travelTime = __ENV.TRAVEL_TIME || 7200
     const countryCoords = countries[country]
 
-    randomSeed(seed)
+
     const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
     const requestBody = protobuf
