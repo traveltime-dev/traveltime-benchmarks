@@ -17,8 +17,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build the Docker image
         run: |
-          docker build -t igeolise/traveltime-k6-benchmarks:${GITHUB_SHA::7} .
-          docker build -t igeolise/traveltime-k6-benchmarks:latest
+          docker build -t igeolise/traveltime-k6-benchmarks:${GITHUB_SHA::7} -t igeolise/traveltime-k6-benchmarks:latest .
       
       
 
