@@ -48,11 +48,7 @@ The simplest way to run these benchmarks is to use docker:
 docker run 
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e DESTINATIONS="1000,5000,10000,25000,100000" // optional
-    -e HOST=proto.api.traveltimeapp.com // optional
-    -e TRANSPORTATION=driving+ferry // optional
-    -e COUNTRY=uk // optional
-    -e TRAVEL_TIME=7200 // optional
+    ...other ENV (-e) vars...
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/{benchmark-file}.js
 ```
 
