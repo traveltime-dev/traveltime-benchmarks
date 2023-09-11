@@ -2,3 +2,9 @@
 bin/
 pkg/
 k6
+
+node_modules/
+.eslintcache
+.eslintrc.json
+*.log
+.eslint-*.json
