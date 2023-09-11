@@ -1,119 +1,148 @@
-import http from 'k6/http';
-import protobuf from 'k6/x/protobuf';
+import http from 'k6/http'
+import protobuf from 'k6/x/protobuf'
 import {
-    check,
-    randomSeed,
-    sleep
-} from 'k6';
+  check,
+  randomSeed,
+  sleep
+} from 'k6'
 import {
-    countries,
-    destinationDeltas,
-    generateDestinations,
-    generateRandomCoordinate,
-    destinations,
-    configs,
-    setThresholdsForScenarios,
-    summaryFormatter
-} from './common.js';
+  protoCountries,
+  destinationDeltas,
+  generateDestinations,
+  generateRandomCoordinate,
+  destinations,
+  timeFilterOptions,
+  setThresholdsForScenarios
+} from './common.js'
 import {
-    textSummary
-} from 'https://jslib.k6.io/k6-summary/0.0.3/index.js';
+  textSummary
+} from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 
-export let options = configs
+export const options = timeFilterOptions
 
 setThresholdsForScenarios(options)
 
-export default function() {
-    const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
-    const mapDate = __ENV.MAP_DATE || 'unknown'
-    const appId = __ENV.APP_ID
-    const apiKey = __ENV.API_KEY
-    const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
-    const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
-    const seed = __ENV.SEED || 1234567
-    const country = __ENV.COUNTRY || 'uk'
-    const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-    const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
-    const protocol = __ENV.PROTOCOL || 'https'
-    const travelTime = __ENV.TRAVEL_TIME || 7200
-    const countryCoords = countries[country]
+export default function () {
+  const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
+  const mapDate = __ENV.MAP_DATE || 'unknown'
+  const appId = __ENV.APP_ID
+  const apiKey = __ENV.API_KEY
+  const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
+  const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
+  const seed = __ENV.SEED || 1234567
+  const country = __ENV.COUNTRY || 'uk'
+  const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
+  const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
+  const protocol = __ENV.PROTOCOL || 'https'
+  const travelTime = __ENV.TRAVEL_TIME || 7200
+  const countryCoords = protoCountries[country]
 
-    randomSeed(seed)
-    const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
+  randomSeed(seed)
+  const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
-    const requestBody = protobuf
-        .load('proto/request.proto', 'TimeFilterFastRequest')
-        .encode(generateBody(destinationsAmount, countryCoords, transportation, travelTime))
+  const requestBody = protobuf
+    .load('proto/request.proto', 'TimeFilterFastRequest')
+    .encode(generateBody(destinationsAmount, countryCoords, transportation, travelTime))
 
-
-    const response = http.post(
-        url,
-        requestBody, {
-            headers: {
-                'Content-Type': 'application/octet-stream'
-            },
-            tags: {
-                'destinations': destinationsAmount,
-                'serviceImage': serviceImage,
-                'mapDate': mapDate
-            }
-        }
-    );
-
-    const decodedResponse = protobuf.load('proto/response.proto', 'TimeFilterFastResponse').decode(response.body)
-
-
-    check(response, {
-        'status is 200': (r) => r.status === 200,
-    });
-
-    check(decodedResponse, {
-        'response body is not empty': (r) => r.length !== 0,
-    });
-
-
-    sleep(1);
-}
-
-export function handleSummary(data) {
-    return summaryFormatter(data)
-}
-
-function transportationType(transportation) {
-    switch (transportation) {
-        case 'driving+ferry':
-            return 'DRIVING_AND_FERRY'
-        case 'walking+ferry':
-            return 'WALKING_FERRY'
-        case 'cycling+ferry':
-            return 'CYCLING_FERRY'
-        case 'pt':
-            return 'PUBLIC_TRANSPORT'
-        default:
-            return null
+  const response = http.post(
+    url,
+    requestBody, {
+      headers: {
+        'Content-Type': 'application/octet-stream'
+      },
+      tags: {
+        destinations: destinationsAmount,
+        serviceImage,
+        mapDate
+      }
     }
+  )
+
+  const decodedResponse = protobuf.load('proto/response.proto', 'TimeFilterFastResponse').decode(response.body)
+
+  check(response, {
+    'status is 200': (r) => r.status === 200
+  })
+
+  check(decodedResponse, {
+    'response body is not empty': (r) => r.length !== 0
+  })
+
+  sleep(1)
 }
 
-function countryCode(country) {
-    if (country.startsWith("us_"))
-        return "us"
-    else
-        return country
-}
+export function handleSummary (data) {
+  // removing default metrics
+  delete data.metrics.http_req_duration
+  delete data.metrics.http_req_sending
+  delete data.metrics.http_req_receiving
+  delete data.metrics.http_req_blocked
+  delete data.metrics['http_req_duration{expected_response:true}']
+  delete data.metrics.http_req_waiting
+  delete data.metrics.http_reqs
+  delete data.metrics.iteration_duration
+  delete data.metrics.iterations
+  delete data.metrics.vus
+  delete data.metrics.http_req_connecting
+  delete data.metrics.http_req_failed
+  delete data.metrics.http_req_tls_handshaking
 
+  data = destinations.reduce((curData, curDestinations) => {
+    return reportPerDestination(curData, curDestinations)
+  }, data)
 
-function generateBody(destinationsAmount, coord, transportation, travelTime) {
-    const diff = 0.005
-    const departure = generateRandomCoordinate(coord.lat, coord.lng, diff)
-    const destinations = generateDestinations(destinationsAmount, departure, diff)
-    return JSON.stringify({
-        oneToManyRequest: {
-            departureLocation: departure,
-            locationDeltas: destinationDeltas(departure, destinations),
-            transportation: {
-                type: transportationType(transportation)
-            },
-            travelTime: travelTime
-        }
+  return {
+    stdout: textSummary(data, {
+      indent: ' ',
+      enableColors: true
     })
+  }
+}
+
+function reportPerDestination (data, destinations) {
+  data.metrics[`http_req_sending(${destinations} destinations)`] =
+        data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
+  delete data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
+  data.metrics[`http_req_receiving(${destinations} destinations)`] =
+        data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
+  delete data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
+  data.metrics[`http_req_duration(${destinations} destinations)`] =
+        data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
+  delete data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
+  return data
+}
+
+function transportationType (transportation) {
+  switch (transportation) {
+    case 'driving+ferry':
+      return 'DRIVING_AND_FERRY'
+    case 'walking+ferry':
+      return 'WALKING_FERRY'
+    case 'cycling+ferry':
+      return 'CYCLING_FERRY'
+    case 'pt':
+      return 'PUBLIC_TRANSPORT'
+    default:
+      return null
+  }
+}
+
+function countryCode (country) {
+  if (country.startsWith('us_')) { return 'us' } else { return country }
+}
+
+function generateBody (destinationsAmount, coord, transportation, travelTime) {
+  const diff = 0.005
+  const departure = generateRandomCoordinate(coord.lat, coord.lng, diff)
+  const destinations = generateDestinations(destinationsAmount, departure, diff)
+  return JSON.stringify({
+    oneToManyRequest: {
+      departureLocation: departure,
+      locationDeltas: destinationDeltas(departure, destinations),
+      transportation: {
+        type: transportationType(transportation)
+      },
+      travelTime
+    }
+  })
 }

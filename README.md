@@ -54,6 +54,20 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter.js
 ```
 
+#### time-filter-proto
+
+```bash
+docker run 
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e DESTINATIONS="1000,5000,10000,25000,100000" // optional
+    -e HOST=proto.api.traveltimeapp.com // optional
+    -e TRANSPORTATION=driving+ferry // optional
+    -e COUNTRY=uk // optional
+    -e TRAVEL_TIME=7200 // optional
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/{benchmark-file}.js
+```
+
 ### Running K6 Tests Locally
 
 Install [K6](https://k6.io/docs/get-started/installation/)
@@ -128,10 +142,10 @@ walking+ferry
 
 ### Running proto benchmarks locally
 
-1. Export path: ```bash export PATH=$(go env GOPATH)/bin:$PATH ```
-2. Install xk6: ```bash go install go.k6.io/xk6/cmd/xk6@latest ```
-3. Build: ```bash xk6 build --with github.com/traveltime-dev/xk6-protobuf@latest ```
-4. Run: ```bash ./k6 run -e APP_ID={APP_ID} -e API_KEY={API_KEY} -e HOST={HOST} scripts/{proto-benchmark-file}.js```
+1. Install xk6: `go install go.k6.io/xk6/cmd/xk6@latest `
+2. Export path: `export PATH=$(go env GOPATH)/bin:$PATH`
+3. Build: `xk6 build --with github.com/traveltime-dev/xk6-protobuf@latest  --with github.com/grafana/xk6-output-prometheus-remote@latest`
+4. Run: ` ./k6 run -e APP_ID={APP_ID} -e API_KEY={API_KEY} -e HOST={HOST} scripts/{proto-benchmark-file}.js`
 
 ### Benchmark results:
 
