@@ -8,27 +8,27 @@ First, obtain an App ID and an API key from https://docs.traveltime.com/api/over
 
 You will need to email sales@traveltime.com or book a demo at https://traveltime.com/book-demo to gain access to TimeFilterFast(Proto).
 
-### Running K6 Tests Locally
+### Running K6 Tests with Docker
 
-Install [K6](https://k6.io/docs/get-started/installation/)
+The simplest way to run these benchmarks is to use docker:
 
 #### time-map
 
 ```bash
-k6 run 
+docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e HOST=api-dev.traveltimeapp.com //optional
     -e COUNTRY=gb //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
-    scripts/time-map.js
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
 ```
 
 #### time-filter
 
 ```bash
-k6 run 
+docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e HOST=api-dev.traveltimeapp.com //optional
@@ -37,19 +37,19 @@ k6 run
     -e TRAVEL_TIME=7200 //optional
     -e DESTINATIONS="100,150,200" // optional
     -e RANGE=600 //optional
-    scripts/time-filter.js
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter.js
 ```
 
-### Running K6 Tests with Docker
+### Running K6 Tests Locally
 
-The simplest way to run these benchmarks is to use docker:
+Install [K6](https://k6.io/docs/get-started/installation/)
 
 ```bash 
-docker run 
+k6 run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     ...other ENV (-e) vars...
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/{benchmark-file}.js
+    scripts/{benchmark-file}.js
 ```
 
 ### Metrics:
@@ -112,7 +112,7 @@ cycling+ferry
 walking+ferry
 ```
 
-### Running proto benchmarks
+### Running proto benchmarks locally
 
 1. Export path: ```bash export PATH=$(go env GOPATH)/bin:$PATH ```
 2. Install xk6: ```bash go install go.k6.io/xk6/cmd/xk6@latest ```
