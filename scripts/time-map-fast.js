@@ -12,7 +12,8 @@ import {
   summaryTrendStats,
   timeMapScenarios as scenarios,
   setThresholdsForScenarios,
-  deleteTimeMapMetrics
+  deleteTimeMapMetrics,
+  timeMapReport
 } from './common.js'
 
 export const options = {
@@ -56,6 +57,8 @@ export default function () {
 
 export function handleSummary (data) {
   deleteTimeMapMetrics(data)
+
+  data = timeMapReport(data)
 
   return {
     stdout: textSummary(data, {
