@@ -1,41 +1,62 @@
-export const mapEndpointOptions = {
-  stages: [{
+export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
+
+export const timeMapScenarios = {
+  mainScenario: {
+    executor: 'constant-vus',
     duration: '10s',
-    target: 5
-  } // 5 virtual users over 1 minutes
-  ],
-  summaryTrendStats: ['avg', 'min', 'max', 'p(90)', 'p(95)'],
-  thresholds: {
-    http_req_duration: ['max>=0'],
-    http_req_receiving: ['max>=0'],
-    http_req_sending: ['max>=0']
+    vus: 1,
+    startTime: '1s',
+    gracefulStop: '10s'
   }
+}
+
+export function deleteTimeMapMetrics (data) {
+  delete data.metrics.http_req_blocked
+  delete data.metrics['http_req_duration{expected_response:true}']
+  delete data.metrics.http_req_waiting
+  delete data.metrics.http_reqs
+  delete data.metrics.iteration_duration
+  delete data.metrics.iterations
+  delete data.metrics.vus
+  delete data.metrics.http_req_connecting
+  delete data.metrics.http_req_failed
+  delete data.metrics.http_req_tls_handshaking
+  delete data.metrics['http_req_sending{scenario:mainScenario}']
+  delete data.metrics['http_req_duration{scenario:mainScenario}']
+  delete data.metrics['http_req_receiving{scenario:mainScenario}']
 }
 
 export const destinations = (__ENV.DESTINATIONS || '50, 100, 150')
   .split(',')
   .map((curDestinations) => parseInt(curDestinations))
 
-const scenarios = destinations.reduce((accumulator, currentDestinations) => {
+export const timeFilterScenarios = destinations.reduce((accumulator, currentDestinations) => {
   accumulator[`sending_${currentDestinations}_destinations`] = {
     executor: 'constant-vus',
-    duration: '3m',
+    duration: '10s',
     env: { SCENARIO_DESTINATIONS: currentDestinations.toString() },
 
     vus: 1,
-    startTime: '10s',
+    startTime: '1s',
     gracefulStop: '10s'
   }
   return accumulator
 }, {})
 
-export const timeFilterOptions = {
-  scenarios,
-  summaryTrendStats: ['avg', 'min', 'max', 'p(90)', 'p(95)'],
-
-  thresholds: {
-    // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
-  }
+export function deleteTimeFilterMetrics (data) {
+  delete data.metrics.http_req_duration
+  delete data.metrics.http_req_sending
+  delete data.metrics.http_req_receiving
+  delete data.metrics.http_req_blocked
+  delete data.metrics['http_req_duration{expected_response:true}']
+  delete data.metrics.http_req_waiting
+  delete data.metrics.http_reqs
+  delete data.metrics.iteration_duration
+  delete data.metrics.iterations
+  delete data.metrics.vus
+  delete data.metrics.http_req_connecting
+  delete data.metrics.http_req_failed
+  delete data.metrics.http_req_tls_handshaking
 }
 
 export function setThresholdsForScenarios (options) {

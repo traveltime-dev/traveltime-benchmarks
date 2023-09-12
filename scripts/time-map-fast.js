@@ -9,10 +9,21 @@ import {
 import {
   generateRandomCoordinate,
   countries,
-  mapEndpointOptions
+  summaryTrendStats,
+  timeMapScenarios as scenarios,
+  setThresholdsForScenarios,
+  deleteTimeMapMetrics
 } from './common.js'
 
-export const options = mapEndpointOptions
+export const options = {
+  scenarios,
+  summaryTrendStats,
+
+  thresholds: {
+    // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
+  }
+}
+setThresholdsForScenarios(options)
 
 export default function () {
   const appId = __ENV.APP_ID
@@ -44,16 +55,7 @@ export default function () {
 }
 
 export function handleSummary (data) {
-  delete data.metrics.http_req_blocked
-  delete data.metrics['http_req_duration{expected_response:true}']
-  delete data.metrics.http_req_waiting
-  delete data.metrics.http_reqs
-  delete data.metrics.iteration_duration
-  delete data.metrics.iterations
-  delete data.metrics.vus
-  delete data.metrics.http_req_connecting
-  delete data.metrics.http_req_failed
-  delete data.metrics.http_req_tls_handshaking
+  deleteTimeMapMetrics(data)
 
   return {
     stdout: textSummary(data, {

@@ -11,14 +11,23 @@ import {
   generateDestinations,
   generateRandomCoordinate,
   destinations,
-  timeFilterOptions,
-  setThresholdsForScenarios
+  timeFilterScenarios as scenarios,
+  setThresholdsForScenarios,
+  deleteTimeFilterMetrics,
+  summaryTrendStats
 } from './common.js'
 import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 
-export const options = timeFilterOptions
+export const options = {
+  scenarios,
+  summaryTrendStats,
+
+  thresholds: {
+    // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
+  }
+}
 
 setThresholdsForScenarios(options)
 
@@ -73,19 +82,7 @@ export default function () {
 
 export function handleSummary (data) {
   // removing default metrics
-  delete data.metrics.http_req_duration
-  delete data.metrics.http_req_sending
-  delete data.metrics.http_req_receiving
-  delete data.metrics.http_req_blocked
-  delete data.metrics['http_req_duration{expected_response:true}']
-  delete data.metrics.http_req_waiting
-  delete data.metrics.http_reqs
-  delete data.metrics.iteration_duration
-  delete data.metrics.iterations
-  delete data.metrics.vus
-  delete data.metrics.http_req_connecting
-  delete data.metrics.http_req_failed
-  delete data.metrics.http_req_tls_handshaking
+  deleteTimeFilterMetrics(data)
 
   data = destinations.reduce((curData, curDestinations) => {
     return reportPerDestination(curData, curDestinations)

@@ -9,15 +9,26 @@ import {
 import {
   generateRandomCoordinate,
   countries,
-  mapEndpointOptions
+  timeMapScenarios as scenarios,
+  setThresholdsForScenarios,
+  summaryTrendStats,
+  deleteTimeMapMetrics
 } from './common.js'
 
-export const options = mapEndpointOptions
+export const options = {
+  scenarios,
+  summaryTrendStats,
+
+  thresholds: {
+    // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
+  }
+}
+setThresholdsForScenarios(options)
 
 export default function () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
-  const host = __ENV.HOST || 'api-dev.traveltimeapp.com'
+  const host = __ENV.HOST || 'api.traveltimeapp.com'
   const countryCode = __ENV.COUNTRY || 'gb'
   const countryCoords = countries[countryCode]
   const url = `https://${host}/v4/time-map`
@@ -32,6 +43,8 @@ export default function () {
   }
   const dateTime = new Date().toISOString()
 
+  console.log(countryCode)
+
   const response = http.post(url, generateBody(countryCode, travelTime, transportation, countryCoords, dateTime), params)
   check(response, {
     'status is 200': (r) => r.status === 200,
@@ -41,16 +54,7 @@ export default function () {
 }
 
 export function handleSummary (data) {
-  delete data.metrics.http_req_blocked
-  delete data.metrics['http_req_duration{expected_response:true}']
-  delete data.metrics.http_req_waiting
-  delete data.metrics.http_reqs
-  delete data.metrics.iteration_duration
-  delete data.metrics.iterations
-  delete data.metrics.vus
-  delete data.metrics.http_req_connecting
-  delete data.metrics.http_req_failed
-  delete data.metrics.http_req_tls_handshaking
+  deleteTimeMapMetrics(data)
 
   return {
     stdout: textSummary(data, {
