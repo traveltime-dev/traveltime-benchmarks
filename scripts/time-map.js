@@ -43,8 +43,6 @@ export default function () {
   }
   const dateTime = new Date().toISOString()
 
-  console.log(countryCode)
-
   const response = http.post(url, generateBody(countryCode, travelTime, transportation, countryCoords, dateTime), params)
   check(response, {
     'status is 200': (r) => r.status === 200,

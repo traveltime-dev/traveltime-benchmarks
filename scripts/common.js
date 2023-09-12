@@ -59,6 +59,19 @@ export function deleteTimeFilterMetrics (data) {
   delete data.metrics.http_req_tls_handshaking
 }
 
+export function reportPerDestination (data, destinations) {
+  data.metrics[`http_req_sending(${destinations} destinations)`] =
+               data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
+  delete data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
+  data.metrics[`http_req_receiving(${destinations} destinations)`] =
+               data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
+  delete data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
+  data.metrics[`http_req_duration(${destinations} destinations)`] =
+               data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
+  delete data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
+  return data
+}
+
 export function setThresholdsForScenarios (options) {
   for (const key in options.scenarios) {
     options.thresholds[`http_req_duration{scenario:${key}}`] = ['max>=0']

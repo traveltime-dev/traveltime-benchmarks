@@ -14,7 +14,8 @@ import {
   timeFilterScenarios as scenarios,
   setThresholdsForScenarios,
   deleteTimeFilterMetrics,
-  summaryTrendStats
+  summaryTrendStats,
+  reportPerDestination
 } from './common.js'
 import {
   textSummary
@@ -94,19 +95,6 @@ export function handleSummary (data) {
       enableColors: true
     })
   }
-}
-
-function reportPerDestination (data, destinations) {
-  data.metrics[`http_req_sending(${destinations} destinations)`] =
-        data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-  data.metrics[`http_req_receiving(${destinations} destinations)`] =
-        data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-  data.metrics[`http_req_duration(${destinations} destinations)`] =
-        data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
-  return data
 }
 
 function transportationType (transportation) {

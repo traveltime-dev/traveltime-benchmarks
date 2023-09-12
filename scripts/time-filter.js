@@ -13,7 +13,8 @@ import {
   setThresholdsForScenarios,
   countries,
   summaryTrendStats,
-  deleteTimeFilterMetrics
+  deleteTimeFilterMetrics,
+  reportPerDestination
 } from './common.js'
 
 export const options = {
@@ -78,21 +79,15 @@ export function handleSummary (data) {
   }
 }
 
-function reportPerDestination (data, destinations) {
-  data.metrics[`http_req_sending(${destinations} destinations)`] =
-        data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-  data.metrics[`http_req_receiving(${destinations} destinations)`] =
-        data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-  data.metrics[`http_req_duration(${destinations} destinations)`] =
-        data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
-  return data
-}
-
-function generateBody (countryCode, travelTime, transportation, destinationsAmount, rangeSettings,
-  countryCoords, dateTime) {
+function generateBody (
+  countryCode,
+  travelTime,
+  transportation,
+  destinationsAmount,
+  rangeSettings,
+  countryCoords,
+  dateTime
+) {
   const coordinates = countryCoords
 
   const destinations = Array.from({
