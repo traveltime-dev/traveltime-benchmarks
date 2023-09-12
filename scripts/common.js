@@ -21,9 +21,19 @@ export function deleteTimeMapMetrics (data) {
   delete data.metrics.http_req_connecting
   delete data.metrics.http_req_failed
   delete data.metrics.http_req_tls_handshaking
+}
+
+export function timeMapReport (data) {
+  data.metrics.http_req_sending =
+               data.metrics['http_req_sending{scenario:mainScenario}']
   delete data.metrics['http_req_sending{scenario:mainScenario}']
+  data.metrics.http_req_duration =
+                 data.metrics['http_req_duration{scenario:mainScenario}']
   delete data.metrics['http_req_duration{scenario:mainScenario}']
+  data.metrics.http_req_receiving =
+                data.metrics['http_req_receiving{scenario:mainScenario}']
   delete data.metrics['http_req_receiving{scenario:mainScenario}']
+  return data
 }
 
 export const destinations = (__ENV.DESTINATIONS || '50, 100, 150')
