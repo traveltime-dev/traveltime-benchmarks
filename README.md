@@ -12,7 +12,51 @@ You will need to email sales@traveltime.com or book a demo at https://traveltime
 
 The simplest way to run these benchmarks is to use docker:
 
-```bash 
+#### time-map
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=api-dev.traveltimeapp.com //optional
+    -e COUNTRY=gb //optional
+    -e TRANSPORTATION='driving+ferry' //optional
+    -e TRAVEL_TIME=7200 //optional
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
+```
+
+#### time-map-fast
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=api-dev.traveltimeapp.com //optional
+    -e COUNTRY=gb //optional
+    -e TRANSPORTATION='driving+ferry' //optional
+    -e TRAVEL_TIME=7200 //optional
+    -e ARRIVAL_TIME_PERIOD='weekday_morning' //optional
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
+```
+
+#### time-filter
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=api-dev.traveltimeapp.com //optional
+    -e COUNTRY=gb //optional
+    -e TRANSPORTATION='driving+ferry' //optional
+    -e TRAVEL_TIME=7200 //optional
+    -e DESTINATIONS="100,150,200" // optional
+    -e RANGE=600 //optional
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter.js
+```
+
+#### time-filter-proto
+
+```bash
 docker run 
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
@@ -24,6 +68,18 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/{benchmark-file}.js
 ```
 
+### Running K6 Tests Locally
+
+Install [K6](https://k6.io/docs/get-started/installation/)
+
+```bash 
+k6 run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    ...other ENV (-e) vars...
+    scripts/{benchmark-file}.js
+```
+
 ### Metrics:
 
 All used metrics are described here:
@@ -33,8 +89,12 @@ https://k6.io/docs/using-k6/metrics/
 * http_req_sending - Time spent sending data to the remote host
 * http_req_receiving - Time spent receiving response data from the remote host
 
-### Supported countries, transport modes
-Countries:
+### Supported Countries
+
+To see a list of all supported countries, send **map-info** **GET** request ([Postman](https://docs.traveltime.com/api/start/postman-collection#)) to:
+- https://api.traveltimeapp.com
+
+### Supported Countries for Proto
 ```
 lv
 nl
@@ -54,7 +114,25 @@ us_hi
 us_mst
 us_pst
 ```
-Modes:
+
+### Transport modes
+#### time-map, time-map-fast, time-filter
+```
+pt
+cycling
+driving
+driving+train
+public_transport
+walking
+coach
+bus
+train
+ferry
+driving+ferry
+cycling+ferry
+```
+
+#### time-filter-proto
 ```
 pt
 driving+ferry
@@ -62,21 +140,12 @@ cycling+ferry
 walking+ferry
 ```
 
-### Running locally:
+### Running proto benchmarks locally
 
-Install [K6](https://k6.io/docs/get-started/installation/)
-
-#### Running json requests:
-```bash
-k6 run -e APP_ID={APP_ID} -e API_KEY={API_KEY} -e HOST={HOST} scripts/{benchmark-file}.js
-```
-
-### Running proto benchmarks
-
-1. Export path: ```bash export PATH=$(go env GOPATH)/bin:$PATH ```
-2. Install xk6: ```bash go install go.k6.io/xk6/cmd/xk6@latest ```
-3. Build: ```bash xk6 build --with github.com/traveltime-dev/xk6-protobuf@latest ```
-4. Run: ```bash ./k6 run -e APP_ID={APP_ID} -e API_KEY={API_KEY} -e HOST={HOST} scripts/{proto-benchmark-file}.js```
+1. Install xk6: `go install go.k6.io/xk6/cmd/xk6@latest `
+2. Export path: `export PATH=$(go env GOPATH)/bin:$PATH`
+3. Build: `xk6 build --with github.com/traveltime-dev/xk6-protobuf@latest  --with github.com/grafana/xk6-output-prometheus-remote@latest`
+4. Run: ` ./k6 run -e APP_ID={APP_ID} -e API_KEY={API_KEY} -e HOST={HOST} scripts/{proto-benchmark-file}.js`
 
 ### Benchmark results:
 
