@@ -51,7 +51,7 @@ export default function () {
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
   const requestBody = protobuf
-    .load('proto/request.proto', 'TimeFilterFastRequest')
+    .load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
     .encode(generateBody(destinationsAmount, countryCoords, transportation, travelTime))
 
   const response = http.post(
@@ -68,7 +68,7 @@ export default function () {
     }
   )
 
-  const decodedResponse = protobuf.load('proto/response.proto', 'TimeFilterFastResponse').decode(response.body)
+  const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
 
   check(response, {
     'status is 200': (r) => r.status === 200
