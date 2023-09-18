@@ -11,18 +11,12 @@ import {
   countries,
   timeMapScenarios as scenarios,
   setThresholdsForScenarios,
-  summaryTrendStats,
-  deleteTimeMapMetrics
+  deleteTimeMapMetrics,
+  optionSetter
 } from './common.js'
 
-export const options = {
-  scenarios,
-  summaryTrendStats,
+export const options = optionSetter(scenarios)
 
-  thresholds: {
-    // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
-  }
-}
 setThresholdsForScenarios(options)
 
 export default function () {
@@ -33,7 +27,7 @@ export default function () {
   const countryCoords = countries[countryCode]
   const url = `https://${host}/v4/time-map`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const travelTime = __ENV.TRAVEL_TIME || 7200
+  const travelTime = __ENV.TRAVEL_TIME || 3800
   const params = {
     headers: {
       'Content-Type': 'application/json',

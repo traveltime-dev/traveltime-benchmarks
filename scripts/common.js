@@ -10,6 +10,17 @@ export const timeMapScenarios = {
   }
 }
 
+export function optionSetter (scenarios) {
+  return {
+    scenarios,
+    summaryTrendStats,
+
+    thresholds: {
+      // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
+    }
+  }
+}
+
 export function deleteTimeMapMetrics (data) {
   delete data.metrics.http_req_blocked
   delete data.metrics['http_req_duration{expected_response:true}']
@@ -26,7 +37,7 @@ export function deleteTimeMapMetrics (data) {
   delete data.metrics['http_req_receiving{scenario:mainScenario}']
 }
 
-export const destinations = (__ENV.DESTINATIONS || '50, 100, 150')
+export const destinations = (__ENV.DESTINATIONS || '5000')
   .split(',')
   .map((curDestinations) => parseInt(curDestinations))
 
@@ -308,6 +319,7 @@ export const countries = {
   ua: { lat: 50.4333333333333, lng: 30.516667 },
   ae: { lat: 25.276987, lng: 55.296249 },
   gb: { lat: 51.5, lng: -0.083333 },
+  uk: { lat: 51.5, lng: -0.083333 }, // added uk for consistency in naming (proto uses uk instead of gb)
   us: { lat: 38.895110, lng: -77.036366 },
   vi: { lat: 18.35, lng: -64.933333 },
   uy: { lat: -34.9, lng: -56.191667 },

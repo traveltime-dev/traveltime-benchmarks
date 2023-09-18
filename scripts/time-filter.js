@@ -12,19 +12,12 @@ import {
   timeFilterScenarios as scenarios,
   setThresholdsForScenarios,
   countries,
-  summaryTrendStats,
+  optionSetter,
   deleteTimeFilterMetrics,
   reportPerDestination
 } from './common.js'
 
-export const options = {
-  scenarios,
-  summaryTrendStats,
-
-  thresholds: {
-    // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
-  }
-}
+export const options = optionSetter(scenarios)
 
 setThresholdsForScenarios(options)
 
@@ -36,7 +29,7 @@ export default function () {
   const countryCoords = countries[countryCode]
   const url = `https://${host}/v4/time-filter`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const travelTime = __ENV.TRAVEL_TIME || 1900
+  const travelTime = __ENV.TRAVEL_TIME || 3800
   const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
   const rangeWidth = __ENV.RANGE || 0
   const rangeSettings = {

@@ -21,7 +21,7 @@ docker run
     -e HOST=api-dev.traveltimeapp.com //optional
     -e COUNTRY=gb //optional
     -e TRANSPORTATION='driving+ferry' //optional
-    -e TRAVEL_TIME=7200 //optional
+    -e TRAVEL_TIME=3800 //optional
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
 ```
 
@@ -34,7 +34,7 @@ docker run
     -e HOST=api-dev.traveltimeapp.com //optional
     -e COUNTRY=gb //optional
     -e TRANSPORTATION='driving+ferry' //optional
-    -e TRAVEL_TIME=7200 //optional
+    -e TRAVEL_TIME=3800 //optional
     -e ARRIVAL_TIME_PERIOD='weekday_morning' //optional
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
 ```
@@ -48,8 +48,8 @@ docker run
     -e HOST=api-dev.traveltimeapp.com //optional
     -e COUNTRY=gb //optional
     -e TRANSPORTATION='driving+ferry' //optional
-    -e TRAVEL_TIME=7200 //optional
-    -e DESTINATIONS="100,150,200" // optional
+    -e TRAVEL_TIME=3800 //optional
+    -e DESTINATIONS="5000" // optional
     -e RANGE=600 //optional
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter.js
 ```
@@ -63,8 +63,8 @@ docker run
     -e HOST=api-dev.traveltimeapp.com //optional
     -e COUNTRY=gb //optional
     -e TRANSPORTATION='driving+ferry' //optional
-    -e TRAVEL_TIME=7200 //optional
-    -e DESTINATIONS="100,150,200" // optional
+    -e TRAVEL_TIME=3800 //optional
+    -e DESTINATIONS="5000" // optional
     -e ARRIVAL_TIME_PERIOD='weekday_morning' //optional
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-fast.js
 ```
@@ -75,11 +75,11 @@ docker run
 docker run 
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e DESTINATIONS="1000,5000,10000,25000,100000" // optional
+    -e DESTINATIONS="5000" // optional
     -e HOST=proto.api.traveltimeapp.com // optional
-    -e TRANSPORTATION=driving+ferry // optional
+    -e TRANSPORTATION='driving+ferry' // optional
     -e COUNTRY=uk // optional
-    -e TRAVEL_TIME=7200 // optional
+    -e TRAVEL_TIME=3800 // optional
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/{benchmark-file}.js
 ```
 
@@ -129,22 +129,36 @@ us_hi
 us_mst
 us_pst
 ```
-
+x
 ### Transport modes
-#### time-map, time-map-fast, time-filter, time-filter-fast
+
+### time-map, time-filter
+
 ```
-pt
 cycling
 driving
 driving+train
+cycling+public_transport
 public_transport
 walking
 coach
 bus
 train
 ferry
-driving+ferry
 cycling+ferry
+driving+ferry
+```
+
+### time-map-fast
+```
+public_transport
+driving+public_transport
+driving
+driving+ferry
+cycling
+cycling+ferry
+walking
+walking+ferry
 ```
 
 #### time-filter-proto

@@ -8,32 +8,25 @@ import {
 } from 'k6'
 import {
   generateRandomCoordinate,
-  countries,
-  summaryTrendStats,
+  protoCountries,
+  optionSetter,
   timeMapScenarios as scenarios,
   setThresholdsForScenarios,
   deleteTimeMapMetrics
 } from './common.js'
 
-export const options = {
-  scenarios,
-  summaryTrendStats,
-
-  thresholds: {
-    // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
-  }
-}
+export const options = optionSetter(scenarios)
 setThresholdsForScenarios(options)
 
 export default function () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'
-  const countryCode = __ENV.COUNTRY || 'gb'
-  const countryCoords = countries[countryCode]
+  const countryCode = __ENV.COUNTRY || 'uk'
+  const countryCoords = protoCountries[countryCode]
   const url = `https://${host}/v4/time-map/fast`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const travelTime = __ENV.TRAVEL_TIME || 7200
+  const travelTime = __ENV.TRAVEL_TIME || 3800
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
   const params = {
     headers: {
@@ -46,6 +39,9 @@ export default function () {
 
   const response = http.post(url, generateBody(countryCode, travelTime,
     transportation, countryCoords, dateTime, arrivalTimePeriod), params)
+
+  console.log(generateBody(countryCode, travelTime,
+    transportation, countryCoords, dateTime, arrivalTimePeriod))
 
   check(response, {
     'status is 200': (r) => r.status === 200,

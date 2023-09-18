@@ -14,21 +14,14 @@ import {
   timeFilterScenarios as scenarios,
   setThresholdsForScenarios,
   deleteTimeFilterMetrics,
-  summaryTrendStats,
+  optionSetter,
   reportPerDestination
 } from './common.js'
 import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 
-export const options = {
-  scenarios,
-  summaryTrendStats,
-
-  thresholds: {
-    // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
-  }
-}
+export const options = optionSetter(scenarios)
 
 setThresholdsForScenarios(options)
 
@@ -44,7 +37,7 @@ export default function () {
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const protocol = __ENV.PROTOCOL || 'https'
-  const travelTime = __ENV.TRAVEL_TIME || 7200
+  const travelTime = __ENV.TRAVEL_TIME || 3800
   const countryCoords = protoCountries[country]
 
   randomSeed(seed)

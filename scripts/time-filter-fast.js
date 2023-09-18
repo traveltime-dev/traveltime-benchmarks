@@ -11,32 +11,25 @@ import {
   destinations,
   timeFilterScenarios as scenarios,
   setThresholdsForScenarios,
-  countries,
-  summaryTrendStats,
+  protoCountries,
+  optionSetter,
   deleteTimeFilterMetrics,
   reportPerDestination
 } from './common.js'
 
-export const options = {
-  scenarios,
-  summaryTrendStats,
-
-  thresholds: {
-    // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
-  }
-}
+export const options = optionSetter(scenarios)
 
 setThresholdsForScenarios(options)
 
 export default function () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
-  const host = __ENV.HOST || 'api.traveltimeapp.com'
-  const countryCode = __ENV.COUNTRY || 'gb'
-  const countryCoords = countries[countryCode]
+  const host = __ENV.HOST || 'api-dev.traveltimeapp.com'
+  const countryCode = __ENV.COUNTRY || 'uk'
+  const countryCoords = protoCountries[countryCode]
   const url = `https://${host}/v4/time-filter/fast`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const travelTime = __ENV.TRAVEL_TIME || 1900
+  const travelTime = __ENV.TRAVEL_TIME || 3800
   const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
 
@@ -50,6 +43,8 @@ export default function () {
 
   const response = http.post(url, generateBody(countryCode, travelTime,
     transportation, destinationsAmount, countryCoords, arrivalTimePeriod), params)
+
+  console.log(response.body)
 
   check(response, {
     'status is 200': (r) => r.status === 200,
