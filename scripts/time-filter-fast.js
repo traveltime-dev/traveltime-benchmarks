@@ -44,8 +44,6 @@ export default function () {
   const response = http.post(url, generateBody(countryCode, travelTime,
     transportation, destinationsAmount, countryCoords, arrivalTimePeriod), params)
 
-  console.log(response.body)
-
   check(response, {
     'status is 200': (r) => r.status === 200,
     'response body is not empty': (r) => r.body.length > 0
