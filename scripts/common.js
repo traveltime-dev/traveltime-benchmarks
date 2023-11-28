@@ -40,15 +40,19 @@ export const destinations = (__ENV.DESTINATIONS || '50, 100, 150')
   .split(',')
   .map((curDestinations) => parseInt(curDestinations))
 
+export const rpm = parseInt(__ENV.RPM || '60')
+
 export const timeFilterScenarios = destinations.reduce((accumulator, currentDestinations) => {
   accumulator[`sending_${currentDestinations}_destinations`] = {
-    executor: 'constant-vus',
-    duration: '10s',
+    executor: 'constant-arrival-rate',
+    duration: '3m',
     env: { SCENARIO_DESTINATIONS: currentDestinations.toString() },
-
-    vus: 1,
-    startTime: '1s',
-    gracefulStop: '10s'
+    rate: rpm,
+    timeUnit: '1m',
+    startTime: '5s',
+    gracefulStop: '10s',
+    preAllocatedVUs: 10,
+    maxVUs: 400,
   }
   return accumulator
 }, {})
@@ -88,7 +92,7 @@ export function setThresholdsForScenarios (options) {
     options.thresholds[`http_req_receiving{scenario:${key}}`] = ['max>=0']
     options.thresholds[`http_req_sending{scenario:${key}}`] = ['max>=0']
   }
-};
+}
 
 export const countries = {
   gs: { lat: -54.283333, lng: -36.5 },
