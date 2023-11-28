@@ -25,6 +25,7 @@ export const options = {
   }
 }
 setThresholdsForScenarios(options)
+randomSeed(__ENV.SEED || 1234567)
 
 export default function () {
   const appId = __ENV.APP_ID
