@@ -52,7 +52,7 @@ export const timeFilterScenarios = destinations.reduce((accumulator, currentDest
     startTime: '5s',
     gracefulStop: '10s',
     preAllocatedVUs: 10,
-    maxVUs: 400,
+    maxVUs: 400
   }
   return accumulator
 }, {})

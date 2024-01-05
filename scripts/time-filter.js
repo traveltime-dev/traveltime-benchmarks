@@ -4,7 +4,8 @@ import {
 import http from 'k6/http'
 import {
   check,
-  sleep
+  sleep,
+  randomSeed
 } from 'k6'
 import {
   generateRandomCoordinate,
