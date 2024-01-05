@@ -65,7 +65,7 @@ docker run
     -e TRANSPORTATION=driving+ferry // optional
     -e COUNTRY=uk // optional
     -e TRAVEL_TIME=7200 // optional
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/{benchmark-file}.js
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-proto.js
 ```
 
 ### Running K6 Tests Locally
