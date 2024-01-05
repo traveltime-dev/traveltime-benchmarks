@@ -9,12 +9,12 @@ import {
 } from 'k6'
 import {
   generateRandomCoordinate,
-  countries,
   summaryTrendStats,
   timeMapScenarios as scenarios,
   setThresholdsForScenarios,
   deleteTimeMapMetrics,
-  timeMapReport
+  timeMapReport,
+  getCountryCoordinates
 } from './common.js'
 
 export const options = {
@@ -33,7 +33,7 @@ export default function () {
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'
   const countryCode = __ENV.COUNTRY || 'gb'
-  const countryCoords = countries[countryCode]
+  const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
   const url = `https://${host}/v4/time-map/fast`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = __ENV.TRAVEL_TIME || 7200
@@ -45,10 +45,8 @@ export default function () {
       'X-Api-Key': apiKey
     }
   }
-  const dateTime = new Date().toISOString()
 
-  const response = http.post(url, generateBody(countryCode, travelTime,
-    transportation, countryCoords, dateTime, arrivalTimePeriod), params)
+  const response = http.post(url, generateBody(travelTime, transportation, countryCoords, arrivalTimePeriod), params)
 
   check(response, {
     'status is 200': (r) => r.status === 200,
@@ -70,7 +68,7 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (countryCode, travelTime, transportation, countryCoords, dateTime, arrivalTimePeriod) {
+function generateBody (travelTime, transportation, countryCoords, arrivalTimePeriod) {
   const coordinates = countryCoords
   return JSON.stringify({
     arrival_searches: {

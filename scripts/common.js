@@ -94,6 +94,19 @@ export function setThresholdsForScenarios (options) {
   }
 }
 
+export function getCountryCoordinates (countryCode, coordinatesEnv, useProto = false) {
+  const data = useProto ? protoCountries : countries
+
+  if (coordinatesEnv) {
+    const coords = coordinatesEnv.split(',')
+    if (coords.length === 2) {
+      const [lat, lng] = coords.map(Number)
+      return { lat, lng }
+    }
+  }
+  return data[countryCode]
+}
+
 export const countries = {
   gs: { lat: -54.283333, lng: -36.5 },
   tf: { lat: -49.35, lng: 70.216667 },
