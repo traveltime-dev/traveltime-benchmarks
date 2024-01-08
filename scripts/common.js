@@ -98,7 +98,7 @@ export function getCountryCoordinates (countryCode, coordinatesEnv, useProto = f
   const data = useProto ? protoCountries : countries
 
   if (coordinatesEnv) {
-    const coords = coordinatesEnv.split(',')
+    const coords = coordinatesEnv.split(',').map(coord => coord.trim())
     if (coords.length === 2) {
       const [lat, lng] = coords.map(Number)
       return { lat, lng }
