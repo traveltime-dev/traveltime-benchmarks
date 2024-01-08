@@ -102,6 +102,9 @@ export function getCountryCoordinates (countryCode, coordinatesEnv, useProto = f
     if (coords.length === 2) {
       const [lat, lng] = coords.map(Number)
       return { lat, lng }
+    } else {
+      console.error('Invalid coordinates format')
+      return null
     }
   }
   return data[countryCode]
