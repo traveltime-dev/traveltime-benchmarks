@@ -45,7 +45,7 @@ export default function () {
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const protocol = __ENV.PROTOCOL || 'https'
   const travelTime = __ENV.TRAVEL_TIME || 7200
-  const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES, true)
+  const countryCoords = getCountryCoordinates(countryCode(country), __ENV.COORDINATES, true)
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
