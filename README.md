@@ -18,7 +18,7 @@ The simplest way to run these benchmarks is to use docker:
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api-dev.traveltimeapp.com //optional
+    -e HOST=api.traveltimeapp.com //optional
     -e COUNTRY=gb //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
@@ -31,7 +31,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api-dev.traveltimeapp.com //optional
+    -e HOST=api.traveltimeapp.com //optional
     -e COUNTRY=gb //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
@@ -45,7 +45,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api-dev.traveltimeapp.com //optional
+    -e HOST=api.traveltimeapp.com //optional
     -e COUNTRY=gb //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
