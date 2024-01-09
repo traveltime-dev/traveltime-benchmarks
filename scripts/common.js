@@ -94,20 +94,34 @@ export function setThresholdsForScenarios (options) {
   }
 }
 
-export function getCountryCoordinates (countryCode, coordinatesEnv, useProto = false) {
-  const data = useProto ? protoCountries : countries
-
-  if (coordinatesEnv) {
-    const coords = coordinatesEnv.split(',').map(coord => coord.trim())
-    if (coords.length === 2) {
-      const [lat, lng] = coords.map(Number)
-      return { lat, lng }
-    } else {
-      console.error('Invalid coordinates format')
-      return null
-    }
+function coords (coordinatesEnv) {
+  const coords = coordinatesEnv.split(',').map(coord => coord.trim())
+  if (coords.length === 2) {
+    const [lat, lng] = coords.map(Number)
+    return { lat, lng }
+  } else {
+    console.error('Invalid coordinates format')
+    return null
   }
-  return data[countryCode]
+}
+
+export function getCountryCoordinates (countryCode, coordinatesEnv) {
+  if (coordinatesEnv) {
+    return coords(coordinatesEnv)
+  }
+  return countries[countryCode]
+}
+
+export function getProtoCountryCoordinates (countryCodeEnv, coordinatesEnv) {
+  if (coordinatesEnv && countryCodeEnv) {
+    return coords(coordinatesEnv)
+  } else if (coordinatesEnv && !countryCodeEnv) {
+    console.error('Country code must be specified with custom coords for protobuf requests')
+  } else if (countryCodeEnv && !coordinatesEnv) {
+    return protoCountries[countryCodeEnv]
+  } else {
+    return protoCountries.uk // default
+  }
 }
 
 export const countries = {
