@@ -94,6 +94,35 @@ export function setThresholdsForScenarios (options) {
   }
 }
 
+function coords (coordinatesEnv) {
+  const coords = coordinatesEnv.split(',').map(coord => coord.trim())
+  if (coords.length === 2) {
+    const [lat, lng] = coords.map(Number)
+    return { lat, lng }
+  } else {
+    throw new Error('Invalid coordinates format')
+  }
+}
+
+export function getCountryCoordinates (countryCode, coordinatesEnv) {
+  if (coordinatesEnv) {
+    return coords(coordinatesEnv)
+  }
+  return countries[countryCode]
+}
+
+export function getProtoCountryCoordinates (countryCodeEnv, coordinatesEnv) {
+  if (coordinatesEnv && countryCodeEnv) {
+    return coords(coordinatesEnv)
+  } else if (coordinatesEnv && !countryCodeEnv) {
+    throw new Error('Country code must be specified with custom coords for protobuf requests')
+  } else if (countryCodeEnv && !coordinatesEnv) {
+    return protoCountries[countryCodeEnv]
+  } else {
+    return protoCountries.uk // default
+  }
+}
+
 export const countries = {
   gs: { lat: -54.283333, lng: -36.5 },
   tf: { lat: -49.35, lng: 70.216667 },

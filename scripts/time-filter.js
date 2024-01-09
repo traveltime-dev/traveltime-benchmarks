@@ -12,10 +12,10 @@ import {
   destinations,
   timeFilterScenarios as scenarios,
   setThresholdsForScenarios,
-  countries,
   summaryTrendStats,
   deleteTimeFilterMetrics,
-  reportPerDestination
+  reportPerDestination,
+  getCountryCoordinates
 } from './common.js'
 
 export const options = {
@@ -35,7 +35,7 @@ export default function () {
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'
   const countryCode = __ENV.COUNTRY || 'gb'
-  const countryCoords = countries[countryCode]
+  const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
   const url = `https://${host}/v4/time-filter`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = __ENV.TRAVEL_TIME || 1900
@@ -56,8 +56,7 @@ export default function () {
     }
   }
 
-  const response = http.post(url, generateBody(countryCode, travelTime,
-    transportation, destinationsAmount, rangeSettings, countryCoords, dateTime), params)
+  const response = http.post(url, generateBody(travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime), params)
   check(response, {
     'status is 200': (r) => r.status === 200,
     'response body is not empty': (r) => r.body.length > 0
@@ -82,7 +81,6 @@ export function handleSummary (data) {
 }
 
 function generateBody (
-  countryCode,
   travelTime,
   transportation,
   destinationsAmount,

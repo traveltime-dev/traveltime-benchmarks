@@ -6,7 +6,6 @@ import {
   sleep
 } from 'k6'
 import {
-  protoCountries,
   destinationDeltas,
   generateDestinations,
   generateRandomCoordinate,
@@ -15,7 +14,8 @@ import {
   setThresholdsForScenarios,
   deleteTimeFilterMetrics,
   summaryTrendStats,
-  reportPerDestination
+  reportPerDestination,
+  getProtoCountryCoordinates
 } from './common.js'
 import {
   textSummary
@@ -40,12 +40,13 @@ export default function () {
   const apiKey = __ENV.API_KEY
   const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
   const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
-  const country = __ENV.COUNTRY || 'uk'
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const protocol = __ENV.PROTOCOL || 'https'
   const travelTime = __ENV.TRAVEL_TIME || 7200
-  const countryCoords = protoCountries[country]
+  const envCountry = __ENV.COUNTRY
+  const countryCoords = getProtoCountryCoordinates(envCountry, __ENV.COORDINATES, true)
+  const country = envCountry || 'uk'
+  const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
