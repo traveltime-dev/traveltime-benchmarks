@@ -100,8 +100,7 @@ function coords (coordinatesEnv) {
     const [lat, lng] = coords.map(Number)
     return { lat, lng }
   } else {
-    console.error('Invalid coordinates format')
-    return null
+    throw new Error('Invalid coordinates format')
   }
 }
 
@@ -116,7 +115,7 @@ export function getProtoCountryCoordinates (countryCodeEnv, coordinatesEnv) {
   if (coordinatesEnv && countryCodeEnv) {
     return coords(coordinatesEnv)
   } else if (coordinatesEnv && !countryCodeEnv) {
-    console.error('Country code must be specified with custom coords for protobuf requests')
+    throw new Error('Country code must be specified with custom coords for protobuf requests')
   } else if (countryCodeEnv && !coordinatesEnv) {
     return protoCountries[countryCodeEnv]
   } else {
