@@ -66,8 +66,8 @@ docker run
     -e DESTINATIONS="1000,5000,10000,25000,100000" // optional
     -e HOST=proto.api.traveltimeapp.com // optional
     -e TRANSPORTATION=driving+ferry // optional
-    -e COUNTRY=uk // optional
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
+    -e COUNTRY=uk // optional, but mandatory if COORDINATES are specified
     -e TRAVEL_TIME=7200 // optional
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-proto.js
 ```
