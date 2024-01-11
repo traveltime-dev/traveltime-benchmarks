@@ -38,7 +38,7 @@ export default function () {
   const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
   const url = `https://${host}/v4/time-filter`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const travelTime = __ENV.TRAVEL_TIME || 1900
+  const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
   const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
   const rangeWidth = __ENV.RANGE || 0
   const rangeSettings = {

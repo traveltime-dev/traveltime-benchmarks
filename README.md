@@ -37,6 +37,8 @@ docker run
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
+    -e LEVEL_OF_DETAILS=2 // optional
+    -e RPM=200 // optional
     -e ARRIVAL_TIME_PERIOD='weekday_morning' //optional
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
 ```

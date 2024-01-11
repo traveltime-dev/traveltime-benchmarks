@@ -42,7 +42,7 @@ export default function () {
   const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
-  const travelTime = __ENV.TRAVEL_TIME || 7200
+  const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const envCountry = __ENV.COUNTRY
   const countryCoords = getProtoCountryCoordinates(envCountry, __ENV.COORDINATES, true)
   const country = envCountry || 'uk'
@@ -53,6 +53,7 @@ export default function () {
   const requestBody = protobuf
     .load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
     .encode(generateBody(destinationsAmount, countryCoords, transportation, travelTime))
+
 
   const response = http.post(
     url,

@@ -1,12 +1,17 @@
 export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
 
+export const rpm = parseInt(__ENV.RPM || '60')
+
 export const timeMapScenarios = {
   mainScenario: {
-    executor: 'constant-vus',
-    duration: '10s',
-    vus: 1,
-    startTime: '1s',
-    gracefulStop: '10s'
+    executor: 'constant-arrival-rate',
+    duration: '3m',
+    rate: rpm,
+    timeUnit: '1m',
+    startTime: '5s',
+    gracefulStop: '10s',
+    preAllocatedVUs: 10,
+    maxVUs: 400
   }
 }
 
@@ -40,7 +45,6 @@ export const destinations = (__ENV.DESTINATIONS || '50, 100, 150')
   .split(',')
   .map((curDestinations) => parseInt(curDestinations))
 
-export const rpm = parseInt(__ENV.RPM || '60')
 
 export const timeFilterScenarios = destinations.reduce((accumulator, currentDestinations) => {
   accumulator[`sending_${currentDestinations}_destinations`] = {
