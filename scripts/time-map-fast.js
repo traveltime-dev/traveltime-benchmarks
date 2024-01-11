@@ -36,7 +36,7 @@ export default function () {
   const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
   const url = `https://${host}/v4/time-map/fast`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const travelTime = __ENV.TRAVEL_TIME || 7200
+  const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
   const params = {
     headers: {
@@ -80,6 +80,10 @@ function generateBody (travelTime, transportation, countryCoords, arrivalTimePer
           travel_time: travelTime,
           transportation: {
             type: transportation
+          },
+          level_of_detail: {
+            scale_type: "simple_numeric",
+            level: -8
           }
         }
       ]

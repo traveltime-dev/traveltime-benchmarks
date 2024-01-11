@@ -42,7 +42,7 @@ export default function () {
   const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
-  const travelTime = __ENV.TRAVEL_TIME || 7200
+  const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const envCountry = __ENV.COUNTRY
   const countryCoords = getProtoCountryCoordinates(envCountry, __ENV.COORDINATES, true)
   const country = envCountry || 'uk'
@@ -54,6 +54,8 @@ export default function () {
     .load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
     .encode(generateBody(destinationsAmount, countryCoords, transportation, travelTime))
 
+
+  console.log(generateBody(destinationsAmount, countryCoords, transportation, travelTime))
   const response = http.post(
     url,
     requestBody, {
@@ -70,6 +72,7 @@ export default function () {
 
   const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
 
+  console.log(decodedResponse)
   check(response, {
     'status is 200': (r) => r.status === 200
   })
@@ -121,8 +124,8 @@ function generateBody (destinationsAmount, coord, transportation, travelTime) {
   const departure = generateRandomCoordinate(coord.lat, coord.lng, diff)
   const destinations = generateDestinations(destinationsAmount, departure, diff)
   return JSON.stringify({
-    oneToManyRequest: {
-      departureLocation: departure,
+    manyToOneRequest: {
+      arrivalLocation: departure,
       locationDeltas: destinationDeltas(departure, destinations),
       transportation: {
         type: transportationType(transportation)

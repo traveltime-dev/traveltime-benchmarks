@@ -36,7 +36,7 @@ export default function () {
   const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
   const url = `https://${host}/v4/time-map`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const travelTime = __ENV.TRAVEL_TIME || 7200
+  const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const params = {
     headers: {
       'Content-Type': 'application/json',
