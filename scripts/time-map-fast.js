@@ -37,6 +37,7 @@ export default function () {
   const url = `https://${host}/v4/time-map/fast`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
+  const levelOfDetails = parseInt(__ENV.LEVEL_OF_DETAILS || -8)
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
   const params = {
     headers: {
@@ -46,7 +47,7 @@ export default function () {
     }
   }
 
-  const response = http.post(url, generateBody(travelTime, transportation, countryCoords, arrivalTimePeriod), params)
+  const response = http.post(url, generateBody(travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails), params)
 
   check(response, {
     'status is 200': (r) => r.status === 200,
@@ -68,7 +69,7 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (travelTime, transportation, countryCoords, arrivalTimePeriod) {
+function generateBody (travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails) {
   const coordinates = countryCoords
   return JSON.stringify({
     arrival_searches: {
@@ -83,7 +84,7 @@ function generateBody (travelTime, transportation, countryCoords, arrivalTimePer
           },
           level_of_detail: {
             scale_type: "simple_numeric",
-            level: -8
+            level: levelOfDetails
           }
         }
       ]
