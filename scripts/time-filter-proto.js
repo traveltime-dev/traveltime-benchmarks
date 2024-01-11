@@ -55,7 +55,6 @@ export default function () {
     .encode(generateBody(destinationsAmount, countryCoords, transportation, travelTime))
 
 
-  console.log(generateBody(destinationsAmount, countryCoords, transportation, travelTime))
   const response = http.post(
     url,
     requestBody, {
@@ -72,7 +71,6 @@ export default function () {
 
   const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
 
-  console.log(decodedResponse)
   check(response, {
     'status is 200': (r) => r.status === 200
   })
@@ -124,8 +122,8 @@ function generateBody (destinationsAmount, coord, transportation, travelTime) {
   const departure = generateRandomCoordinate(coord.lat, coord.lng, diff)
   const destinations = generateDestinations(destinationsAmount, departure, diff)
   return JSON.stringify({
-    manyToOneRequest: {
-      arrivalLocation: departure,
+    oneToManyRequest: {
+      departureLocation: departure,
       locationDeltas: destinationDeltas(departure, destinations),
       transportation: {
         type: transportationType(transportation)
