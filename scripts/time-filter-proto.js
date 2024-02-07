@@ -103,9 +103,9 @@ function transportationType (transportation) {
     case 'driving+ferry':
       return 'DRIVING_AND_FERRY'
     case 'walking+ferry':
-      return 'WALKING_FERRY'
+      return 'WALKING_AND_FERRY'
     case 'cycling+ferry':
-      return 'CYCLING_FERRY'
+      return 'CYCLING_AND_FERRY'
     case 'pt':
       return 'PUBLIC_TRANSPORT'
     default:
