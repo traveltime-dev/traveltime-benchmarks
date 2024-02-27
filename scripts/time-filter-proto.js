@@ -53,8 +53,7 @@ export default function () {
 
   const requestBody = protobuf
     .load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
-    .encode(generateBody(destinationsAmount, countryCoords, transportation, travelTime))
-
+    .encode(generateBody(destinationsAmount, countryCoords, transportation, travelTime, isManyToOne))
 
   const response = http.post(
     url,
