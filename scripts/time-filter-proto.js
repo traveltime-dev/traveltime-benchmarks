@@ -47,6 +47,7 @@ export default function () {
   const countryCoords = getProtoCountryCoordinates(envCountry, __ENV.COORDINATES, true)
   const country = envCountry || 'uk'
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
+  const isManyToOne = __ENV.MANY_TO_ONE !== undefined
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
@@ -117,18 +118,31 @@ function countryCode (country) {
   if (country.startsWith('us_')) { return 'us' } else { return country }
 }
 
-function generateBody (destinationsAmount, coord, transportation, travelTime) {
+function generateBody (destinationsAmount, coord, transportation, travelTime, isManyToOne) {
   const diff = 0.005
-  const departure = generateRandomCoordinate(coord.lat, coord.lng, diff)
-  const destinations = generateDestinations(destinationsAmount, departure, diff)
-  return JSON.stringify({
-    oneToManyRequest: {
-      departureLocation: departure,
-      locationDeltas: destinationDeltas(departure, destinations),
-      transportation: {
-        type: transportationType(transportation)
-      },
-      travelTime
-    }
-  })
+  const originLocation = generateRandomCoordinate(coord.lat, coord.lng, diff)
+  const destinations = generateDestinations(destinationsAmount, originLocation, diff)
+  if(isManyToOne) {
+    return JSON.stringify({
+      manyToOneRequest: {
+        arrivalLocation: originLocation,
+        locationDeltas: destinationDeltas(originLocation, destinations),
+        transportation: {
+          type: transportationType(transportation)
+        },
+        travelTime
+      }
+    })
+  } else {
+    return JSON.stringify({
+      oneToManyRequest: {
+        departureLocation: originLocation,
+        locationDeltas: destinationDeltas(originLocation, destinations),
+        transportation: {
+          type: transportationType(transportation)
+        },
+        travelTime
+      }
+    })
+  }
 }
