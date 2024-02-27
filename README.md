@@ -66,6 +66,7 @@ docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e DESTINATIONS="1000,5000,10000,25000,100000" // optional
+    -e MANY_TO_ONE // optional
     -e HOST=proto.api.traveltimeapp.com // optional
     -e TRANSPORTATION=driving+ferry // optional
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
