@@ -9,7 +9,7 @@ import {
 } from 'k6'
 import {
   generateRandomCoordinate,
-  timeMapScenarios as scenarios,
+  oneLocationScenario as scenarios,
   setThresholdsForScenarios,
   summaryTrendStats,
   deleteTimeMapMetrics,

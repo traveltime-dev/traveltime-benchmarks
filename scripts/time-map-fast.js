@@ -10,7 +10,7 @@ import {
 import {
   generateRandomCoordinate,
   summaryTrendStats,
-  timeMapScenarios as scenarios,
+  oneLocationScenario as scenarios,
   setThresholdsForScenarios,
   deleteTimeMapMetrics,
   timeMapReport,

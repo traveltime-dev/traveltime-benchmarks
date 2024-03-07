@@ -36,7 +36,7 @@ export default function () {
   const host = __ENV.HOST || 'api.traveltimeapp.com'
   const countryCode = __ENV.COUNTRY || 'gb'
   const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
-  const url = `https://${host}/v4/routes`
+  const url = `https://${host}/v4/time-filter`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
   const destinationsAmount = __ENV.SCENARIO_DESTINATIONS

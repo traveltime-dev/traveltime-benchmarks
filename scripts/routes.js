@@ -10,7 +10,7 @@ import {
 import {
     generateRandomCoordinate,
     destinations,
-    multipleDestinationsScenarios as scenarios,
+    oneLocationScenario as scenarios,
     setThresholdsForScenarios,
     summaryTrendStats,
     deleteTimeFilterMetrics,
@@ -36,10 +36,8 @@ export default function () {
     const host = __ENV.HOST || 'api.traveltimeapp.com'
     const countryCode = __ENV.COUNTRY || 'gb'
     const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
-    const url = `https://${host}/v4/time-filter`
+    const url = `https://${host}/v4/routes`
     const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-    const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
-    const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
     const dateTime = new Date().toISOString()
 
     const params = {
@@ -50,8 +48,7 @@ export default function () {
         }
     }
 
-    const response = http.post(url, generateBody(travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime), params)
-    console.log(response.status)
+    const response = http.post(url, generateBody(transportation, countryCoords, dateTime), params)
     check(response, {
         'status is 200': (r) => r.status === 200,
         'response body is not empty': (r) => r.body.length > 0
@@ -59,7 +56,7 @@ export default function () {
     sleep(1)
 }
 
-export function handleSummary (data) {
+export function handleSummary(data) {
     // removing default metrics
     deleteTimeFilterMetrics(data)
 
@@ -75,39 +72,39 @@ export function handleSummary (data) {
     }
 }
 
-function generateBody (
-    travelTime,
+function generateBody(
     transportation,
-    destinationsAmount,
-    rangeSettings,
     countryCoords,
     dateTime
 ) {
     const coordinates = countryCoords
+    const diff = 0.01
 
-    const destinations = Array.from({
-        length: destinationsAmount
-    }, (_, i) => ({
-        id: `destination${i + 1}`,
-        coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, 0.005)
-    }))
+    const origin = {
+        id: 'origin',
+        coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, diff)
+    }
+
+    const destination = {
+        id: 'destination',
+        coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, diff)
+    }
 
     const departureSearches = [{
         id: 'Routes benchmark',
-        departure_location_id: 'destination1',
-        arrival_location_ids: destinations.map(destination => destination.id),
+        departure_location_id: origin.id,
+        arrival_location_ids: [destination.id],
         departure_time: dateTime,
         properties: [
             'travel_time', 'distance', 'route'
         ],
         transportation: {
             type: transportation
-        },
-        range: rangeSettings
+        }
     }]
 
     return JSON.stringify({
-        locations: destinations,
+        locations: [origin, destination],
         departure_searches: departureSearches
     })
 }
