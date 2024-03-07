@@ -5,7 +5,7 @@ export const rpm = parseInt(__ENV.RPM || '60')
 export const oneLocationScenario = {
   mainScenario: {
     executor: 'constant-arrival-rate',
-    duration: '1m',
+    duration: '3m',
     rate: rpm,
     timeUnit: '1m',
     startTime: '5s',
