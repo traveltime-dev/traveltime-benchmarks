@@ -10,7 +10,7 @@ import {
   generateDestinations,
   generateRandomCoordinate,
   destinations,
-  timeFilterScenarios as scenarios,
+  multipleDestinationsScenarios as scenarios,
   setThresholdsForScenarios,
   deleteTimeFilterMetrics,
   summaryTrendStats,

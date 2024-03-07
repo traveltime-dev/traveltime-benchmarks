@@ -46,7 +46,7 @@ export const destinations = (__ENV.DESTINATIONS || '50, 100, 150')
   .map((curDestinations) => parseInt(curDestinations))
 
 
-export const timeFilterScenarios = destinations.reduce((accumulator, currentDestinations) => {
+export const multipleDestinationsScenarios = destinations.reduce((accumulator, currentDestinations) => {
   accumulator[`sending_${currentDestinations}_destinations`] = {
     executor: 'constant-arrival-rate',
     duration: '3m',
