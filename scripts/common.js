@@ -41,7 +41,7 @@ export function timeMapReport (data) {
   return data
 }
 
-export const destinations = (__ENV.DESTINATIONS || '50')
+export const destinations = (__ENV.DESTINATIONS || '50, 100, 150')
   .split(',')
   .map((curDestinations) => parseInt(curDestinations))
 
