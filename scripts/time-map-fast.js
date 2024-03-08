@@ -10,10 +10,10 @@ import {
 import {
   generateRandomCoordinate,
   summaryTrendStats,
-  timeMapScenarios as scenarios,
+  oneScenario as scenarios,
   setThresholdsForScenarios,
-  deleteTimeMapMetrics,
-  timeMapReport,
+  deleteOneScenarioMetrics as deleteTimeMapMetrics,
+  oneScenarioReport as timeMapReport,
   getCountryCoordinates
 } from './common.js'
 

@@ -59,6 +59,19 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter.js
 ```
 
+#### routes
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=api.traveltimeapp.com //optional
+    -e COUNTRY=gb //optional
+    -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
+    -e TRANSPORTATION='driving+ferry' //optional
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
+```
+
 #### time-filter-proto
 
 ```bash
@@ -123,7 +136,7 @@ us_pst
 ```
 
 ### Transport modes
-#### time-map, time-map-fast, time-filter
+#### time-map, time-map-fast, time-filter, routes
 ```
 pt
 cycling
