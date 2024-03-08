@@ -136,7 +136,7 @@ us_pst
 ```
 
 ### Transport modes
-#### time-map, time-map-fast, time-filter
+#### time-map, time-map-fast, time-filter, routes
 ```
 pt
 cycling
