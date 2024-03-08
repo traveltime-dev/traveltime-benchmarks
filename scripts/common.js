@@ -2,7 +2,7 @@ export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
 
 export const rpm = parseInt(__ENV.RPM || '60')
 
-export const oneLocationScenario = {
+export const oneScenario = {
   mainScenario: {
     executor: 'constant-arrival-rate',
     duration: '3m',
@@ -15,7 +15,7 @@ export const oneLocationScenario = {
   }
 }
 
-export function deleteTimeMapMetrics (data) {
+export function deleteOneScenarioMetrics(data) {
   delete data.metrics.http_req_blocked
   delete data.metrics['http_req_duration{expected_response:true}']
   delete data.metrics.http_req_waiting
@@ -28,15 +28,15 @@ export function deleteTimeMapMetrics (data) {
   delete data.metrics.http_req_tls_handshaking
 }
 
-export function timeMapReport (data) {
+export function oneScenarioReport(data) {
   data.metrics.http_req_sending =
-               data.metrics['http_req_sending{scenario:mainScenario}']
+      data.metrics['http_req_sending{scenario:mainScenario}']
   delete data.metrics['http_req_sending{scenario:mainScenario}']
   data.metrics.http_req_duration =
-                 data.metrics['http_req_duration{scenario:mainScenario}']
+      data.metrics['http_req_duration{scenario:mainScenario}']
   delete data.metrics['http_req_duration{scenario:mainScenario}']
   data.metrics.http_req_receiving =
-                data.metrics['http_req_receiving{scenario:mainScenario}']
+      data.metrics['http_req_receiving{scenario:mainScenario}']
   delete data.metrics['http_req_receiving{scenario:mainScenario}']
   return data
 }

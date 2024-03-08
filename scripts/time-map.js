@@ -9,11 +9,11 @@ import {
 } from 'k6'
 import {
   generateRandomCoordinate,
-  oneLocationScenario as scenarios,
+  oneScenario as scenarios,
   setThresholdsForScenarios,
   summaryTrendStats,
-  deleteTimeMapMetrics,
-  timeMapReport,
+  deleteOneScenarioMetrics as deleteTimeMapMetrics,
+  oneScenarioReport as timeMapReport,
   getCountryCoordinates
 } from './common.js'
 

@@ -10,12 +10,12 @@ import {
 import {
     generateRandomCoordinate,
     destinations,
-    oneLocationScenario as scenarios,
+    oneScenario as scenarios,
     setThresholdsForScenarios,
     summaryTrendStats,
-    deleteTimeFilterMetrics,
-    reportPerDestination,
-    getCountryCoordinates
+    deleteOneScenarioMetrics as deleteRoutesMetrics,
+    oneScenarioReport as routesReport,
+    getCountryCoordinates,
 } from './common.js'
 
 export const options = {
@@ -58,11 +58,8 @@ export default function () {
 
 export function handleSummary(data) {
     // removing default metrics
-    deleteTimeFilterMetrics(data)
-
-    data = destinations.reduce((curData, curDestinations) => {
-        return reportPerDestination(curData, curDestinations)
-    }, data)
+    deleteRoutesMetrics(data)
+    data = routesReport(data)
 
     return {
         stdout: textSummary(data, {
