@@ -10,8 +10,8 @@ export const oneScenario = {
     timeUnit: '1m',
     startTime: '5s',
     gracefulStop: '10s',
-    preAllocatedVUs: 10,
-    maxVUs: 400
+    preAllocatedVUs: 100,
+    maxVUs: 3000
   }
 }
 
@@ -55,8 +55,8 @@ export const multipleDestinationsScenarios = destinations.reduce((accumulator, c
     timeUnit: '1m',
     startTime: '5s',
     gracefulStop: '10s',
-    preAllocatedVUs: 10,
-    maxVUs: 400
+    preAllocatedVUs: 100,
+    maxVUs: 3000
   }
   return accumulator
 }, {})
