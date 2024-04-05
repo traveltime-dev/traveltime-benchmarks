@@ -41,7 +41,7 @@ export function setup () {
   const url = `https://${host}/v4/time-filter`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
-  const destinationsAmount = __ENV.SCENARIO_DESTINATIONS || 1
+  const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
   const rangeWidth = __ENV.RANGE || 0
   const rangeSettings = {
     enabled: rangeWidth !== 0,
