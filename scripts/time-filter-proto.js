@@ -40,7 +40,7 @@ export function setup () {
   const mapDate = __ENV.MAP_DATE || 'unknown'
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
-  const destinationsAmount = __ENV.SCENARIO_DESTINATIONS || 1
+  const destinationsAmount = __ENV.SCENARIO_DESTINATIONS 
   const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
@@ -76,10 +76,6 @@ export default function (data) {
   const response = http.post(data.url, data.encodedRequestBodies[index], data.params)
 
   const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
-
-  console.log(response.status)
-  console.log(response.body)
-  console.log(decodedResponse)
 
   check(response, {
     'status is 200': (r) => r.status === 200
@@ -130,7 +126,6 @@ function countryCode (country) {
 function encodeBodies (bodies) {
   const proto = protobuf.load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
   const encodedBodies = bodies.map(body => proto.encode(body))
-  console.log(encodedBodies[0])
   return encodedBodies
 }
 
