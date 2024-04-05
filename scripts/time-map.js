@@ -14,7 +14,8 @@ import {
   summaryTrendStats,
   deleteOneScenarioMetrics as deleteTimeMapMetrics,
   oneScenarioReport as timeMapReport,
-  getCountryCoordinates
+  getCountryCoordinates,
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -25,10 +26,11 @@ export const options = {
     // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
   }
 }
-setThresholdsForScenarios(options)
-randomSeed(__ENV.SEED || 1234567)
 
-export default function () {
+export function setup () {
+  setThresholdsForScenarios(options)
+  randomSeed(__ENV.SEED || 1234567)
+
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'
@@ -37,6 +39,8 @@ export default function () {
   const url = `https://${host}/v4/time-map`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
+  const uniqueRequests = parseInt(__ENV.UNIQUE_REQUESTS || 1)
+
   const params = {
     headers: {
       'Content-Type': 'application/json',
@@ -46,7 +50,13 @@ export default function () {
   }
   const dateTime = new Date().toISOString()
 
-  const response = http.post(url, generateBody(travelTime, transportation, countryCoords, dateTime), params)
+  const requestBodies = generateRequestBodies(uniqueRequests, travelTime, transportation, countryCoords, dateTime)
+  return { url, requestBodies, params }
+}
+
+export default function (data) {
+  const index = randomIndex(data.requestBodies.length)
+  const response = http.post(data.url, data.requestBodies[index], data.params)
 
   check(response, {
     'status is 200': (r) => r.status === 200,
@@ -81,4 +91,8 @@ function generateBody (travelTime, transportation, countryCoords, dateTime) {
       }
     }]
   })
+}
+
+function generateRequestBodies (count, travelTime, transportation, coords, dateTime) {
+  return Array.from({ length: count }, () => generateBody(travelTime, transportation, coords, dateTime))
 }

@@ -30,13 +30,13 @@ export function deleteOneScenarioMetrics (data) {
 
 export function oneScenarioReport (data) {
   data.metrics.http_req_sending =
-      data.metrics['http_req_sending{scenario:mainScenario}']
+    data.metrics['http_req_sending{scenario:mainScenario}']
   delete data.metrics['http_req_sending{scenario:mainScenario}']
   data.metrics.http_req_duration =
-      data.metrics['http_req_duration{scenario:mainScenario}']
+    data.metrics['http_req_duration{scenario:mainScenario}']
   delete data.metrics['http_req_duration{scenario:mainScenario}']
   data.metrics.http_req_receiving =
-      data.metrics['http_req_receiving{scenario:mainScenario}']
+    data.metrics['http_req_receiving{scenario:mainScenario}']
   delete data.metrics['http_req_receiving{scenario:mainScenario}']
   return data
 }
@@ -78,13 +78,13 @@ export function deleteTimeFilterMetrics (data) {
 
 export function reportPerDestination (data, destinations) {
   data.metrics[`http_req_sending(${destinations} destinations)`] =
-               data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
+    data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
   delete data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
   data.metrics[`http_req_receiving(${destinations} destinations)`] =
-               data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
+    data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
   delete data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
   data.metrics[`http_req_duration(${destinations} destinations)`] =
-               data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
+    data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
   delete data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
   return data
 }
@@ -389,6 +389,10 @@ export const protoCountries = {
 
 function randomInRange (min, max) {
   return Math.random() * (max - min) + min
+}
+
+export function randomIndex (length) {
+  return Math.floor(randomInRange(0, length))
 }
 
 export function generateRandomCoordinate (lat, lng, diff) {
