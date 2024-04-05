@@ -14,6 +14,15 @@ import {
   summaryTrendStats,
   deleteOneScenarioMetrics as deleteRoutesMetrics,
   oneScenarioReport as routesReport,
+  getCountryCoordinates,
+  generateRequestBodies,
+  randomIndex
+  generateRandomCoordinate,
+  oneScenario as scenarios,
+  setThresholdsForScenarios,
+  summaryTrendStats,
+  deleteOneScenarioMetrics as deleteRoutesMetrics,
+  oneScenarioReport as routesReport,
   getCountryCoordinates
 } from './common.js'
 
@@ -26,10 +35,10 @@ export const options = {
   }
 }
 
-setThresholdsForScenarios(options)
-randomSeed(__ENV.SEED || 1234567)
+export function setup () {
+  setThresholdsForScenarios(options)
+  randomSeed(__ENV.SEED || 1234567)
 
-export default function () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'
@@ -37,6 +46,7 @@ export default function () {
   const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
   const url = `https://${host}/v4/routes`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
+  const uniqueRequests = parseInt(__ENV.UNIQUE_REQUESTS || 1)
   const dateTime = new Date().toISOString()
 
   const params = {
@@ -47,7 +57,16 @@ export default function () {
     }
   }
 
-  const response = http.post(url, generateBody(transportation, countryCoords, dateTime), params)
+  const requestBodies = generateRequestBodies(uniqueRequests, generateBody, transportation, countryCoords, dateTime)
+  return { url, requestBodies, params }
+}
+
+export default function (data) {
+  const index = randomIndex(data.requestBodies.length)
+  const response = http.post(data.url, data.requestBodies[index], data.params)
+
+  console.log(response.status)
+
   check(response, {
     'status is 200': (r) => r.status === 200,
     'response body is not empty': (r) => r.body.length > 0
@@ -55,52 +74,52 @@ export default function () {
   sleep(1)
 }
 
-export function handleSummary (data) {
-  // removing default metrics
-  deleteRoutesMetrics(data)
-  data = routesReport(data)
+export function handleSummary(data) {
+    // removing default metrics
+    deleteRoutesMetrics(data)
+    data = routesReport(data)
 
-  return {
-    stdout: textSummary(data, {
-      indent: ' ',
-      enableColors: true
-    })
-  }
+    return {
+        stdout: textSummary(data, {
+            indent: ' ',
+            enableColors: true
+        })
+    }
 }
 
-function generateBody (
-  transportation,
-  countryCoords,
-  dateTime
+function generateBody(
+    transportation,
+    countryCoords,
+    dateTime
 ) {
-  const coordinates = countryCoords
-  const diff = 0.01
+    const coordinates = countryCoords
+    const diff = 0.01
 
-  const origin = {
-    id: 'origin',
-    coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, diff)
-  }
-
-  const destination = {
-    id: 'destination',
-    coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, diff)
-  }
-
-  const departureSearches = [{
-    id: 'Routes benchmark',
-    departure_location_id: origin.id,
-    arrival_location_ids: [destination.id],
-    departure_time: dateTime,
-    properties: [
-      'travel_time', 'distance', 'route'
-    ],
-    transportation: {
-      type: transportation
+    const origin = {
+        id: 'origin',
+        coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, diff)
     }
-  }]
 
-  return JSON.stringify({
-    locations: [origin, destination],
-    departure_searches: departureSearches
-  })
+    const destination = {
+        id: 'destination',
+        coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, diff)
+    }
+
+    const departureSearches = [{
+        id: 'Routes benchmark',
+        departure_location_id: origin.id,
+        arrival_location_ids: [destination.id],
+        departure_time: dateTime,
+        properties: [
+            'travel_time', 'distance', 'route'
+        ],
+        transportation: {
+            type: transportation
+        }
+    }]
+
+    return JSON.stringify({
+        locations: [origin, destination],
+        departure_searches: departureSearches
+    })
 }
