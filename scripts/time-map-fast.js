@@ -14,7 +14,9 @@ import {
   setThresholdsForScenarios,
   deleteOneScenarioMetrics as deleteTimeMapMetrics,
   oneScenarioReport as timeMapReport,
-  getCountryCoordinates
+  getCountryCoordinates,
+  generateRequestBodies,
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -28,7 +30,7 @@ export const options = {
 setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
 
-export default function () {
+export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'
@@ -39,6 +41,7 @@ export default function () {
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const levelOfDetails = parseInt(__ENV.LEVEL_OF_DETAILS || -8)
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
+  const uniqueRequests = parseInt(__ENV.UNIQUE_REQUESTS || 1)
   const params = {
     headers: {
       'Content-Type': 'application/json',
@@ -47,7 +50,15 @@ export default function () {
     }
   }
 
-  const response = http.post(url, generateBody(travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails), params)
+  const requestBodies = generateRequestBodies(uniqueRequests, generateBody, travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails)
+  return { url, requestBodies, params }
+}
+
+export default function (data) {
+  const index = randomIndex(data.requestBodies.length)
+  const response = http.post(data.url, data.requestBodies[index], data.params)
+
+  console.log(response.status)
 
   check(response, {
     'status is 200': (r) => r.status === 200,

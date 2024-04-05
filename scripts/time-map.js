@@ -15,6 +15,7 @@ import {
   deleteOneScenarioMetrics as deleteTimeMapMetrics,
   oneScenarioReport as timeMapReport,
   getCountryCoordinates,
+  generateRequestBodies,
   randomIndex
 } from './common.js'
 
@@ -50,7 +51,7 @@ export function setup () {
   }
   const dateTime = new Date().toISOString()
 
-  const requestBodies = generateRequestBodies(uniqueRequests, travelTime, transportation, countryCoords, dateTime)
+  const requestBodies = generateRequestBodies(uniqueRequests, generateBody, travelTime, transportation, countryCoords, dateTime)
   return { url, requestBodies, params }
 }
 
@@ -91,8 +92,4 @@ function generateBody (travelTime, transportation, countryCoords, dateTime) {
       }
     }]
   })
-}
-
-function generateRequestBodies (count, travelTime, transportation, coords, dateTime) {
-  return Array.from({ length: count }, () => generateBody(travelTime, transportation, coords, dateTime))
 }
