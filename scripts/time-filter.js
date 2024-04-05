@@ -15,7 +15,9 @@ import {
   summaryTrendStats,
   deleteTimeFilterMetrics,
   reportPerDestination,
-  getCountryCoordinates
+  getCountryCoordinates,
+  generateRequestBodies,
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -27,10 +29,10 @@ export const options = {
   }
 }
 
-setThresholdsForScenarios(options)
-randomSeed(__ENV.SEED || 1234567)
+export function setup () {
+  setThresholdsForScenarios(options)
+  randomSeed(__ENV.SEED || 1234567)
 
-export default function () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'
@@ -39,13 +41,15 @@ export default function () {
   const url = `https://${host}/v4/time-filter`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
-  const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
+  const destinationsAmount = __ENV.SCENARIO_DESTINATIONS || 1
   const rangeWidth = __ENV.RANGE || 0
   const rangeSettings = {
     enabled: rangeWidth !== 0,
     max_results: 3,
     width: rangeWidth === 0 ? 1 : parseInt(rangeWidth)
   }
+  const uniqueRequests = parseInt(__ENV.UNIQUE_REQUESTS || 1)
+
   const dateTime = new Date().toISOString()
 
   const params = {
@@ -56,7 +60,15 @@ export default function () {
     }
   }
 
-  const response = http.post(url, generateBody(travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime), params)
+  const requestBodies = generateRequestBodies(uniqueRequests, generateBody, travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime)
+
+  return { url, requestBodies, params }
+}
+
+export default function (data) {
+  const index = randomIndex(data.requestBodies.length)
+  const response = http.post(data.url, data.requestBodies[index], data.params)
+
   check(response, {
     'status is 200': (r) => r.status === 200,
     'response body is not empty': (r) => r.body.length > 0

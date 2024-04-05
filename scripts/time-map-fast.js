@@ -27,10 +27,11 @@ export const options = {
     // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
   }
 }
-setThresholdsForScenarios(options)
-randomSeed(__ENV.SEED || 1234567)
 
 export function setup () {
+  setThresholdsForScenarios(options)
+  randomSeed(__ENV.SEED || 1234567)
+
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'
