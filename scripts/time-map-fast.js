@@ -83,7 +83,7 @@ function generateBody (travelTime, transportation, countryCoords, arrivalTimePer
             type: transportation
           },
           level_of_detail: {
-            scale_type: "simple_numeric",
+            scale_type: 'simple_numeric',
             level: levelOfDetails
           }
         }

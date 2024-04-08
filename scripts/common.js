@@ -15,7 +15,7 @@ export const oneScenario = {
   }
 }
 
-export function deleteOneScenarioMetrics(data) {
+export function deleteOneScenarioMetrics (data) {
   delete data.metrics.http_req_blocked
   delete data.metrics['http_req_duration{expected_response:true}']
   delete data.metrics.http_req_waiting
@@ -28,7 +28,7 @@ export function deleteOneScenarioMetrics(data) {
   delete data.metrics.http_req_tls_handshaking
 }
 
-export function oneScenarioReport(data) {
+export function oneScenarioReport (data) {
   data.metrics.http_req_sending =
       data.metrics['http_req_sending{scenario:mainScenario}']
   delete data.metrics['http_req_sending{scenario:mainScenario}']
@@ -44,7 +44,6 @@ export function oneScenarioReport(data) {
 export const destinations = (__ENV.DESTINATIONS || '50, 100, 150')
   .split(',')
   .map((curDestinations) => parseInt(curDestinations))
-
 
 export const multipleDestinationsScenarios = destinations.reduce((accumulator, currentDestinations) => {
   accumulator[`sending_${currentDestinations}_destinations`] = {
