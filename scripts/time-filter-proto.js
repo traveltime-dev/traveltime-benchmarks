@@ -68,14 +68,14 @@ export function setup () {
 
   const encodedRequestBodyArrays = requestBodyArrays.map(bodies => encodeBodies(bodies))
 
-  return { url, encodedRequestBodyArrays, paramArrays}
+  return { url, encodedRequestBodyArrays, paramArrays }
 }
 
 export default function (data) {
   const destinationsAmount = parseInt(__ENV.SCENARIO_DESTINATIONS)
 
   // We determine which request array we should use
-  const arrayIndex = destinations.findIndex(destination => destination === destinationsAmount);
+  const arrayIndex = destinations.findIndex(destination => destination === destinationsAmount)
   const requests = data.encodedRequestBodyArrays[arrayIndex]
   const params = data.paramArrays[arrayIndex]
 

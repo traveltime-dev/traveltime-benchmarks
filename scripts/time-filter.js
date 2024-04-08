@@ -68,7 +68,7 @@ export default function (data) {
   const destinationsAmount = parseInt(__ENV.SCENARIO_DESTINATIONS)
 
   // We determine which request array we should use
-  const arrayIndex = destinations.findIndex(destination => destination === destinationsAmount);
+  const arrayIndex = destinations.findIndex(destination => destination === destinationsAmount)
   const requests = data.requestBodyArrays[arrayIndex]
 
   const index = randomIndex(requests.length)

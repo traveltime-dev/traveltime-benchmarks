@@ -17,13 +17,6 @@ import {
   getCountryCoordinates,
   generateRequestBodies,
   randomIndex
-  generateRandomCoordinate,
-  oneScenario as scenarios,
-  setThresholdsForScenarios,
-  summaryTrendStats,
-  deleteOneScenarioMetrics as deleteRoutesMetrics,
-  oneScenarioReport as routesReport,
-  getCountryCoordinates
 } from './common.js'
 
 export const options = {
@@ -74,52 +67,52 @@ export default function (data) {
   sleep(1)
 }
 
-export function handleSummary(data) {
-    // removing default metrics
-    deleteRoutesMetrics(data)
-    data = routesReport(data)
+export function handleSummary (data) {
+  // removing default metrics
+  deleteRoutesMetrics(data)
+  data = routesReport(data)
 
-    return {
-        stdout: textSummary(data, {
-            indent: ' ',
-            enableColors: true
-        })
-    }
+  return {
+    stdout: textSummary(data, {
+      indent: ' ',
+      enableColors: true
+    })
+  }
 }
 
-function generateBody(
-    transportation,
-    countryCoords,
-    dateTime
+function generateBody (
+  transportation,
+  countryCoords,
+  dateTime
 ) {
-    const coordinates = countryCoords
-    const diff = 0.01
+  const coordinates = countryCoords
+  const diff = 0.01
 
-    const origin = {
-        id: 'origin',
-        coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, diff)
+  const origin = {
+    id: 'origin',
+    coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, diff)
+  }
+
+  const destination = {
+    id: 'destination',
+    coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, diff)
+  }
+
+  const departureSearches = [{
+    id: 'Routes benchmark',
+    departure_location_id: origin.id,
+    arrival_location_ids: [destination.id],
+    departure_time: dateTime,
+    properties: [
+      'travel_time', 'distance', 'route'
+    ],
+    transportation: {
+      type: transportation
     }
+  }]
 
-    const destination = {
-        id: 'destination',
-        coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, diff)
-    }
-
-    const departureSearches = [{
-        id: 'Routes benchmark',
-        departure_location_id: origin.id,
-        arrival_location_ids: [destination.id],
-        departure_time: dateTime,
-        properties: [
-            'travel_time', 'distance', 'route'
-        ],
-        transportation: {
-            type: transportation
-        }
-    }]
-
-    return JSON.stringify({
-        locations: [origin, destination],
-        departure_searches: departureSearches
-    })
+  return JSON.stringify({
+    locations: [origin, destination],
+    departure_searches: departureSearches
+  })
 }
