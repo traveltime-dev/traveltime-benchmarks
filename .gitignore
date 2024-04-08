@@ -5,8 +5,6 @@ k6
 
 node_modules/
 .eslintcache
-.eslintrc.json
 *.log
-.eslint-*.json
 package.json
 package-lock.json
