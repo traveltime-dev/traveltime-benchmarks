@@ -40,7 +40,6 @@ export function setup () {
   const mapDate = __ENV.MAP_DATE || 'unknown'
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
-  const destinationsAmount = __ENV.SCENARIO_DESTINATIONS 
   const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
@@ -51,29 +50,37 @@ export function setup () {
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
   const uniqueRequests = parseInt(__ENV.UNIQUE_REQUESTS || 1)
-  const params = {
+
+  const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
+
+  const paramArrays = destinations.map(dest => ({
     headers: {
       'Content-Type': 'application/octet-stream'
     },
     tags: {
-      destinations: destinationsAmount,
+      destinations: dest,
       serviceImage,
       mapDate
     }
-  }
+  }))
 
-  const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
+  const requestBodyArrays = destinations.map(dest => generateRequestBodies(uniqueRequests, generateBody, dest, countryCoords, transportation, travelTime, isManyToOne))
 
-  const requestBodies = generateRequestBodies(uniqueRequests, generateBody, destinationsAmount, countryCoords, transportation, travelTime, isManyToOne)
+  const encodedRequestBodyArrays = requestBodyArrays.map(bodies => encodeBodies(bodies))
 
-  const encodedRequestBodies = encodeBodies(requestBodies)
-
-  return { url, encodedRequestBodies, params }
+  return { url, encodedRequestBodyArrays, paramArrays}
 }
 
 export default function (data) {
-  const index = randomIndex(data.encodedRequestBodies.length)
-  const response = http.post(data.url, data.encodedRequestBodies[index], data.params)
+  const destinationsAmount = parseInt(__ENV.SCENARIO_DESTINATIONS)
+
+  // We determine which request array we should use
+  const arrayIndex = destinations.findIndex(destination => destination === destinationsAmount);
+  const requests = data.encodedRequestBodyArrays[arrayIndex]
+  const params = data.paramArrays[arrayIndex]
+
+  const index = randomIndex(requests.length)
+  const response = http.post(data.url, requests[index], params)
 
   const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
 
