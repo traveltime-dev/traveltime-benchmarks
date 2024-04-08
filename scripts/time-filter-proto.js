@@ -121,7 +121,7 @@ function generateBody (destinationsAmount, coord, transportation, travelTime, is
   const diff = 0.005
   const originLocation = generateRandomCoordinate(coord.lat, coord.lng, diff)
   const destinations = generateDestinations(destinationsAmount, originLocation, diff)
-  if(isManyToOne) {
+  if (isManyToOne) {
     return JSON.stringify({
       manyToOneRequest: {
         arrivalLocation: originLocation,
