@@ -41,7 +41,6 @@ export function setup () {
   const url = `https://${host}/v4/time-filter`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
-  const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
   const rangeWidth = __ENV.RANGE || 0
   const rangeSettings = {
     enabled: rangeWidth !== 0,
@@ -60,14 +59,22 @@ export function setup () {
     }
   }
 
-  const requestBodies = generateRequestBodies(uniqueRequests, generateBody, travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime)
+  const requestBodyArrays = destinations.map(dest => generateRequestBodies(uniqueRequests, generateBody, travelTime, transportation, dest, rangeSettings, countryCoords, dateTime))
 
-  return { url, requestBodies, params }
+  return { url, requestBodyArrays, params }
 }
 
 export default function (data) {
-  const index = randomIndex(data.requestBodies.length)
-  const response = http.post(data.url, data.requestBodies[index], data.params)
+  const destinationsAmount = parseInt(__ENV.SCENARIO_DESTINATIONS)
+
+  // We determine which request array we should use
+  const arrayIndex = destinations.findIndex(destination => destination === destinationsAmount);
+  const requests = data.requestBodyArrays[arrayIndex]
+
+  const index = randomIndex(requests.length)
+  const response = http.post(data.url, requests[index], data.params)
+
+  console.log(response.status)
 
   check(response, {
     'status is 200': (r) => r.status === 200,
