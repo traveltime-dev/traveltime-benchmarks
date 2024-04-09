@@ -28,10 +28,10 @@ export const options = {
   }
 }
 
-export function setup () {
-  setThresholdsForScenarios(options)
-  randomSeed(__ENV.SEED || 1234567)
+setThresholdsForScenarios(options)
+randomSeed(__ENV.SEED || 1234567)
 
+export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'

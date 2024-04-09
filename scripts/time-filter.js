@@ -9,15 +9,14 @@ import {
 } from 'k6'
 import {
   generateRandomCoordinate,
-  destinations,
-  multipleDestinationsScenarios as scenarios,
+  oneScenario as scenarios,
   setThresholdsForScenarios,
   summaryTrendStats,
-  deleteTimeFilterMetrics,
-  reportPerDestination,
   getCountryCoordinates,
-  generateRequestBodies,
-  randomIndex
+  deleteOneScenarioMetrics,
+  oneScenarioReport,
+  randomIndex,
+  generateRequestBodies
 } from './common.js'
 
 export const options = {
@@ -29,10 +28,10 @@ export const options = {
   }
 }
 
-export function setup () {
-  setThresholdsForScenarios(options)
-  randomSeed(__ENV.SEED || 1234567)
+setThresholdsForScenarios(options)
+randomSeed(__ENV.SEED || 1234567)
 
+export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'
@@ -41,14 +40,14 @@ export function setup () {
   const url = `https://${host}/v4/time-filter`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
+  const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
   const rangeWidth = __ENV.RANGE || 0
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 1)
   const rangeSettings = {
     enabled: rangeWidth !== 0,
     max_results: 3,
     width: rangeWidth === 0 ? 1 : parseInt(rangeWidth)
   }
-  const uniqueRequests = parseInt(__ENV.UNIQUE_REQUESTS || 1)
-
   const dateTime = new Date().toISOString()
 
   const params = {
@@ -59,22 +58,14 @@ export function setup () {
     }
   }
 
-  const requestBodyArrays = destinations.map(dest => generateRequestBodies(uniqueRequests, generateBody, travelTime, transportation, dest, rangeSettings, countryCoords, dateTime))
+  const requestBodies = generateRequestBodies(uniqueRequestsAmount, generateBody, travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime)
 
-  return { url, requestBodyArrays, params }
+  return { url, requestBodies, params }
 }
 
 export default function (data) {
-  const destinationsAmount = parseInt(__ENV.SCENARIO_DESTINATIONS)
-
-  // We determine which request array we should use
-  const arrayIndex = destinations.findIndex(destination => destination === destinationsAmount)
-  const requests = data.requestBodyArrays[arrayIndex]
-
-  const index = randomIndex(requests.length)
-  const response = http.post(data.url, requests[index], data.params)
-
-  console.log(response.status)
+  const index = randomIndex(data.requestBodies.length)
+  const response = http.post(data.url, data.requestBodies[index], data.params)
 
   check(response, {
     'status is 200': (r) => r.status === 200,
@@ -85,11 +76,9 @@ export default function (data) {
 
 export function handleSummary (data) {
   // removing default metrics
-  deleteTimeFilterMetrics(data)
+  deleteOneScenarioMetrics(data)
 
-  data = destinations.reduce((curData, curDestinations) => {
-    return reportPerDestination(curData, curDestinations)
-  }, data)
+  data = oneScenarioReport(data)
 
   return {
     stdout: textSummary(data, {
