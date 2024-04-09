@@ -1,3 +1,6 @@
+import {
+  textSummary
+} from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
 import protobuf from 'k6/x/protobuf'
 import {
@@ -10,12 +13,13 @@ import {
   generateDestinations,
   generateRandomCoordinate,
   oneScenario as scenarios,
+  oneScenarioReport,
+  deleteOneScenarioMetrics,
   setThresholdsForScenarios,
   summaryTrendStats,
   getProtoCountryCoordinates,
   randomIndex,
-  generateRequestBodies,
-  handleSummaryInternal
+  generateRequestBodies
 } from './common.js'
 
 export const options = {
@@ -86,7 +90,17 @@ export default function (data) {
 }
 
 export function handleSummary (data) {
-  handleSummaryInternal(data)
+  // removing default metrics
+  deleteOneScenarioMetrics(data)
+
+  data = oneScenarioReport(data)
+
+  return {
+    stdout: textSummary(data, {
+      indent: ' ',
+      enableColors: true
+    })
+  }
 }
 
 function transportationType (transportation) {

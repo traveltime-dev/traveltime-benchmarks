@@ -1,3 +1,6 @@
+import {
+  textSummary
+} from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
 import {
   check,
@@ -9,10 +12,11 @@ import {
   summaryTrendStats,
   oneScenario as scenarios,
   setThresholdsForScenarios,
+  oneScenarioReport,
+  deleteOneScenarioMetrics,
   getCountryCoordinates,
   generateRequestBodies,
   randomIndex,
-  handleSummaryInternal
 } from './common.js'
 
 export const options = {
@@ -63,7 +67,17 @@ export default function (data) {
 }
 
 export function handleSummary (data) {
-  handleSummaryInternal(data)
+  // removing default metrics
+  deleteOneScenarioMetrics(data)
+
+  data = oneScenarioReport(data)
+
+  return {
+    stdout: textSummary(data, {
+      indent: ' ',
+      enableColors: true
+    })
+  }
 }
 
 function generateBody (travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails) {

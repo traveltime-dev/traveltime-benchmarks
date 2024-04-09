@@ -1,7 +1,3 @@
-import {
-  textSummary
-} from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
-
 export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
 
 export const rpm = parseInt(__ENV.RPM || '60')
@@ -9,17 +5,17 @@ export const rpm = parseInt(__ENV.RPM || '60')
 export const oneScenario = {
   mainScenario: {
     executor: 'constant-arrival-rate',
-    duration: '5s',
+    duration: '3m',
     rate: rpm,
-    timeUnit: '5s',
-    startTime: '1s',
-    gracefulStop: '1s',
+    timeUnit: '1m',
+    startTime: '5s',
+    gracefulStop: '10s',
     preAllocatedVUs: 100,
     maxVUs: 3000
   }
 }
 
-function deleteOneScenarioMetrics (data) {
+export function deleteOneScenarioMetrics (data) {
   delete data.metrics.http_req_blocked
   delete data.metrics['http_req_duration{expected_response:true}']
   delete data.metrics.http_req_waiting
@@ -43,20 +39,6 @@ export function oneScenarioReport (data) {
     data.metrics['http_req_receiving{scenario:mainScenario}']
   delete data.metrics['http_req_receiving{scenario:mainScenario}']
   return data
-}
-
-export function handleSummaryInternal(data){
-  // removing default metrics
-  deleteOneScenarioMetrics(data)
-
-  data = oneScenarioReport(data)
-
-  return {
-    stdout: textSummary(data, {
-      indent: ' ',
-      enableColors: true
-    })
-  }
 }
 
 export function setThresholdsForScenarios (options) {
