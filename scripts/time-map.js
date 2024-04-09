@@ -1,6 +1,3 @@
-import {
-  textSummary
-} from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
 import {
   check,
@@ -11,11 +8,10 @@ import {
   generateRandomCoordinate,
   oneScenario as scenarios,
   setThresholdsForScenarios,
-  summaryTrendStats,
-  deleteOneScenarioMetrics as deleteTimeMapMetrics,
-  oneScenarioReport as timeMapReport,
+  handleSummaryInternal,
   getCountryCoordinates,
   generateRequestBodies,
+  summaryTrendStats,
   randomIndex
 } from './common.js'
 
@@ -27,6 +23,7 @@ export const options = {
     // Intentionally empty. I'll define bogus thresholds (to generate the sub-metrics) below.
   }
 }
+
 setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
 
@@ -39,7 +36,7 @@ export function setup () {
   const url = `https://${host}/v4/time-map`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
-  const uniqueRequests = parseInt(__ENV.UNIQUE_REQUESTS || 1)
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 1)
 
   const params = {
     headers: {
@@ -50,7 +47,7 @@ export function setup () {
   }
   const dateTime = new Date().toISOString()
 
-  const requestBodies = generateRequestBodies(uniqueRequests, generateBody, travelTime, transportation, countryCoords, dateTime)
+  const requestBodies = generateRequestBodies(uniqueRequestsAmount, generateBody, travelTime, transportation, countryCoords, dateTime)
   return { url, requestBodies, params }
 }
 
@@ -66,17 +63,7 @@ export default function (data) {
 }
 
 export function handleSummary (data) {
-  console.log(data)
-  deleteTimeMapMetrics(data)
-
-  data = timeMapReport(data)
-
-  return {
-    stdout: textSummary(data, {
-      indent: ' ',
-      enableColors: true
-    })
-  }
+  handleSummaryInternal(data)
 }
 
 function generateBody (travelTime, transportation, countryCoords, dateTime) {

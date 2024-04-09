@@ -1,3 +1,7 @@
+import {
+  textSummary
+} from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
+
 export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
 
 export const rpm = parseInt(__ENV.RPM || '60')
@@ -5,17 +9,17 @@ export const rpm = parseInt(__ENV.RPM || '60')
 export const oneScenario = {
   mainScenario: {
     executor: 'constant-arrival-rate',
-    duration: '3m',
+    duration: '5s',
     rate: rpm,
-    timeUnit: '1m',
-    startTime: '5s',
-    gracefulStop: '10s',
+    timeUnit: '5s',
+    startTime: '1s',
+    gracefulStop: '1s',
     preAllocatedVUs: 100,
     maxVUs: 3000
   }
 }
 
-export function deleteOneScenarioMetrics (data) {
+function deleteOneScenarioMetrics (data) {
   delete data.metrics.http_req_blocked
   delete data.metrics['http_req_duration{expected_response:true}']
   delete data.metrics.http_req_waiting
@@ -41,33 +45,18 @@ export function oneScenarioReport (data) {
   return data
 }
 
-export function deleteTimeFilterMetrics (data) {
-  delete data.metrics.http_req_duration
-  delete data.metrics.http_req_sending
-  delete data.metrics.http_req_receiving
-  delete data.metrics.http_req_blocked
-  delete data.metrics['http_req_duration{expected_response:true}']
-  delete data.metrics.http_req_waiting
-  delete data.metrics.http_reqs
-  delete data.metrics.iteration_duration
-  delete data.metrics.iterations
-  delete data.metrics.vus
-  delete data.metrics.http_req_connecting
-  delete data.metrics.http_req_failed
-  delete data.metrics.http_req_tls_handshaking
-}
+export function handleSummaryInternal(data){
+  // removing default metrics
+  deleteOneScenarioMetrics(data)
 
-export function reportPerDestination (data, destinations) {
-  data.metrics[`http_req_sending(${destinations} destinations)`] =
-    data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-  data.metrics[`http_req_receiving(${destinations} destinations)`] =
-    data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-  data.metrics[`http_req_duration(${destinations} destinations)`] =
-    data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
-  return data
+  data = oneScenarioReport(data)
+
+  return {
+    stdout: textSummary(data, {
+      indent: ' ',
+      enableColors: true
+    })
+  }
 }
 
 export function setThresholdsForScenarios (options) {

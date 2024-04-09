@@ -1,6 +1,3 @@
-import {
-  textSummary
-} from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
 import {
   check,
@@ -12,11 +9,10 @@ import {
   summaryTrendStats,
   oneScenario as scenarios,
   setThresholdsForScenarios,
-  deleteOneScenarioMetrics as deleteTimeMapMetrics,
-  oneScenarioReport as timeMapReport,
   getCountryCoordinates,
   generateRequestBodies,
-  randomIndex
+  randomIndex,
+  handleSummaryInternal
 } from './common.js'
 
 export const options = {
@@ -59,8 +55,6 @@ export default function (data) {
   const index = randomIndex(data.requestBodies.length)
   const response = http.post(data.url, data.requestBodies[index], data.params)
 
-  console.log(response.status)
-
   check(response, {
     'status is 200': (r) => r.status === 200,
     'response body is not empty': (r) => r.body.length > 0
@@ -69,16 +63,7 @@ export default function (data) {
 }
 
 export function handleSummary (data) {
-  deleteTimeMapMetrics(data)
-
-  data = timeMapReport(data)
-
-  return {
-    stdout: textSummary(data, {
-      indent: ' ',
-      enableColors: true
-    })
-  }
+  handleSummaryInternal(data)
 }
 
 function generateBody (travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails) {
