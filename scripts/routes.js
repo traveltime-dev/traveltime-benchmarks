@@ -15,7 +15,6 @@ import {
   deleteOneScenarioMetrics,
   oneScenarioReport,
   getCountryCoordinates,
-  generateRequestBodies,
   randomIndex
 } from './common.js'
 
@@ -50,7 +49,7 @@ export function setup () {
     }
   }
 
-  const requestBodies = generateRequestBodies(uniqueRequests, generateBody, transportation, countryCoords, dateTime)
+  const requestBodies = generateRequestBodies(uniqueRequests, transportation, countryCoords, dateTime)
   return { url, requestBodies, params }
 }
 
@@ -79,11 +78,7 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (
-  transportation,
-  countryCoords,
-  dateTime
-) {
+function generateBody (transportation, countryCoords, dateTime) {
   const coordinates = countryCoords
   const diff = 0.01
 
@@ -114,4 +109,8 @@ function generateBody (
     locations: [origin, destination],
     departure_searches: departureSearches
   })
+}
+
+function generateRequestBodies (count, transportation, countryCoords, dateTime) {
+  return Array.from({ length: count }, () => generateBody(transportation, countryCoords, dateTime))
 }

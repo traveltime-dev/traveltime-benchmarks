@@ -18,8 +18,7 @@ import {
   setThresholdsForScenarios,
   summaryTrendStats,
   getProtoCountryCoordinates,
-  randomIndex,
-  generateRequestBodies
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -64,7 +63,7 @@ export function setup () {
     }
   }
 
-  const requestBodies = generateRequestBodies(uniqueRequestsAmount, generateBody, destinationsAmount, countryCoords, transportation, travelTime, isManyToOne)
+  const requestBodies = generateRequestBodies(uniqueRequestsAmount, destinationsAmount, countryCoords, transportation, travelTime, isManyToOne)
 
   return { url, requestBodies, params }
 }
@@ -149,4 +148,10 @@ function generateBody (destinationsAmount, coord, transportation, travelTime, is
       }
     })
   }
+}
+
+function generateRequestBodies (count, destinationsAmount, coord, transportation, travelTime, isManyToOne) {
+  return Array.from({ length: count }, () => generateBody(
+    destinationsAmount, coord, transportation, travelTime, isManyToOne
+  ))
 }

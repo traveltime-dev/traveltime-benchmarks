@@ -15,8 +15,7 @@ import {
   deleteOneScenarioMetrics,
   summaryTrendStats,
   getCountryCoordinates,
-  randomIndex,
-  generateRequestBodies
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -58,7 +57,7 @@ export function setup () {
     }
   }
 
-  const requestBodies = generateRequestBodies(uniqueRequestsAmount, generateBody, travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime)
+  const requestBodies = generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime)
 
   return { url, requestBodies, params }
 }
@@ -124,4 +123,18 @@ function generateBody (
     locations: destinations,
     departure_searches: departureSearches
   })
+}
+
+function generateRequestBodies (
+  count,
+  travelTime,
+  transportation,
+  destinationsAmount,
+  rangeSettings,
+  countryCoords,
+  dateTime
+) {
+  return Array.from({ length: count }, () => generateBody(
+    travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime
+  ))
 }
