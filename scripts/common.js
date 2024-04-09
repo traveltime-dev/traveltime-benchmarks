@@ -354,10 +354,6 @@ export function generateRandomCoordinate (lat, lng, diff) {
   }
 }
 
-export function generateRequestBodies (count, generateBodyFn, ...args) {
-  return Array.from({ length: count }, () => generateBodyFn(...args))
-}
-
 export function generateDestinations (numCoordinates, departure, diff) {
   return Array.from({ length: numCoordinates }, () =>
     generateRandomCoordinate(departure.lat, departure.lng, diff)
