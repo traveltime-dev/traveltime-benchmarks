@@ -13,7 +13,6 @@ import {
   setThresholdsForScenarios,
   deleteOneScenarioMetrics,
   oneScenarioReport,
-  handleSummaryInternal,
   getCountryCoordinates,
   generateRequestBodies,
   summaryTrendStats,

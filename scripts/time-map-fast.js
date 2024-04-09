@@ -16,7 +16,7 @@ import {
   deleteOneScenarioMetrics,
   getCountryCoordinates,
   generateRequestBodies,
-  randomIndex,
+  randomIndex
 } from './common.js'
 
 export const options = {

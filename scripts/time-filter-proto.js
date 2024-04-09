@@ -54,15 +54,15 @@ export function setup () {
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
   const params = {
-      headers: {
-        'Content-Type': 'application/octet-stream'
-      },
-      tags: {
-        destinations: destinationsAmount,
-        serviceImage,
-        mapDate
-      }
+    headers: {
+      'Content-Type': 'application/octet-stream'
+    },
+    tags: {
+      destinations: destinationsAmount,
+      serviceImage,
+      mapDate
     }
+  }
 
   const requestBodies = generateRequestBodies(uniqueRequestsAmount, generateBody, destinationsAmount, countryCoords, transportation, travelTime, isManyToOne)
 
