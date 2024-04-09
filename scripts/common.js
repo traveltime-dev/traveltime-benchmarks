@@ -41,25 +41,6 @@ export function oneScenarioReport (data) {
   return data
 }
 
-export const destinations = (__ENV.DESTINATIONS || '50, 100, 150')
-  .split(',')
-  .map((curDestinations) => parseInt(curDestinations))
-
-export const multipleDestinationsScenarios = destinations.reduce((accumulator, currentDestinations) => {
-  accumulator[`sending_${currentDestinations}_destinations`] = {
-    executor: 'constant-arrival-rate',
-    duration: '3m',
-    env: { SCENARIO_DESTINATIONS: currentDestinations.toString() },
-    rate: rpm,
-    timeUnit: '1m',
-    startTime: '5s',
-    gracefulStop: '10s',
-    preAllocatedVUs: 100,
-    maxVUs: 3000
-  }
-  return accumulator
-}, {})
-
 export function deleteTimeFilterMetrics (data) {
   delete data.metrics.http_req_duration
   delete data.metrics.http_req_sending

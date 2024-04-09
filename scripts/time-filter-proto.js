@@ -9,15 +9,14 @@ import {
   destinationDeltas,
   generateDestinations,
   generateRandomCoordinate,
-  destinations,
-  multipleDestinationsScenarios as scenarios,
+  oneScenario as scenarios,
   setThresholdsForScenarios,
-  deleteTimeFilterMetrics,
   summaryTrendStats,
-  reportPerDestination,
   getProtoCountryCoordinates,
-  generateRequestBodies,
-  randomIndex
+  oneScenarioReport,
+  deleteOneScenarioMetrics,
+  randomIndex,
+  generateRequestBodies
 } from './common.js'
 import {
   textSummary
@@ -32,14 +31,15 @@ export const options = {
   }
 }
 
-export function setup () {
-  setThresholdsForScenarios(options)
-  randomSeed(__ENV.SEED || 1234567)
+setThresholdsForScenarios(options)
+randomSeed(__ENV.SEED || 1234567)
 
+export function setup () {
   const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
   const mapDate = __ENV.MAP_DATE || 'unknown'
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
+  const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
   const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
@@ -49,38 +49,32 @@ export function setup () {
   const country = envCountry || 'uk'
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
-  const uniqueRequests = parseInt(__ENV.UNIQUE_REQUESTS || 1)
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 1)
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
-  const paramArrays = destinations.map(dest => ({
-    headers: {
-      'Content-Type': 'application/octet-stream'
-    },
-    tags: {
-      destinations: dest,
-      serviceImage,
-      mapDate
+  const params = {
+      headers: {
+        'Content-Type': 'application/octet-stream'
+      },
+      tags: {
+        destinations: destinationsAmount,
+        serviceImage,
+        mapDate
+      }
     }
-  }))
 
-  const requestBodyArrays = destinations.map(dest => generateRequestBodies(uniqueRequests, generateBody, dest, countryCoords, transportation, travelTime, isManyToOne))
+  const requestBodies = generateRequestBodies(uniqueRequestsAmount, generateBody, destinationsAmount, countryCoords, transportation, travelTime, isManyToOne)
 
-  const encodedRequestBodyArrays = requestBodyArrays.map(bodies => encodeBodies(bodies))
-
-  return { url, encodedRequestBodyArrays, paramArrays }
+  return { url, requestBodies, params }
 }
 
 export default function (data) {
-  const destinationsAmount = parseInt(__ENV.SCENARIO_DESTINATIONS)
-
-  // We determine which request array we should use
-  const arrayIndex = destinations.findIndex(destination => destination === destinationsAmount)
-  const requests = data.encodedRequestBodyArrays[arrayIndex]
-  const params = data.paramArrays[arrayIndex]
-
-  const index = randomIndex(requests.length)
-  const response = http.post(data.url, requests[index], params)
+  const index = randomIndex(data.requestBodies.length)
+  const requestBodyEncoded = protobuf
+    .load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
+    .encode(data.requestBodies[index])
+  const response = http.post(data.url, requestBodyEncoded, data.params)
 
   const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
 
@@ -97,11 +91,9 @@ export default function (data) {
 
 export function handleSummary (data) {
   // removing default metrics
-  deleteTimeFilterMetrics(data)
+  deleteOneScenarioMetrics(data)
 
-  data = destinations.reduce((curData, curDestinations) => {
-    return reportPerDestination(curData, curDestinations)
-  }, data)
+  data = oneScenarioReport(data)
 
   return {
     stdout: textSummary(data, {
@@ -128,12 +120,6 @@ function transportationType (transportation) {
 
 function countryCode (country) {
   if (country.startsWith('us_')) { return 'us' } else { return country }
-}
-
-function encodeBodies (bodies) {
-  const proto = protobuf.load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
-  const encodedBodies = bodies.map(body => proto.encode(body))
-  return encodedBodies
 }
 
 function generateBody (destinationsAmount, coord, transportation, travelTime, isManyToOne) {
