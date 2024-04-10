@@ -41,7 +41,7 @@ export function setup () {
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const levelOfDetails = parseInt(__ENV.LEVEL_OF_DETAILS || -8)
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
-  const uniqueRequests = parseInt(__ENV.UNIQUE_REQUESTS || 1)
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 1)
   const params = {
     headers: {
       'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export function setup () {
     }
   }
 
-  const requestBodies = generateRequestBodies(uniqueRequests, travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails)
+  const requestBodies = generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails)
   return { url, requestBodies, params }
 }
 

@@ -38,7 +38,7 @@ export function setup () {
   const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
   const url = `https://${host}/v4/routes`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const uniqueRequests = parseInt(__ENV.UNIQUE_REQUESTS || 1)
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 1)
   const dateTime = new Date().toISOString()
 
   const params = {
@@ -49,7 +49,7 @@ export function setup () {
     }
   }
 
-  const requestBodies = generateRequestBodies(uniqueRequests, transportation, countryCoords, dateTime)
+  const requestBodies = generateRequestBodies(uniqueRequestsAmount, transportation, countryCoords, dateTime)
   return { url, requestBodies, params }
 }
 

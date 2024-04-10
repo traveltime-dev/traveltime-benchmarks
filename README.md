@@ -23,6 +23,7 @@ docker run
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
+    -e UNIQUE_REQUESTS=1 // optional, this specifies how many requests with random locations to generate
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
 ```
 
@@ -40,6 +41,7 @@ docker run
     -e LEVEL_OF_DETAILS=2 // optional
     -e RPM=200 // optional
     -e ARRIVAL_TIME_PERIOD='weekday_morning' //optional
+    -e UNIQUE_REQUESTS=1 // optional, this specifies how many requests with random locations to generate
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
 ```
 
@@ -54,8 +56,9 @@ docker run
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
-    -e DESTINATIONS="100,150,200" // optional
+    -e DESTINATIONS=50 // optional
     -e RANGE=600 //optional
+    -e UNIQUE_REQUESTS=1 // optional, this specifies how many unique requests to generate
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter.js
 ```
 
@@ -69,6 +72,7 @@ docker run
     -e COUNTRY=gb //optional
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e TRANSPORTATION='driving+ferry' //optional
+    -e UNIQUE_REQUESTS=1 // optional, this specifies how many unique requests to generate
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
 ```
 
@@ -78,13 +82,14 @@ docker run
 docker run 
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e DESTINATIONS="1000,5000,10000,25000,100000" // optional
+    -e DESTINATIONS=50 // optional
     -e MANY_TO_ONE // optional
     -e HOST=proto.api.traveltimeapp.com // optional
     -e TRANSPORTATION=driving+ferry // optional
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e COUNTRY=uk // optional, but mandatory if COORDINATES are specified
     -e TRAVEL_TIME=7200 // optional
+    -e UNIQUE_REQUESTS=1 // optional, this specifies how many unique requests to generate
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-proto.js
 ```
 
