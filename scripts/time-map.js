@@ -4,7 +4,6 @@ import {
 import http from 'k6/http'
 import {
   check,
-  sleep,
   randomSeed
 } from 'k6'
 import {
@@ -15,7 +14,9 @@ import {
   oneScenarioReport,
   getCountryCoordinates,
   summaryTrendStats,
-  randomIndex
+  randomIndex,
+  rpm,
+  durationInMinutes
 } from './common.js'
 
 export const options = {
@@ -39,7 +40,8 @@ export function setup () {
   const url = `https://${host}/v4/time-map`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
-  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 1)
+  const uniqueRequestsPercentage = parseInt(__ENV.UNIQUE_REQUESTS || 2)
+  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
 
   const params = {
     headers: {
@@ -62,7 +64,6 @@ export default function (data) {
     'status is 200': (r) => r.status === 200,
     'response body is not empty': (r) => r.body.length > 0
   })
-  sleep(1)
 }
 
 export function handleSummary (data) {

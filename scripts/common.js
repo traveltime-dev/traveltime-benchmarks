@@ -1,11 +1,12 @@
 export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
 
 export const rpm = parseInt(__ENV.RPM || '60')
+export const durationInMinutes = 3
 
 export const oneScenario = {
   mainScenario: {
     executor: 'constant-arrival-rate',
-    duration: '3m',
+    duration: durationInMinutes + 'm',
     rate: rpm,
     timeUnit: '1m',
     startTime: '5s',

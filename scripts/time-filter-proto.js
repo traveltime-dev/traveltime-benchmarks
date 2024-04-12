@@ -6,7 +6,6 @@ import protobuf from 'k6/x/protobuf'
 import {
   check,
   randomSeed,
-  sleep
 } from 'k6'
 import {
   destinationDeltas,
@@ -18,7 +17,9 @@ import {
   setThresholdsForScenarios,
   summaryTrendStats,
   getProtoCountryCoordinates,
-  randomIndex
+  randomIndex,
+  rpm,
+  durationInMinutes
 } from './common.js'
 
 export const options = {
@@ -48,7 +49,8 @@ export function setup () {
   const country = envCountry || 'uk'
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
-  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 1)
+  const uniqueRequestsPercentage = parseInt(__ENV.UNIQUE_REQUESTS || 2)
+  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
@@ -69,6 +71,7 @@ export function setup () {
 }
 
 export default function (data) {
+
   const index = randomIndex(data.requestBodies.length)
   const requestBodyEncoded = protobuf
     .load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
@@ -84,8 +87,6 @@ export default function (data) {
   check(decodedResponse, {
     'response body is not empty': (r) => r.length !== 0
   })
-
-  sleep(1)
 }
 
 export function handleSummary (data) {

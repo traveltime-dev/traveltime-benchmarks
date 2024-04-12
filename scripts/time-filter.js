@@ -4,7 +4,6 @@ import {
 import http from 'k6/http'
 import {
   check,
-  sleep,
   randomSeed
 } from 'k6'
 import {
@@ -15,7 +14,9 @@ import {
   deleteOneScenarioMetrics,
   summaryTrendStats,
   getCountryCoordinates,
-  randomIndex
+  randomIndex,
+  rpm,
+  durationInMinutes
 } from './common.js'
 
 export const options = {
@@ -41,7 +42,8 @@ export function setup () {
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
   const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
   const rangeWidth = __ENV.RANGE || 0
-  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 1)
+  const uniqueRequestsPercentage = parseInt(__ENV.UNIQUE_REQUESTS || 2)
+  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
   const rangeSettings = {
     enabled: rangeWidth !== 0,
     max_results: 3,
@@ -70,7 +72,6 @@ export default function (data) {
     'status is 200': (r) => r.status === 200,
     'response body is not empty': (r) => r.body.length > 0
   })
-  sleep(1)
 }
 
 export function handleSummary (data) {

@@ -4,7 +4,6 @@ import {
 import http from 'k6/http'
 import {
   check,
-  sleep,
   randomSeed
 } from 'k6'
 import {
@@ -15,7 +14,9 @@ import {
   deleteOneScenarioMetrics,
   oneScenarioReport,
   getCountryCoordinates,
-  randomIndex
+  randomIndex,
+  rpm,
+  durationInMinutes
 } from './common.js'
 
 export const options = {
@@ -38,7 +39,9 @@ export function setup () {
   const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
   const url = `https://${host}/v4/routes`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 1)
+  const uniqueRequestsPercentage = parseInt(__ENV.UNIQUE_REQUESTS || 2)
+  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
+
   const dateTime = new Date().toISOString()
 
   const params = {
@@ -61,7 +64,6 @@ export default function (data) {
     'status is 200': (r) => r.status === 200,
     'response body is not empty': (r) => r.body.length > 0
   })
-  sleep(1)
 }
 
 export function handleSummary (data) {
