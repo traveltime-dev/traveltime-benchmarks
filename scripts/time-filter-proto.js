@@ -5,7 +5,7 @@ import http from 'k6/http'
 import protobuf from 'k6/x/protobuf'
 import {
   check,
-  randomSeed,
+  randomSeed
 } from 'k6'
 import {
   destinationDeltas,
@@ -71,7 +71,6 @@ export function setup () {
 }
 
 export default function (data) {
-
   const index = randomIndex(data.requestBodies.length)
   const requestBodyEncoded = protobuf
     .load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
