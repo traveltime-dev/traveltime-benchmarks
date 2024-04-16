@@ -1,18 +1,21 @@
 export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
 
-export const rpm = parseInt(__ENV.RPM || '60')
+export const rpm = parseInt(__ENV.RPM || '1000')
 export const durationInMinutes = 3
+const warmupDurationInMinutes = 2
 
 export const oneScenario = {
   mainScenario: {
-    executor: 'constant-arrival-rate',
-    duration: durationInMinutes + 'm',
-    rate: rpm,
+    executor: 'ramping-arrival-rate',
+    startRate: 0,
     timeUnit: '1m',
-    startTime: '5s',
-    gracefulStop: '10s',
-    preAllocatedVUs: 100,
-    maxVUs: 3000
+    gracefulStop: '15s',
+    preAllocatedVUs: 10,
+    maxVUs: 300,
+    stages: [
+      { target: rpm, duration: warmupDurationInMinutes + 'm' },
+      { target: rpm, duration: durationInMinutes + 'm' }
+    ]
   }
 }
 

@@ -1,6 +1,5 @@
-import {
-  textSummary
-} from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
+import { getCurrentStageIndex } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js'
+import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
 import protobuf from 'k6/x/protobuf'
 import {
@@ -79,13 +78,15 @@ export default function (data) {
 
   const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
 
-  check(response, {
-    'status is 200': (r) => r.status === 200
-  })
+  if (getCurrentStageIndex() === 1) { // Ignoring results from warm-up stage
+    check(response, {
+      'status is 200': (r) => r.status === 200
+    })
 
-  check(decodedResponse, {
-    'response body is not empty': (r) => r.length !== 0
-  })
+    check(decodedResponse, {
+      'response body is not empty': (r) => r.length !== 0
+    })
+  }
 }
 
 export function handleSummary (data) {

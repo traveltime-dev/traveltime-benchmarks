@@ -1,3 +1,4 @@
+import { getCurrentStageIndex } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js'
 import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
@@ -60,10 +61,12 @@ export default function (data) {
   const index = randomIndex(data.requestBodies.length)
   const response = http.post(data.url, data.requestBodies[index], data.params)
 
+  if (getCurrentStageIndex() === 1) { // Ignoring results from warm-up stage
   check(response, {
     'status is 200': (r) => r.status === 200,
     'response body is not empty': (r) => r.body.length > 0
   })
+  }
 }
 
 export function handleSummary (data) {
