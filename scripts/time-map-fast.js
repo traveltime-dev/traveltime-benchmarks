@@ -63,10 +63,10 @@ export default function (data) {
   const response = http.post(data.url, data.requestBodies[index], data.params)
 
   if (getCurrentStageIndex() === 1) { // Ignoring results from warm-up stage
-  check(response, {
-    'status is 200': (r) => r.status === 200,
-    'response body is not empty': (r) => r.body.length > 0
-  })
+    check(response, {
+      'status is 200': (r) => r.status === 200,
+      'response body is not empty': (r) => r.body.length > 0
+    })
   }
 }
 
