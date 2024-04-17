@@ -181,38 +181,6 @@ walking+ferry
 3. Build: `xk6 build --with github.com/traveltime-dev/xk6-protobuf@latest  --with github.com/grafana/xk6-output-prometheus-remote@latest`
 4. Run: ` ./k6 run -e APP_ID={APP_ID} -e API_KEY={API_KEY} -e HOST={HOST} scripts/{proto-benchmark-file}.js`
 
-### Benchmark results example:
-
-```
-          /\      |‾‾| /‾‾/   /‾‾/   
-     /\  /  \     |  |/  /   /  /    
-    /  \/    \    |     (   /   ‾‾\  
-   /          \   |  |\  \ |  (‾)  | 
-  / __________ \  |__| \__\ \_____/ .io
-
-     execution: local
-        script: ./scripts/time-filter.js
-        output: -
-
-     scenarios: (100.00%) 1 scenario, 3000 max VUs, 3m15s max duration (incl. graceful stop):
-              * mainScenario: 1.00 iterations/s for 3m0s (maxVUs: 100-3000, startTime: 5s, gracefulStop: 10s)
-
-     ✓ status is 200
-     ✓ response body is not empty
-
-     █ setup
-
-     checks...............: 100.00% ✓ 360    ✗ 0    
-     data_received........: 1.1 MB  6.2 kB/s
-     data_sent............: 1.0 MB  5.5 kB/s
-   ✓ http_req_duration....: avg=340.49ms min=239.51ms max=619.23ms p(90)=436.24ms p(95)=473.31ms
-   ✓ http_req_receiving...: avg=622.6µs  min=50.53µs  max=2.63ms   p(90)=1.69ms   p(95)=1.94ms  
-   ✓ http_req_sending.....: avg=293.7µs  min=101.74µs max=798.2µs  p(90)=490.6µs  p(95)=527.14µs
-
-running (3m05.0s), 0000/0100 VUs, 180 complete and 0 interrupted iterations
-mainScenario ✓ [======================================] 0000/0100 VUs  3m0s  1.00 iters/s
-```
-
 ### Benchmark results:
 
 ---
