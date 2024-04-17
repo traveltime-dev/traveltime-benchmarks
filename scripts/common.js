@@ -1,7 +1,7 @@
 export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
 
-export const rpm = parseInt(__ENV.RPM || '1000')
-export const durationInMinutes = 3
+export const rpm = parseInt(__ENV.RPM || '60')
+export const durationInMinutes = parseInt(__ENV.TEST_DURATION || '3')
 const warmupDurationInMinutes = 2
 
 export const oneScenario = {

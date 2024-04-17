@@ -23,6 +23,8 @@ docker run
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
+    -e RPM=60 // optional
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=2 // optional, percentage of requests that should be unique
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
 ```
@@ -39,7 +41,8 @@ docker run
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
     -e LEVEL_OF_DETAILS=2 // optional
-    -e RPM=200 // optional
+    -e RPM=60 // optional
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e ARRIVAL_TIME_PERIOD='weekday_morning' //optional
     -e UNIQUE_REQUESTS=2 // optional, percentage of requests that should be unique
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
@@ -58,6 +61,8 @@ docker run
     -e TRAVEL_TIME=7200 //optional
     -e DESTINATIONS=50 // optional
     -e RANGE=600 //optional
+    -e RPM=60 // optional
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=2 // optional, percentage of requests that should be unique
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter.js
 ```
@@ -72,6 +77,8 @@ docker run
     -e COUNTRY=gb //optional
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e TRANSPORTATION='driving+ferry' //optional
+    -e RPM=60 // optional
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=2 // optional, percentage of requests that should be unique
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
 ```
@@ -88,6 +95,8 @@ docker run
     -e TRANSPORTATION=driving+ferry // optional
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e COUNTRY=uk // optional, but mandatory if COORDINATES are specified
+    -e RPM=60 // optional
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e TRAVEL_TIME=7200 // optional
     -e UNIQUE_REQUESTS=2 // optional, percentage of requests that should be unique
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-proto.js
