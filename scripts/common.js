@@ -1,17 +1,21 @@
 export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
 
 export const rpm = parseInt(__ENV.RPM || '60')
+export const durationInMinutes = parseInt(__ENV.TEST_DURATION || '3')
+const warmupDurationInMinutes = 2
 
 export const oneScenario = {
   mainScenario: {
-    executor: 'constant-arrival-rate',
-    duration: '3m',
-    rate: rpm,
+    executor: 'ramping-arrival-rate',
+    startRate: 0,
     timeUnit: '1m',
-    startTime: '5s',
-    gracefulStop: '10s',
-    preAllocatedVUs: 100,
-    maxVUs: 3000
+    gracefulStop: '15s',
+    preAllocatedVUs: 10,
+    maxVUs: 300,
+    stages: [
+      { target: rpm, duration: warmupDurationInMinutes + 'm' },
+      { target: rpm, duration: durationInMinutes + 'm' }
+    ]
   }
 }
 
@@ -30,62 +34,14 @@ export function deleteOneScenarioMetrics (data) {
 
 export function oneScenarioReport (data) {
   data.metrics.http_req_sending =
-      data.metrics['http_req_sending{scenario:mainScenario}']
+    data.metrics['http_req_sending{scenario:mainScenario}']
   delete data.metrics['http_req_sending{scenario:mainScenario}']
   data.metrics.http_req_duration =
-      data.metrics['http_req_duration{scenario:mainScenario}']
+    data.metrics['http_req_duration{scenario:mainScenario}']
   delete data.metrics['http_req_duration{scenario:mainScenario}']
   data.metrics.http_req_receiving =
-      data.metrics['http_req_receiving{scenario:mainScenario}']
+    data.metrics['http_req_receiving{scenario:mainScenario}']
   delete data.metrics['http_req_receiving{scenario:mainScenario}']
-  return data
-}
-
-export const destinations = (__ENV.DESTINATIONS || '50, 100, 150')
-  .split(',')
-  .map((curDestinations) => parseInt(curDestinations))
-
-export const multipleDestinationsScenarios = destinations.reduce((accumulator, currentDestinations) => {
-  accumulator[`sending_${currentDestinations}_destinations`] = {
-    executor: 'constant-arrival-rate',
-    duration: '3m',
-    env: { SCENARIO_DESTINATIONS: currentDestinations.toString() },
-    rate: rpm,
-    timeUnit: '1m',
-    startTime: '5s',
-    gracefulStop: '10s',
-    preAllocatedVUs: 100,
-    maxVUs: 3000
-  }
-  return accumulator
-}, {})
-
-export function deleteTimeFilterMetrics (data) {
-  delete data.metrics.http_req_duration
-  delete data.metrics.http_req_sending
-  delete data.metrics.http_req_receiving
-  delete data.metrics.http_req_blocked
-  delete data.metrics['http_req_duration{expected_response:true}']
-  delete data.metrics.http_req_waiting
-  delete data.metrics.http_reqs
-  delete data.metrics.iteration_duration
-  delete data.metrics.iterations
-  delete data.metrics.vus
-  delete data.metrics.http_req_connecting
-  delete data.metrics.http_req_failed
-  delete data.metrics.http_req_tls_handshaking
-}
-
-export function reportPerDestination (data, destinations) {
-  data.metrics[`http_req_sending(${destinations} destinations)`] =
-               data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_sending{scenario:sending_${destinations}_destinations}`]
-  data.metrics[`http_req_receiving(${destinations} destinations)`] =
-               data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_receiving{scenario:sending_${destinations}_destinations}`]
-  data.metrics[`http_req_duration(${destinations} destinations)`] =
-               data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
-  delete data.metrics[`http_req_duration{scenario:sending_${destinations}_destinations}`]
   return data
 }
 
@@ -389,6 +345,10 @@ export const protoCountries = {
 
 function randomInRange (min, max) {
   return Math.random() * (max - min) + min
+}
+
+export function randomIndex (length) {
+  return Math.floor(randomInRange(0, length))
 }
 
 export function generateRandomCoordinate (lat, lng, diff) {

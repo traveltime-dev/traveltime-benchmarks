@@ -1,25 +1,25 @@
+import { getCurrentStageIndex } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js'
+import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
 import protobuf from 'k6/x/protobuf'
 import {
   check,
-  randomSeed,
-  sleep
+  randomSeed
 } from 'k6'
 import {
   destinationDeltas,
   generateDestinations,
   generateRandomCoordinate,
-  destinations,
-  multipleDestinationsScenarios as scenarios,
+  oneScenario as scenarios,
+  oneScenarioReport,
+  deleteOneScenarioMetrics,
   setThresholdsForScenarios,
-  deleteTimeFilterMetrics,
   summaryTrendStats,
-  reportPerDestination,
-  getProtoCountryCoordinates
+  getProtoCountryCoordinates,
+  randomIndex,
+  rpm,
+  durationInMinutes
 } from './common.js'
-import {
-  textSummary
-} from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 
 export const options = {
   scenarios,
@@ -33,12 +33,12 @@ export const options = {
 setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
 
-export default function () {
+export function setup () {
   const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
   const mapDate = __ENV.MAP_DATE || 'unknown'
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
-  const destinationsAmount = __ENV.SCENARIO_DESTINATIONS
+  const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
   const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
@@ -48,47 +48,52 @@ export default function () {
   const country = envCountry || 'uk'
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
+  const uniqueRequestsPercentage = parseInt(__ENV.UNIQUE_REQUESTS || 2)
+  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
-  const requestBody = protobuf
-    .load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
-    .encode(generateBody(destinationsAmount, countryCoords, transportation, travelTime, isManyToOne))
-
-  const response = http.post(
-    url,
-    requestBody, {
-      headers: {
-        'Content-Type': 'application/octet-stream'
-      },
-      tags: {
-        destinations: destinationsAmount,
-        serviceImage,
-        mapDate
-      }
+  const params = {
+    headers: {
+      'Content-Type': 'application/octet-stream'
+    },
+    tags: {
+      destinations: destinationsAmount,
+      serviceImage,
+      mapDate
     }
-  )
+  }
+
+  const requestBodies = generateRequestBodies(uniqueRequestsAmount, destinationsAmount, countryCoords, transportation, travelTime, isManyToOne)
+
+  return { url, requestBodies, params }
+}
+
+export default function (data) {
+  const index = randomIndex(data.requestBodies.length)
+  const requestBodyEncoded = protobuf
+    .load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
+    .encode(data.requestBodies[index])
+  const response = http.post(data.url, requestBodyEncoded, data.params)
 
   const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
 
-  check(response, {
-    'status is 200': (r) => r.status === 200
-  })
+  if (getCurrentStageIndex() === 1) { // Ignoring results from warm-up stage
+    check(response, {
+      'status is 200': (r) => r.status === 200
+    })
 
-  check(decodedResponse, {
-    'response body is not empty': (r) => r.length !== 0
-  })
-
-  sleep(1)
+    check(decodedResponse, {
+      'response body is not empty': (r) => r.length !== 0
+    })
+  }
 }
 
 export function handleSummary (data) {
   // removing default metrics
-  deleteTimeFilterMetrics(data)
+  deleteOneScenarioMetrics(data)
 
-  data = destinations.reduce((curData, curDestinations) => {
-    return reportPerDestination(curData, curDestinations)
-  }, data)
+  data = oneScenarioReport(data)
 
   return {
     stdout: textSummary(data, {
@@ -144,4 +149,10 @@ function generateBody (destinationsAmount, coord, transportation, travelTime, is
       }
     })
   }
+}
+
+function generateRequestBodies (count, destinationsAmount, coord, transportation, travelTime, isManyToOne) {
+  return Array.from({ length: count }, () => generateBody(
+    destinationsAmount, coord, transportation, travelTime, isManyToOne
+  ))
 }
