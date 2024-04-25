@@ -53,7 +53,7 @@ export function setup () {
   }
   const dateTime = new Date().toISOString()
 
-  console.log("The amount of requests generated: " +  uniqueRequestsAmount)
+  console.log('The amount of requests generated: ' + uniqueRequestsAmount)
 
   const requestBodies = generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, countryCoords, dateTime)
   return { url, requestBodies, params }

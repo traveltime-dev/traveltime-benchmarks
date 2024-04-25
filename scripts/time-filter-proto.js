@@ -50,7 +50,7 @@ export function setup () {
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
   const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
   const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
-  const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true';
+  const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
@@ -65,7 +65,7 @@ export function setup () {
     }
   }
 
-  console.log("The amount of requests generated: " +  uniqueRequestsAmount)
+  console.log('The amount of requests generated: ' + uniqueRequestsAmount)
 
   const requestBodies = generateRequestBodies(uniqueRequestsAmount, destinationsAmount, countryCoords, transportation, travelTime, isManyToOne)
 
@@ -79,24 +79,22 @@ export default function (data) {
     .encode(data.requestBodies[index])
   const response = http.post(data.url, requestBodyEncoded, data.params)
 
-
   const isBenchmarkStage = getCurrentStageIndex() === 1
 
-  if(!data.disableBodyDecoding) {
+  if (isBenchmarkStage) {
+    check(response, {
+      'status is 200': (r) => r.status === 200
+    })
+  }
+
+  if (!data.disableBodyDecoding) {
     const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
 
-    if(isBenchmarkStage) {
+    if (isBenchmarkStage) {
       check(decodedResponse, {
         'response body is not empty': (r) => r.length !== 0
       })
     }
-  }
-
-  if (isBenchmarkStage) { 
-    check(response, {
-      'status is 200': (r) => r.status === 200
-    })
-
   }
 }
 

@@ -53,7 +53,7 @@ export function setup () {
     }
   }
 
-  console.log("The amount of requests generated: " +  uniqueRequestsAmount)
+  console.log('The amount of requests generated: ' + uniqueRequestsAmount)
 
   const requestBodies = generateRequestBodies(uniqueRequestsAmount, transportation, countryCoords, dateTime)
   return { url, requestBodies, params }
