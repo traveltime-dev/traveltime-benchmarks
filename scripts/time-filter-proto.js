@@ -48,8 +48,9 @@ export function setup () {
   const country = envCountry || 'uk'
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
-  const uniqueRequestsPercentage = parseInt(__ENV.UNIQUE_REQUESTS || 2)
+  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
   const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
+  const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
@@ -64,9 +65,11 @@ export function setup () {
     }
   }
 
+  console.log('The amount of requests generated: ' + uniqueRequestsAmount)
+
   const requestBodies = generateRequestBodies(uniqueRequestsAmount, destinationsAmount, countryCoords, transportation, travelTime, isManyToOne)
 
-  return { url, requestBodies, params }
+  return { url, requestBodies, params, disableBodyDecoding }
 }
 
 export default function (data) {
@@ -76,16 +79,22 @@ export default function (data) {
     .encode(data.requestBodies[index])
   const response = http.post(data.url, requestBodyEncoded, data.params)
 
-  const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
+  const isBenchmarkStage = getCurrentStageIndex() === 1
 
-  if (getCurrentStageIndex() === 1) { // Ignoring results from warm-up stage
+  if (isBenchmarkStage) {
     check(response, {
       'status is 200': (r) => r.status === 200
     })
+  }
 
-    check(decodedResponse, {
-      'response body is not empty': (r) => r.length !== 0
-    })
+  if (!data.disableBodyDecoding) {
+    const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
+
+    if (isBenchmarkStage) {
+      check(decodedResponse, {
+        'response body is not empty': (r) => r.length !== 0
+      })
+    }
   }
 }
 
