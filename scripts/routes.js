@@ -40,7 +40,7 @@ export function setup () {
   const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
   const url = `https://${host}/v4/routes`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const uniqueRequestsPercentage = parseInt(__ENV.UNIQUE_REQUESTS || 2)
+  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
   const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
 
   const dateTime = new Date().toISOString()
@@ -52,6 +52,8 @@ export function setup () {
       'X-Api-Key': apiKey
     }
   }
+
+  console.log("The amount of requests generated: " +  uniqueRequestsAmount)
 
   const requestBodies = generateRequestBodies(uniqueRequestsAmount, transportation, countryCoords, dateTime)
   return { url, requestBodies, params }

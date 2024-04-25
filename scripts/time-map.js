@@ -41,7 +41,7 @@ export function setup () {
   const url = `https://${host}/v4/time-map`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
-  const uniqueRequestsPercentage = parseInt(__ENV.UNIQUE_REQUESTS || 2)
+  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
   const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
 
   const params = {
@@ -52,6 +52,8 @@ export function setup () {
     }
   }
   const dateTime = new Date().toISOString()
+
+  console.log("The amount of requests generated: " +  uniqueRequestsAmount)
 
   const requestBodies = generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, countryCoords, dateTime)
   return { url, requestBodies, params }

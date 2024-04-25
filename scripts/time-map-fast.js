@@ -43,7 +43,7 @@ export function setup () {
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const levelOfDetails = parseInt(__ENV.LEVEL_OF_DETAILS || -8)
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
-  const uniqueRequestsPercentage = parseInt(__ENV.UNIQUE_REQUESTS || 2)
+  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
   const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
 
   const params = {
@@ -53,6 +53,8 @@ export function setup () {
       'X-Api-Key': apiKey
     }
   }
+
+  console.log("The amount of requests generated: " +  uniqueRequestsAmount)
 
   const requestBodies = generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails)
   return { url, requestBodies, params }

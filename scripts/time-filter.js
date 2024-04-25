@@ -43,7 +43,7 @@ export function setup () {
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
   const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
   const rangeWidth = __ENV.RANGE || 0
-  const uniqueRequestsPercentage = parseInt(__ENV.UNIQUE_REQUESTS || 2)
+  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
   const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
   const rangeSettings = {
     enabled: rangeWidth !== 0,
@@ -59,6 +59,8 @@ export function setup () {
       'X-Api-Key': apiKey
     }
   }
+
+  console.log("The amount of requests generated: " +  uniqueRequestsAmount)
 
   const requestBodies = generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime)
 
