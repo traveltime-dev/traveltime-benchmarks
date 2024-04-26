@@ -61,8 +61,8 @@ export function getProtoCountryCoordinates (location) {
   return protoCountries[location]
 }
 
-export const countries = JSON.parse(open('../locations_data.json'))
-export const protoCountries = JSON.parse(open('../proto_locations_data.json'))
+export const countries = JSON.parse(open('../locations/locations_data.json'))
+export const protoCountries = JSON.parse(open('../locations/proto_locations_data.json'))
 
 function randomInRange (min, max) {
   return Math.random() * (max - min) + min

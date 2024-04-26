@@ -155,8 +155,8 @@ https://k6.io/docs/using-k6/metrics/
 
 ### Supported Countries
 
-- Supported locations for normal requests are listed in the `locations_data.json` file.
-- Supported locations for proto requests are listed in the `proto_locations_data.json` file.
+- Supported locations for normal requests are listed in the `locations/locations_data.json` file.
+- Supported locations for proto requests are listed in the `locations/proto_locations_data.json` file.
 
 If you want to add a new location, simply append the json files. 
 
