@@ -158,7 +158,11 @@ https://k6.io/docs/using-k6/metrics/
 - Supported locations for normal requests are listed in the `locations_data.json` file.
 - Supported locations for proto requests are listed in the `proto_locations_data.json` file.
 
-If you want to add a new location, simply append the files. **NOTE:** Proto requests support a much more limited amount of countries.
+If you want to add a new location, simply append the json files. 
+
+**NOTE 1:** When adding a new country, please specify the ISO2 country code in the beginning, like it's done everywhere else. Example: 'GB/London'.
+
+**NOTE 2:** Proto requests support a much more limited amount of countries.
 
 To see a list of all supported countries, send [map-info](https://docs.traveltime.com/api/reference/map-info) request ([Postman](https://docs.traveltime.com/api/start/postman-collection#)) to https://api.traveltimeapp.com
 
