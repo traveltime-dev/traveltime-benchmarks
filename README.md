@@ -160,7 +160,7 @@ https://k6.io/docs/using-k6/metrics/
 
 If you want to add a new location, simply append the json files. 
 
-**NOTE 1:** When adding a new country, please specify the ISO2 country code in the beginning, like it's done everywhere else. Example: 'GB/London'.
+**NOTE 1:** When adding a new proto location, please specify the ISO2 country code in the beginning, like it's done everywhere else. It's neccessary for the request. Example: 'GB/London'.
 
 **NOTE 2:** Proto requests support a much more limited amount of countries.
 
