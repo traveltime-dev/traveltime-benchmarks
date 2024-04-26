@@ -44,9 +44,11 @@ export function setup () {
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
-  const envCountry = __ENV.COUNTRY
-  const countryCoords = getProtoCountryCoordinates(envCountry, __ENV.COORDINATES, true)
-  const country = envCountry || 'uk'
+
+  const location = __ENV.LOCATION || 'UK/London'
+  const country = location.slice(0, 2).toLowerCase()
+  const countryCoords = getProtoCountryCoordinates(location)
+
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)

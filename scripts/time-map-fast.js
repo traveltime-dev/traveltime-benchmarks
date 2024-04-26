@@ -37,8 +37,8 @@ export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'
-  const countryCode = __ENV.COUNTRY || 'gb'
-  const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
+  const location = __ENV.LOCATION || 'GB/London'
+  const countryCoords = getCountryCoordinates(location)
   const url = `https://${host}/v4/time-map/fast`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)

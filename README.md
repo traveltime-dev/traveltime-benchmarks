@@ -19,8 +19,7 @@ docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e HOST=api.traveltimeapp.com //optional
-    -e COUNTRY=gb //optional
-    -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
+    -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e TRAVEL_TIME=7200 //optional
@@ -37,8 +36,7 @@ docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e HOST=api.traveltimeapp.com //optional
-    -e COUNTRY=gb //optional
-    -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
+    -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e TRAVEL_TIME=7200 //optional
@@ -57,8 +55,7 @@ docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e HOST=api.traveltimeapp.com //optional
-    -e COUNTRY=gb //optional
-    -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
+    -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e TRAVEL_TIME=7200 //optional
@@ -77,8 +74,7 @@ docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e HOST=api.traveltimeapp.com //optional
-    -e COUNTRY=gb //optional
-    -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
+    -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATA_PATH='../precomputed/routes.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e RPM=60 // optional
@@ -98,8 +94,7 @@ docker run
     -e HOST=proto.api.traveltimeapp.com // optional
     -e TRANSPORTATION=driving+ferry // optional
     -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
-    -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
-    -e COUNTRY=uk // optional, but mandatory if COORDINATES are specified
+    -e LOCATION='UK/London' // optional
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e TRAVEL_TIME=7200 // optional
@@ -160,29 +155,12 @@ https://k6.io/docs/using-k6/metrics/
 
 ### Supported Countries
 
-To see a list of all supported countries, send **map-info** **GET** request ([Postman](https://docs.traveltime.com/api/start/postman-collection#)) to:
-- https://api.traveltimeapp.com
+- Supported locations for normal requests are listed in the `locations_data.json` file.
+- Supported locations for proto requests are listed in the `proto_locations_data.json` file.
 
-### Supported Countries for Proto
-```
-lv
-nl
-at
-be
-de
-fr
-ie
-lt
-uk
-us_akst
-us_cstn
-us_csts
-us_estn
-us_ests
-us_hi
-us_mst
-us_pst
-```
+If you want to add a new location, simply append the files. **NOTE:** Proto requests support a much more limited amount of countries.
+
+To see a list of all supported countries, send [map-info](https://docs.traveltime.com/api/reference/map-info) request ([Postman](https://docs.traveltime.com/api/start/postman-collection#)) to https://api.traveltimeapp.com
 
 ### Transport modes
 #### time-map, time-map-fast, time-filter, routes
