@@ -103,6 +103,35 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-proto.js
 ```
 
+#### geocoding-search
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=api.traveltimeapp.com //optional
+    -e QUERY='Parliament square' //optional
+    -e WITHIN_COUNTRY='gb' //optional, only return the results that are within the specified country
+    -e LIMIT=50 //optional, limits amount of results returned to specified number (1 to 50)
+    -e FORCE_ADD_POSTCODE='true' //optional, forcefully adds postcode to search response. Only works if Switzerland as CH is specified as the value of the within.country parameter.
+    -e FORMAT_NAME='true' //optional, format the name field to a well formatted address
+    -e FORMAT_EXCLUDE_COUNTRY='true' //optional, exclude the country from the formatted name field (used only if format.name is equal true).
+    -e BOUNDS='54.16243,4.04297,71.18316,31.81641' //optional, limit the results to a bounding box
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
+```
+
+#### geocoding-reverse
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=api.traveltimeapp.com //optional
+    -e LAT='51.4952113' //optional, latitude
+    -e LNG='-0.183122' //optional, longitude
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
+```
+
 ### Running K6 Tests Locally
 
 Install [K6](https://k6.io/docs/get-started/installation/)
