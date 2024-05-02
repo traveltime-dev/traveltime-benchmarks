@@ -1,5 +1,5 @@
 import { getCurrentStageIndex } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js'
-import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js';
+import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
@@ -35,7 +35,6 @@ randomSeed(__ENV.SEED || 1234567)
 
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
-
 export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
@@ -57,10 +56,9 @@ export function setup () {
     }
   }
 
-
-  const requestBodies = precomputedDataFile ?
-      readRequestsBodies(transportation, dateTime, precomputedDataFile) :
-      generateRequestBodies(uniqueRequestsAmount, transportation, countryCoords, dateTime)
+  const requestBodies = precomputedDataFile
+    ? readRequestsBodies(transportation, dateTime, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, transportation, countryCoords, dateTime)
   return { url, requestBodies, params }
 }
 
@@ -120,18 +118,18 @@ function generateBody (transportation, dateTime, originCoords, destinationCoords
   })
 }
 
-function readRequestsBodies(transportation, dateTime, precomputedDataFile) {
+function readRequestsBodies (transportation, dateTime, precomputedDataFile) {
   const data = papaparse
-      .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
-      .data
-      .map(route =>
-          generateBody(
-              transportation,
-              dateTime,
-              { lat: parseFloat(route.origin_lat), lng: parseFloat(route.origin_lng) },
-              { lat: parseFloat(route.dest_lat), lng: parseFloat(route.dest_lng) },
-          )
+    .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
+    .data
+    .map(route =>
+      generateBody(
+        transportation,
+        dateTime,
+        { lat: parseFloat(route.origin_lat), lng: parseFloat(route.origin_lng) },
+        { lat: parseFloat(route.dest_lat), lng: parseFloat(route.dest_lng) }
       )
+    )
   console.log('The amount of requests read: ' + data.length)
   return data
 }
@@ -141,13 +139,13 @@ function generateRequestBodies (count, transportation, countryCoords, dateTime) 
   const diff = 0.01
 
   return Array
-      .from(
-          { length: count },
-          () => generateBody(
-              transportation,
-              dateTime,
-              generateRandomCoordinate(countryCoords.lat, countryCoords.lng, diff),
-              generateRandomCoordinate(countryCoords.lat, countryCoords.lng, diff),
-          )
+    .from(
+      { length: count },
+      () => generateBody(
+        transportation,
+        dateTime,
+        generateRandomCoordinate(countryCoords.lat, countryCoords.lng, diff),
+        generateRandomCoordinate(countryCoords.lat, countryCoords.lng, diff)
       )
+    )
 }
