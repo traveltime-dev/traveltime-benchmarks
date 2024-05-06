@@ -77,6 +77,7 @@ docker run
     -e COUNTRY=gb //optional
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e TRANSPORTATION='driving+ferry' //optional
+    -e DATA_PATH='../precomputed/routes.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=2 // optional float, percentage of requests that should be unique
