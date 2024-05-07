@@ -41,7 +41,7 @@ export function setup () {
   const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
   const url = `https://${host}/v4/routes`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const uniqueRequestsAmount = parseFloat(__ENV.UNIQUE_REQUESTS || 100)
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
 
   const dateTime = new Date().toISOString()
 
