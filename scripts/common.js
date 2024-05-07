@@ -1,5 +1,6 @@
-export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
+import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 
+export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
 export const rpm = parseInt(__ENV.RPM || '60')
 export const durationInMinutes = parseInt(__ENV.TEST_DURATION || '3')
 const warmupDurationInMinutes = 2
@@ -53,16 +54,29 @@ export function setThresholdsForScenarios (options) {
   }
 }
 
-export function getCountryCoordinates (location) {
-  return countries[location]
+export function getLocationCoordinates (location) {
+  return locations.get(location)
 }
 
-export function getProtoCountryCoordinates (location) {
-  return protoCountries[location]
+export function getProtoLocationCoordinates (location) {
+  return protoLocations.get(location)
 }
 
-export const countries = JSON.parse(open('../locations/locations_data.json'))
-export const protoCountries = JSON.parse(open('../locations/proto_locations_data.json'))
+function parseLocations(filePath) {
+  const file = open(filePath)
+  const parsedData = papaparse.parse(file, { header: true, skipEmptyLines: true }).data;
+
+  return new Map(parsedData.map(location => {
+    const name = location.name;
+    const lat = parseFloat(location.lat);
+    const lng = parseFloat(location.lng);
+
+    return [name, {lat, lng}]
+  }))
+}
+
+export const locations = parseLocations('../locations/locations_data.csv')
+export const protoLocations = parseLocations('../locations/proto_locations_data.csv')
 
 function randomInRange (min, max) {
   return Math.random() * (max - min) + min

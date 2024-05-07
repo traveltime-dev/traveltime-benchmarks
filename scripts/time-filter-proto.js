@@ -16,7 +16,7 @@ import {
   deleteOneScenarioMetrics,
   setThresholdsForScenarios,
   summaryTrendStats,
-  getProtoCountryCoordinates,
+  getProtoLocationCoordinates,
   randomIndex
 } from './common.js'
 
@@ -47,7 +47,7 @@ export function setup () {
 
   const location = __ENV.LOCATION || 'UK/London'
   const country = location.slice(0, 2).toLowerCase()
-  const countryCoords = getProtoCountryCoordinates(location)
+  const locationCoords = getProtoLocationCoordinates(location)
 
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
@@ -69,7 +69,7 @@ export function setup () {
 
   const requestBodies = precomputedDataFile
     ? readRequestsBodies(destinationsAmount, transportation, travelTime, isManyToOne, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, destinationsAmount, countryCoords, transportation, travelTime, isManyToOne)
+    : generateRequestBodies(uniqueRequestsAmount, destinationsAmount, locationCoords, transportation, travelTime, isManyToOne)
 
   return { url, requestBodies, params, disableBodyDecoding }
 }

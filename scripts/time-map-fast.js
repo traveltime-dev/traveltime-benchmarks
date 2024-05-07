@@ -15,7 +15,7 @@ import {
   setThresholdsForScenarios,
   oneScenarioReport,
   deleteOneScenarioMetrics,
-  getCountryCoordinates,
+  getLocationCoordinates,
   randomIndex
 } from './common.js'
 
@@ -38,7 +38,7 @@ export function setup () {
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST || 'api.traveltimeapp.com'
   const location = __ENV.LOCATION || 'GB/London'
-  const countryCoords = getCountryCoordinates(location)
+  const locationCoords = getLocationCoordinates(location)
   const url = `https://${host}/v4/time-map/fast`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
@@ -56,7 +56,7 @@ export function setup () {
 
   const requestBodies = precomputedDataFile
     ? readRequestsBodies(travelTime, transportation, arrivalTimePeriod, levelOfDetails, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails)
+    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, locationCoords, arrivalTimePeriod, levelOfDetails)
 
   return { url, requestBodies, params }
 }
@@ -126,7 +126,7 @@ function readRequestsBodies (travelTime, transportation, arrivalTimePeriod, leve
   return data
 }
 
-function generateRequestBodies (count, travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails) {
+function generateRequestBodies (count, travelTime, transportation, locationCoords, arrivalTimePeriod, levelOfDetails) {
   console.log('The amount of requests generated: ' + count)
   const diff = 0.01
 
@@ -136,7 +136,7 @@ function generateRequestBodies (count, travelTime, transportation, countryCoords
       () => generateBody(
         travelTime,
         transportation,
-        generateRandomCoordinate(countryCoords.lat, countryCoords.lng, diff),
+        generateRandomCoordinate(locationCoords.lat, countryCoords.lng, diff),
         arrivalTimePeriod,
         levelOfDetails
       )
