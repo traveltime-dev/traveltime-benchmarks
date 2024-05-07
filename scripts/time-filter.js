@@ -1,4 +1,5 @@
 import { getCurrentStageIndex } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js'
+import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
@@ -15,9 +16,7 @@ import {
   deleteOneScenarioMetrics,
   summaryTrendStats,
   getCountryCoordinates,
-  randomIndex,
-  rpm,
-  durationInMinutes
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -32,6 +31,8 @@ export const options = {
 setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
 
+const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
+
 export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
@@ -43,8 +44,7 @@ export function setup () {
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
   const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
   const rangeWidth = __ENV.RANGE || 0
-  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
-  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 2)
   const rangeSettings = {
     enabled: rangeWidth !== 0,
     max_results: 3,
@@ -60,9 +60,9 @@ export function setup () {
     }
   }
 
-  console.log('The amount of requests generated: ' + uniqueRequestsAmount)
-
-  const requestBodies = generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime)
+  const requestBodies = precomputedDataFile
+    ? readRequestsBodies(travelTime, transportation, destinationsAmount, rangeSettings, dateTime, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime)
 
   return { url, requestBodies, params }
 }
@@ -98,22 +98,25 @@ function generateBody (
   transportation,
   destinationsAmount,
   rangeSettings,
-  countryCoords,
+  coords,
   dateTime
 ) {
-  const coordinates = countryCoords
+  const originLocation = {
+    id: 'destination1',
+    coords: { lat: coords.lat, lng: coords.lng }
+  }
 
-  const destinations = Array.from({
-    length: destinationsAmount
-  }, (_, i) => ({
-    id: `destination${i + 1}`,
-    coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, 0.005)
+  const randomDestinations = Array.from({ length: destinationsAmount }, (_, i) => ({
+    id: `destination${i + 2}`,
+    coords: generateRandomCoordinate(coords.lat, coords.lng, 0.005)
   }))
+
+  const allLocations = [originLocation, ...randomDestinations]
 
   const departureSearches = [{
     id: 'Time filter benchmark',
     departure_location_id: 'destination1',
-    arrival_location_ids: destinations.map(destination => destination.id),
+    arrival_location_ids: randomDestinations.map(destination => destination.id),
     departure_time: dateTime,
     travel_time: travelTime,
     properties: [
@@ -126,9 +129,27 @@ function generateBody (
   }]
 
   return JSON.stringify({
-    locations: destinations,
+    locations: allLocations,
     departure_searches: departureSearches
   })
+}
+
+function readRequestsBodies (travelTime, transportation, destinationsAmount, rangeSettings, dateTime, precomputedDataFile) {
+  const data = papaparse
+    .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
+    .data
+    .map(origins =>
+      generateBody(
+        travelTime,
+        transportation,
+        destinationsAmount,
+        rangeSettings,
+        { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
+        dateTime
+      )
+    )
+  console.log('The amount of requests read: ' + data.length)
+  return data
 }
 
 function generateRequestBodies (
@@ -140,7 +161,19 @@ function generateRequestBodies (
   countryCoords,
   dateTime
 ) {
-  return Array.from({ length: count }, () => generateBody(
-    travelTime, transportation, destinationsAmount, rangeSettings, countryCoords, dateTime
-  ))
+  console.log('The amount of requests generated: ' + count)
+  const diff = 0.005
+
+  return Array
+    .from(
+      { length: count },
+      () => generateBody(
+        travelTime,
+        transportation,
+        destinationsAmount,
+        rangeSettings,
+        generateRandomCoordinate(countryCoords.lat, countryCoords.lng, diff),
+        dateTime
+      )
+    )
 }

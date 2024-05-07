@@ -1,4 +1,5 @@
 import { getCurrentStageIndex } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js'
+import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
@@ -15,9 +16,7 @@ import {
   oneScenarioReport,
   deleteOneScenarioMetrics,
   getCountryCoordinates,
-  randomIndex,
-  rpm,
-  durationInMinutes
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -32,6 +31,8 @@ export const options = {
 setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
 
+const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
+
 export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
@@ -43,8 +44,7 @@ export function setup () {
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const levelOfDetails = parseInt(__ENV.LEVEL_OF_DETAILS || -8)
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
-  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
-  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
 
   const params = {
     headers: {
@@ -54,9 +54,10 @@ export function setup () {
     }
   }
 
-  console.log('The amount of requests generated: ' + uniqueRequestsAmount)
+  const requestBodies = precomputedDataFile
+    ? readRequestsBodies(travelTime, transportation, arrivalTimePeriod, levelOfDetails, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails)
 
-  const requestBodies = generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails)
   return { url, requestBodies, params }
 }
 
@@ -86,14 +87,13 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails) {
-  const coordinates = countryCoords
+function generateBody (travelTime, transportation, coords, arrivalTimePeriod, levelOfDetails) {
   return JSON.stringify({
     arrival_searches: {
       one_to_many: [
         {
           id: 'Time map fast benchmark',
-          coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, 0.005),
+          coords,
           arrival_time_period: arrivalTimePeriod,
           travel_time: travelTime,
           transportation: {
@@ -109,8 +109,36 @@ function generateBody (travelTime, transportation, countryCoords, arrivalTimePer
   })
 }
 
+function readRequestsBodies (travelTime, transportation, arrivalTimePeriod, levelOfDetails, precomputedDataFile) {
+  const data = papaparse
+    .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
+    .data
+    .map(origins =>
+      generateBody(
+        travelTime,
+        transportation,
+        { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
+        arrivalTimePeriod,
+        levelOfDetails
+      )
+    )
+  console.log('The amount of requests read: ' + data.length)
+  return data
+}
+
 function generateRequestBodies (count, travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails) {
-  return Array.from({ length: count }, () => generateBody(
-    travelTime, transportation, countryCoords, arrivalTimePeriod, levelOfDetails
-  ))
+  console.log('The amount of requests generated: ' + count)
+  const diff = 0.01
+
+  return Array
+    .from(
+      { length: count },
+      () => generateBody(
+        travelTime,
+        transportation,
+        generateRandomCoordinate(countryCoords.lat, countryCoords.lng, diff),
+        arrivalTimePeriod,
+        levelOfDetails
+      )
+    )
 }

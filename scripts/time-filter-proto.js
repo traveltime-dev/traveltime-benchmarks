@@ -1,4 +1,5 @@
 import { getCurrentStageIndex } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js'
+import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
 import protobuf from 'k6/x/protobuf'
@@ -16,9 +17,7 @@ import {
   setThresholdsForScenarios,
   summaryTrendStats,
   getProtoCountryCoordinates,
-  randomIndex,
-  rpm,
-  durationInMinutes
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -32,6 +31,8 @@ export const options = {
 
 setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
+
+const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
 export function setup () {
   const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
@@ -48,8 +49,7 @@ export function setup () {
   const country = envCountry || 'uk'
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
-  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
-  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
@@ -65,9 +65,9 @@ export function setup () {
     }
   }
 
-  console.log('The amount of requests generated: ' + uniqueRequestsAmount)
-
-  const requestBodies = generateRequestBodies(uniqueRequestsAmount, destinationsAmount, countryCoords, transportation, travelTime, isManyToOne)
+  const requestBodies = precomputedDataFile
+    ? readRequestsBodies(destinationsAmount, transportation, travelTime, isManyToOne, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, destinationsAmount, countryCoords, transportation, travelTime, isManyToOne)
 
   return { url, requestBodies, params, disableBodyDecoding }
 }
@@ -133,7 +133,7 @@ function countryCode (country) {
 
 function generateBody (destinationsAmount, coord, transportation, travelTime, isManyToOne) {
   const diff = 0.005
-  const originLocation = generateRandomCoordinate(coord.lat, coord.lng, diff)
+  const originLocation = coord
   const destinations = generateDestinations(destinationsAmount, originLocation, diff)
   if (isManyToOne) {
     return JSON.stringify({
@@ -160,8 +160,43 @@ function generateBody (destinationsAmount, coord, transportation, travelTime, is
   }
 }
 
-function generateRequestBodies (count, destinationsAmount, coord, transportation, travelTime, isManyToOne) {
-  return Array.from({ length: count }, () => generateBody(
-    destinationsAmount, coord, transportation, travelTime, isManyToOne
-  ))
+function readRequestsBodies (destinationsAmount, transportation, travelTime, isManyToOne, precomputedDataFile) {
+  const data = papaparse
+    .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
+    .data
+    .map(origins =>
+      generateBody(
+        destinationsAmount,
+        { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
+        transportation,
+        travelTime,
+        isManyToOne
+      )
+    )
+  console.log('The amount of requests read: ' + data.length)
+  return data
+}
+
+function generateRequestBodies (
+  count,
+  destinationsAmount,
+  coords,
+  transportation,
+  travelTime,
+  isManyToOne
+) {
+  console.log('The amount of requests generated: ' + count)
+  const diff = 0.005
+
+  return Array
+    .from(
+      { length: count },
+      () => generateBody(
+        destinationsAmount,
+        generateRandomCoordinate(coords.lat, coords.lng, diff),
+        transportation,
+        travelTime,
+        isManyToOne
+      )
+    )
 }

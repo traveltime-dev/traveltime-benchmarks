@@ -1,4 +1,5 @@
 import { getCurrentStageIndex } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js'
+import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
@@ -15,9 +16,7 @@ import {
   oneScenarioReport,
   getCountryCoordinates,
   summaryTrendStats,
-  randomIndex,
-  rpm,
-  durationInMinutes
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -32,6 +31,8 @@ export const options = {
 setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
 
+const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
+
 export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
@@ -41,8 +42,7 @@ export function setup () {
   const url = `https://${host}/v4/time-map`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
-  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
-  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
 
   const params = {
     headers: {
@@ -53,9 +53,10 @@ export function setup () {
   }
   const dateTime = new Date().toISOString()
 
-  console.log('The amount of requests generated: ' + uniqueRequestsAmount)
+  const requestBodies = precomputedDataFile
+    ? readRequestsBodies(travelTime, transportation, dateTime, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, countryCoords, dateTime)
 
-  const requestBodies = generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, countryCoords, dateTime)
   return { url, requestBodies, params }
 }
 
@@ -85,16 +86,11 @@ export function handleSummary (data) {
   }
 }
 
-function generateRequestBodies (count, travelTime, transportation, countryCoords, dateTime) {
-  return Array.from({ length: count }, () => generateBody(travelTime, transportation, countryCoords, dateTime))
-}
-
-function generateBody (travelTime, transportation, countryCoords, dateTime) {
-  const coordinates = countryCoords
+function generateBody (travelTime, transportation, coords, dateTime) {
   return JSON.stringify({
     departure_searches: [{
       id: 'Time map benchmark',
-      coords: generateRandomCoordinate(coordinates.lat, coordinates.lng, 0.005),
+      coords,
       departure_time: dateTime,
       travel_time: travelTime,
       transportation: {
@@ -102,4 +98,36 @@ function generateBody (travelTime, transportation, countryCoords, dateTime) {
       }
     }]
   })
+}
+
+function readRequestsBodies (travelTime, transportation, dateTime, precomputedDataFile) {
+  const data = papaparse
+    .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
+    .data
+    .map(origins =>
+      generateBody(
+        travelTime,
+        transportation,
+        { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
+        dateTime
+      )
+    )
+  console.log('The amount of requests read: ' + data.length)
+  return data
+}
+
+function generateRequestBodies (count, travelTime, transportation, countryCoords, dateTime) {
+  console.log('The amount of requests generated: ' + count)
+  const diff = 0.01
+
+  return Array
+    .from(
+      { length: count },
+      () => generateBody(
+        travelTime,
+        transportation,
+        generateRandomCoordinate(countryCoords.lat, countryCoords.lng, diff),
+        dateTime
+      )
+    )
 }
