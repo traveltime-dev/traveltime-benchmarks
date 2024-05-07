@@ -22,6 +22,7 @@ docker run
     -e COUNTRY=gb //optional
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e TRANSPORTATION='driving+ferry' //optional
+    -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e TRAVEL_TIME=7200 //optional
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
@@ -39,6 +40,7 @@ docker run
     -e COUNTRY=gb //optional
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e TRANSPORTATION='driving+ferry' //optional
+    -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e TRAVEL_TIME=7200 //optional
     -e LEVEL_OF_DETAILS=2 // optional
     -e RPM=60 // optional
@@ -58,6 +60,7 @@ docker run
     -e COUNTRY=gb //optional
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e TRANSPORTATION='driving+ferry' //optional
+    -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e TRAVEL_TIME=7200 //optional
     -e DESTINATIONS=50 // optional
     -e RANGE=600 //optional
@@ -94,6 +97,7 @@ docker run
     -e MANY_TO_ONE // optional
     -e HOST=proto.api.traveltimeapp.com // optional
     -e TRANSPORTATION=driving+ferry // optional
+    -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e COORDINATES=-8,13 // optional, this will overwrite COUNTRY env var
     -e COUNTRY=uk // optional, but mandatory if COORDINATES are specified
     -e RPM=60 // optional
