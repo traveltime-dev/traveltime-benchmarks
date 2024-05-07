@@ -16,9 +16,7 @@ import {
   deleteOneScenarioMetrics,
   oneScenarioReport,
   getCountryCoordinates,
-  randomIndex,
-  rpm,
-  durationInMinutes
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -43,8 +41,7 @@ export function setup () {
   const countryCoords = getCountryCoordinates(countryCode, __ENV.COORDINATES)
   const url = `https://${host}/v4/routes`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
-  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
+  const uniqueRequestsAmount = parseFloat(__ENV.UNIQUE_REQUESTS || 100)
 
   const dateTime = new Date().toISOString()
 

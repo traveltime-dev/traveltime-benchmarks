@@ -17,9 +17,7 @@ import {
   setThresholdsForScenarios,
   summaryTrendStats,
   getProtoCountryCoordinates,
-  randomIndex,
-  rpm,
-  durationInMinutes
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -51,8 +49,7 @@ export function setup () {
   const country = envCountry || 'uk'
   const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
-  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
-  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
+  const uniqueRequestsAmount = parseFloat(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`

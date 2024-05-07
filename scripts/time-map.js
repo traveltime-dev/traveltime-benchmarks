@@ -16,9 +16,7 @@ import {
   oneScenarioReport,
   getCountryCoordinates,
   summaryTrendStats,
-  randomIndex,
-  rpm,
-  durationInMinutes
+  randomIndex
 } from './common.js'
 
 export const options = {
@@ -44,8 +42,7 @@ export function setup () {
   const url = `https://${host}/v4/time-map`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
-  const uniqueRequestsPercentage = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
-  const uniqueRequestsAmount = Math.ceil((rpm * durationInMinutes) * (uniqueRequestsPercentage / 100))
+  const uniqueRequestsAmount = parseFloat(__ENV.UNIQUE_REQUESTS || 100)
 
   const params = {
     headers: {
