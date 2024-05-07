@@ -191,15 +191,15 @@ function generateRequestBodies (
   console.log('The amount of requests generated: ' + count)
   const diff = 0.005
 
-  return Array.
-    from(
+  return Array
+    .from(
       { length: count },
       () => generateBody(
         destinationsAmount,
         generateRandomCoordinate(coords.lat, coords.lng, diff),
         transportation,
-        travelTime, 
+        travelTime,
         isManyToOne
+      )
     )
-  )
 }

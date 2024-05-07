@@ -93,7 +93,7 @@ function generateBody (travelTime, transportation, coords, dateTime) {
   return JSON.stringify({
     departure_searches: [{
       id: 'Time map benchmark',
-      coords: coords,
+      coords,
       departure_time: dateTime,
       travel_time: travelTime,
       transportation: {
@@ -107,11 +107,11 @@ function readRequestsBodies (travelTime, transportation, dateTime, precomputedDa
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
-    .map(timeMap =>
+    .map(origins =>
       generateBody(
         travelTime,
         transportation,
-        { lat: parseFloat(timeMap.lat), lng: parseFloat(timeMap.lng) },
+        { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
         dateTime
       )
     )

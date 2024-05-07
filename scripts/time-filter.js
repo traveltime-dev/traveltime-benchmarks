@@ -96,7 +96,7 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody(
+function generateBody (
   travelTime,
   transportation,
   destinationsAmount,
@@ -107,14 +107,14 @@ function generateBody(
   const originLocation = {
     id: 'destination1',
     coords: { lat: coords.lat, lng: coords.lng }
-  };
+  }
 
   const randomDestinations = Array.from({ length: destinationsAmount }, (_, i) => ({
-    id: `destination${i + 2}`, 
+    id: `destination${i + 2}`,
     coords: generateRandomCoordinate(coords.lat, coords.lng, 0.005)
-  }));
+  }))
 
-  const allLocations = [originLocation, ...randomDestinations];
+  const allLocations = [originLocation, ...randomDestinations]
 
   const departureSearches = [{
     id: 'Time filter benchmark',
@@ -129,12 +129,12 @@ function generateBody(
       type: transportation
     },
     range: rangeSettings
-  }];
+  }]
 
   return JSON.stringify({
     locations: allLocations,
     departure_searches: departureSearches
-  });
+  })
 }
 
 function readRequestsBodies (travelTime, transportation, destinationsAmount, rangeSettings, dateTime, precomputedDataFile) {
@@ -167,17 +167,16 @@ function generateRequestBodies (
   console.log('The amount of requests generated: ' + count)
   const diff = 0.005
 
-  return Array.
-    from(
+  return Array
+    .from(
       { length: count },
       () => generateBody(
-        travelTime, 
-        transportation, 
-        destinationsAmount, 
-        rangeSettings, 
+        travelTime,
+        transportation,
+        destinationsAmount,
+        rangeSettings,
         generateRandomCoordinate(countryCoords.lat, countryCoords.lng, diff),
         dateTime
+      )
     )
-  )
 }
-

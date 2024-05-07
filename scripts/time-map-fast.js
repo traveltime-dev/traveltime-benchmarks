@@ -96,7 +96,7 @@ function generateBody (travelTime, transportation, coords, arrivalTimePeriod, le
       one_to_many: [
         {
           id: 'Time map fast benchmark',
-          coords: coords,
+          coords,
           arrival_time_period: arrivalTimePeriod,
           travel_time: travelTime,
           transportation: {
@@ -116,11 +116,11 @@ function readRequestsBodies (travelTime, transportation, arrivalTimePeriod, leve
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
-    .map(timeMap =>
+    .map(origins =>
       generateBody(
         travelTime,
         transportation,
-        { lat: parseFloat(timeMap.lat), lng: parseFloat(timeMap.lng) },
+        { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
         arrivalTimePeriod,
         levelOfDetails
       )
