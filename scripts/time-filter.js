@@ -44,7 +44,7 @@ export function setup () {
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
   const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
   const rangeWidth = __ENV.RANGE || 0
-  const uniqueRequestsAmount = parseFloat(__ENV.UNIQUE_REQUESTS || 2)
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 2)
   const rangeSettings = {
     enabled: rangeWidth !== 0,
     max_results: 3,

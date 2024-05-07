@@ -44,7 +44,7 @@ export function setup () {
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const levelOfDetails = parseInt(__ENV.LEVEL_OF_DETAILS || -8)
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
-  const uniqueRequestsAmount = parseFloat(__ENV.UNIQUE_REQUESTS || 100)
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
 
   const params = {
     headers: {

@@ -25,7 +25,7 @@ docker run
     -e TRAVEL_TIME=7200 //optional
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
-    -e UNIQUE_REQUESTS=2 // optional float, percentage of requests that should be unique
+    -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
 ```
 
@@ -44,7 +44,7 @@ docker run
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e ARRIVAL_TIME_PERIOD='weekday_morning' //optional
-    -e UNIQUE_REQUESTS=2 // optional float, percentage of requests that should be unique
+    -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
 ```
 
@@ -63,7 +63,7 @@ docker run
     -e RANGE=600 //optional
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
-    -e UNIQUE_REQUESTS=2 // optional float, percentage of requests that should be unique
+    -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter.js
 ```
 
@@ -80,7 +80,7 @@ docker run
     -e DATA_PATH='../precomputed/routes.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
-    -e UNIQUE_REQUESTS=2 // optional float, percentage of requests that should be unique
+    -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
 ```
 
@@ -99,7 +99,7 @@ docker run
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e TRAVEL_TIME=7200 // optional
-    -e UNIQUE_REQUESTS=2 // optional float, percentage of requests that should be unique
+    -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -e DISABLE_DECODING="true" // optional flag, skips proto response decoding if set to "true"
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-proto.js
 ```
