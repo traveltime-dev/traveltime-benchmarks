@@ -62,16 +62,16 @@ export function getProtoLocationCoordinates (location) {
   return protoLocations.get(location)
 }
 
-function parseLocations(filePath) {
+function parseLocations (filePath) {
   const file = open(filePath)
-  const parsedData = papaparse.parse(file, { header: true, skipEmptyLines: true }).data;
+  const parsedData = papaparse.parse(file, { header: true, skipEmptyLines: true }).data
 
   return new Map(parsedData.map(location => {
-    const name = location.name;
-    const lat = parseFloat(location.lat);
-    const lng = parseFloat(location.lng);
+    const name = location.name
+    const lat = parseFloat(location.lat)
+    const lng = parseFloat(location.lng)
 
-    return [name, {lat, lng}]
+    return [name, { lat, lng }]
   }))
 }
 

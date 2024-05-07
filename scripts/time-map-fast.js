@@ -136,7 +136,7 @@ function generateRequestBodies (count, travelTime, transportation, locationCoord
       () => generateBody(
         travelTime,
         transportation,
-        generateRandomCoordinate(locationCoords.lat, countryCoords.lng, diff),
+        generateRandomCoordinate(locationCoords.lat, locationCoords.lng, diff),
         arrivalTimePeriod,
         levelOfDetails
       )

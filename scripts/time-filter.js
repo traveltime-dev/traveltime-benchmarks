@@ -172,7 +172,7 @@ function generateRequestBodies (
         transportation,
         destinationsAmount,
         rangeSettings,
-        generateRandomCoordinate(locationCoords.lat, countryCoords.lng, diff),
+        generateRandomCoordinate(locationCoords.lat, locationCoords.lng, diff),
         dateTime
       )
     )
