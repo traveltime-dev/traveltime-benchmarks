@@ -155,10 +155,10 @@ https://k6.io/docs/using-k6/metrics/
 
 ### Supported Countries
 
-- Supported locations for normal requests are listed in the `locations/locations_data.json` file.
-- Supported locations for proto requests are listed in the `locations/proto_locations_data.json` file.
+- Supported locations for normal requests are listed in the `locations/locations_data.csv` file.
+- Supported locations for proto requests are listed in the `locations/proto_locations_data.csv` file.
 
-If you want to add a new location, simply append the json files. 
+If you want to add a new location, simply append the csv files. 
 
 **NOTE 1:** When adding a new proto location, please specify the ISO2 country code in the beginning, like it's done everywhere else. It's neccessary for the request. Example: 'GB/London'.
 
