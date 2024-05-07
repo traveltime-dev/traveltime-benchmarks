@@ -54,12 +54,20 @@ export function setThresholdsForScenarios (options) {
   }
 }
 
+function getLocation (location, locationsMap) {
+  const coordinates = locationsMap.get(location)
+  if (coordinates === undefined) {
+    throw new Error(`Location "${location}" doesn't exist.`)
+  }
+  return coordinates
+}
+
 export function getLocationCoordinates (location) {
-  return locations.get(location)
+  return getLocation(location, locations)
 }
 
 export function getProtoLocationCoordinates (location) {
-  return protoLocations.get(location)
+  return getLocation(location, protoLocations)
 }
 
 function parseLocations (filePath) {
