@@ -18,7 +18,7 @@ The simplest way to run these benchmarks is to use docker:
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com //optional
+    -e HOST=api.traveltimeapp.com 
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
@@ -35,7 +35,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com //optional
+    -e HOST=api.traveltimeapp.com
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
@@ -54,7 +54,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com //optional
+    -e HOST=api.traveltimeapp.com
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
@@ -73,7 +73,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com //optional
+    -e HOST=api.traveltimeapp.com
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATA_PATH='../precomputed/routes.csv' // optional, this will read coordinates from a file instead of randomly generating them
@@ -91,7 +91,7 @@ docker run
     -e API_KEY={API_KEY}
     -e DESTINATIONS=50 // optional
     -e MANY_TO_ONE // optional
-    -e HOST=proto.api.traveltimeapp.com // optional
+    -e HOST=proto.api.traveltimeapp.com 
     -e TRANSPORTATION=driving+ferry // optional
     -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e LOCATION='UK/London' // optional
@@ -109,7 +109,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com //optional
+    -e HOST=api.traveltimeapp.com 
     -e QUERY='Parliament square' //optional
     -e WITHIN_COUNTRY='gb' //optional, only return the results that are within the specified country
     -e LIMIT=50 //optional, limits amount of results returned to specified number (1 to 50)
@@ -126,7 +126,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com //optional
+    -e HOST=api.traveltimeapp.com 
     -e LAT='51.4952113' //optional, latitude
     -e LNG='-0.183122' //optional, longitude
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js

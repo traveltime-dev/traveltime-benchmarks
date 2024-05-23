@@ -36,7 +36,7 @@ const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
-  const host = __ENV.HOST || 'api.traveltimeapp.com'
+  const host = __ENV.HOST
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
   const url = `https://${host}/v4/routes`

@@ -40,7 +40,7 @@ export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
-  const host = __ENV.HOST || 'proto.api.traveltimeapp.com'
+  const host = __ENV.HOST
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
