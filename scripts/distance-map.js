@@ -42,7 +42,7 @@ export function setup() {
   const url = `https://${host}/v4/distance-map`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelDistance = parseInt(__ENV.TRAVEL_DISTANCE || 2000)
-  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 1)
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
 
   const params = {
     headers: {
