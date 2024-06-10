@@ -48,6 +48,23 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
 ```
 
+#### distance-map
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=api.traveltimeapp.com 
+    -e LOCATION='GB/London' //optional
+    -e TRANSPORTATION='driving+ferry' //optional
+    -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
+    -e TRAVEL_DISTANCE=2000 //optional
+    -e RPM=60 // optional
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
+    -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
+```
+
 #### time-filter
 
 ```bash
