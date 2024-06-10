@@ -33,7 +33,7 @@ randomSeed(__ENV.SEED || 1234567)
 
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
-export function setup() {
+export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST
@@ -60,7 +60,7 @@ export function setup() {
   return { url, requestBodies, params }
 }
 
-export default function(data) {
+export default function (data) {
   const index = randomIndex(data.requestBodies.length)
   const response = http.post(data.url, data.requestBodies[index], data.params)
 
@@ -72,7 +72,7 @@ export default function(data) {
   }
 }
 
-export function handleSummary(data) {
+export function handleSummary (data) {
   // removing default metrics
   deleteOneScenarioMetrics(data)
 
@@ -86,7 +86,7 @@ export function handleSummary(data) {
   }
 }
 
-function generateBody(travelDistance, transportation, coords, dateTime) {
+function generateBody (travelDistance, transportation, coords, dateTime) {
   return JSON.stringify({
     departure_searches: [{
       id: 'Distance map benchmark',
@@ -100,7 +100,7 @@ function generateBody(travelDistance, transportation, coords, dateTime) {
   })
 }
 
-function readRequestsBodies(travelDistance, transportation, dateTime, precomputedDataFile) {
+function readRequestsBodies (travelDistance, transportation, dateTime, precomputedDataFile) {
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
@@ -116,7 +116,7 @@ function readRequestsBodies(travelDistance, transportation, dateTime, precompute
   return data
 }
 
-function generateRequestBodies(count, travelDistance, transportation, locationCoords, dateTime) {
+function generateRequestBodies (count, travelDistance, transportation, locationCoords, dateTime) {
   console.log('The amount of requests generated: ' + count)
   const diff = 0.01
 
