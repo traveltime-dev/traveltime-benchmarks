@@ -45,7 +45,7 @@ docker run
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e ARRIVAL_TIME_PERIOD='weekday_morning' //optional
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map-fast.js
 ```
 
 #### distance-map
