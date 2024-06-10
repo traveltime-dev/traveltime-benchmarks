@@ -62,7 +62,7 @@ docker run
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/distance-map.js
 ```
 
 #### time-filter
