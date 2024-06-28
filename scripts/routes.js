@@ -42,6 +42,7 @@ export function setup () {
   const url = `https://${host}/v4/routes`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
+  const useSharc = __ENV.USE_SHARC === 'true'
 
   const dateTime = new Date().toISOString()
 
@@ -55,7 +56,7 @@ export function setup () {
 
   const requestBodies = precomputedDataFile
     ? readRequestsBodies(transportation, dateTime, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, transportation, locationCoords, dateTime)
+    : generateRequestBodies(uniqueRequestsAmount, transportation, locationCoords, dateTime, useSharc)
   return { url, requestBodies, params }
 }
 
@@ -85,7 +86,7 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (transportation, dateTime, originCoords, destinationCoords) {
+function generateBody (transportation, dateTime, originCoords, destinationCoords, useSharc) {
   const origin = {
     id: 'origin',
     coords: originCoords
@@ -104,6 +105,7 @@ function generateBody (transportation, dateTime, originCoords, destinationCoords
     properties: [
       'travel_time', 'distance', 'route'
     ],
+    use_sharc: useSharc,
     transportation: {
       type: transportation
     }
@@ -131,7 +133,7 @@ function readRequestsBodies (transportation, dateTime, precomputedDataFile) {
   return data
 }
 
-function generateRequestBodies (count, transportation, locationCoords, dateTime) {
+function generateRequestBodies (count, transportation, locationCoords, dateTime, useSharc) {
   console.log('The amount of requests generated: ' + count)
   const diff = 0.01
 
@@ -142,7 +144,8 @@ function generateRequestBodies (count, transportation, locationCoords, dateTime)
         transportation,
         dateTime,
         generateRandomCoordinate(locationCoords.lat, locationCoords.lng, diff),
-        generateRandomCoordinate(locationCoords.lat, locationCoords.lng, diff)
+        generateRandomCoordinate(locationCoords.lat, locationCoords.lng, diff),
+        useSharc
       )
     )
 }

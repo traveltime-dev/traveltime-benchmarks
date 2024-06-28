@@ -95,6 +95,7 @@ docker run
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATA_PATH='../precomputed/routes.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e RPM=60 // optional
+    -e USE_SHARC = true // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
