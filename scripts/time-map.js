@@ -42,6 +42,7 @@ export function setup () {
   const url = `https://${host}/v4/time-map`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
+  const levelOfDetails = parseInt(__ENV.LEVEL_OF_DETAILS || -8)
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
 
   const params = {
@@ -54,8 +55,8 @@ export function setup () {
   const dateTime = new Date().toISOString()
 
   const requestBodies = precomputedDataFile
-    ? readRequestsBodies(travelTime, transportation, dateTime, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, locationCoords, dateTime)
+    ? readRequestsBodies(travelTime, transportation, dateTime, levelOfDetails, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, locationCoords, dateTime, levelOfDetails)
 
   return { url, requestBodies, params }
 }
@@ -86,7 +87,7 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (travelTime, transportation, coords, dateTime) {
+function generateBody (travelTime, transportation, coords, dateTime, levelOfDetails) {
   return JSON.stringify({
     departure_searches: [{
       id: 'Time map benchmark',
@@ -95,12 +96,16 @@ function generateBody (travelTime, transportation, coords, dateTime) {
       travel_time: travelTime,
       transportation: {
         type: transportation
+      },
+      level_of_detail: {
+        scale_type: 'simple_numeric',
+        level: levelOfDetails
       }
     }]
   })
 }
 
-function readRequestsBodies (travelTime, transportation, dateTime, precomputedDataFile) {
+function readRequestsBodies (travelTime, transportation, dateTime, levelOfDetails, precomputedDataFile) {
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
@@ -109,14 +114,15 @@ function readRequestsBodies (travelTime, transportation, dateTime, precomputedDa
         travelTime,
         transportation,
         { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
-        dateTime
+        dateTime,
+        levelOfDetails
       )
     )
   console.log('The amount of requests read: ' + data.length)
   return data
 }
 
-function generateRequestBodies (count, travelTime, transportation, locationCoords, dateTime) {
+function generateRequestBodies (count, travelTime, transportation, locationCoords, dateTime, levelOfDetails) {
   console.log('The amount of requests generated: ' + count)
   const diff = 0.01
 
@@ -127,7 +133,8 @@ function generateRequestBodies (count, travelTime, transportation, locationCoord
         travelTime,
         transportation,
         generateRandomCoordinate(locationCoords.lat, locationCoords.lng, diff),
-        dateTime
+        dateTime,
+        levelOfDetails
       )
     )
 }
