@@ -21,6 +21,7 @@ import {
 } from './common.js'
 
 export const options = {
+  setupTimeout: '1000s',
   scenarios,
   summaryTrendStats,
 
