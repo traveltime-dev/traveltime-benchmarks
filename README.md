@@ -21,6 +21,7 @@ docker run
     -e HOST=api.traveltimeapp.com 
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
+    -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e TRAVEL_TIME=7200 //optional
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
@@ -37,6 +38,7 @@ docker run
     -e HOST=api.traveltimeapp.com
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
+    -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e TRAVEL_TIME=7200 //optional
     -e LEVEL_OF_DETAILS=2 // optional
     -e RPM=60 // optional
@@ -55,6 +57,7 @@ docker run
     -e HOST=api.traveltimeapp.com 
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
+    -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e TRAVEL_DISTANCE=2000 //optional
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
@@ -71,6 +74,7 @@ docker run
     -e HOST=api.traveltimeapp.com
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
+    -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e TRAVEL_TIME=7200 //optional
     -e DESTINATIONS=50 // optional
     -e RANGE=600 //optional
@@ -89,6 +93,7 @@ docker run
     -e HOST=api.traveltimeapp.com
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
+    -e DATA_PATH='../precomputed/routes.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e RPM=60 // optional
     -e USE_SHARC = true // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
@@ -106,6 +111,7 @@ docker run
     -e MANY_TO_ONE // optional
     -e HOST=proto.api.traveltimeapp.com 
     -e TRANSPORTATION=driving+ferry // optional
+    -e DATA_PATH='../precomputed/origins.csv' // optional, this will read coordinates from a file instead of randomly generating them
     -e LOCATION='UK/London' // optional
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
@@ -144,7 +150,9 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
 ```
 
-### Using premade input locations
+### Using custom premade input locations
+
+To load your own precomputed files, you can use a volume. Example:
 
 ```bash
 docker run 
@@ -156,6 +164,7 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/{script_name}.js
 ```
 
+Make sure to maintain the correct csv format:
 - `precomputed/origins.csv` is used for: time-map, time-map-fast, distance-map, time-filter, time-filter-proto.
 - `precomputed/routes.csv` is used for routes.
 

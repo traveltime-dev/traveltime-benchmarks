@@ -5,7 +5,7 @@ WORKDIR /app
 ENV CGO_ENABLED 0
 RUN go install go.k6.io/xk6/cmd/xk6@latest
 
-# Add here all extenstions
+# Add here all extensions
 RUN xk6 build \
     --with github.com/traveltime-dev/xk6-protobuf@latest \
     --with github.com/grafana/xk6-output-prometheus-remote@latest
