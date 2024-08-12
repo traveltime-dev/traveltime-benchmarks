@@ -16,3 +16,4 @@ COPY --from=builder /app/k6 /bin/
 COPY /scripts /scripts/
 COPY /proto /proto/
 COPY /locations /locations/
+COPY /precomputed /precomputed/
