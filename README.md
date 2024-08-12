@@ -156,8 +156,8 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/{script_name}.js
 ```
 
-- `origins.csv` is used for: time-map, time-map-fast, distance-map, time-filter, time-filter-proto.
-- `routes.csv` is used for routes.
+- `precomputed/origins.csv` is used for: time-map, time-map-fast, distance-map, time-filter, time-filter-proto.
+- `precomputed/routes.csv` is used for routes.
 
 ### Running K6 Tests Locally
 
