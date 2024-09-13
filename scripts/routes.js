@@ -40,7 +40,7 @@ export function setup () {
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
   const url = `https://${host}/v4/routes`
-  const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
+  const transportation = __ENV.TRANSPORTATION || 'driving'
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const useSharc = __ENV.USE_SHARC === 'true'
 
@@ -55,7 +55,7 @@ export function setup () {
   }
 
   const requestBodies = precomputedDataFile
-    ? readRequestsBodies(transportation, dateTime, precomputedDataFile)
+    ? readRequestsBodies(transportation, dateTime, precomputedDataFile, useSharc)
     : generateRequestBodies(uniqueRequestsAmount, transportation, locationCoords, dateTime, useSharc)
   return { url, requestBodies, params }
 }
@@ -103,7 +103,7 @@ function generateBody (transportation, dateTime, originCoords, destinationCoords
     arrival_location_ids: [destination.id],
     departure_time: dateTime,
     properties: [
-      'travel_time', 'distance', 'route'
+      'travel_time', 'distance'
     ],
     use_sharc: useSharc,
     transportation: {
@@ -117,7 +117,7 @@ function generateBody (transportation, dateTime, originCoords, destinationCoords
   })
 }
 
-function readRequestsBodies (transportation, dateTime, precomputedDataFile) {
+function readRequestsBodies (transportation, dateTime, precomputedDataFile, useSharc) {
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
@@ -126,7 +126,8 @@ function readRequestsBodies (transportation, dateTime, precomputedDataFile) {
         transportation,
         dateTime,
         { lat: parseFloat(route.origin_lat), lng: parseFloat(route.origin_lng) },
-        { lat: parseFloat(route.dest_lat), lng: parseFloat(route.dest_lng) }
+        { lat: parseFloat(route.dest_lat), lng: parseFloat(route.dest_lng) },
+        useSharc
       )
     )
   console.log('The amount of requests read: ' + data.length)

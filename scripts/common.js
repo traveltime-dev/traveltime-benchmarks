@@ -12,7 +12,7 @@ export const oneScenario = {
     timeUnit: '1m',
     gracefulStop: '15s',
     preAllocatedVUs: 10,
-    maxVUs: 300,
+    maxVUs: 30000,
     stages: [
       { target: rpm, duration: warmupDurationInMinutes + 'm' },
       { target: rpm, duration: durationInMinutes + 'm' }
