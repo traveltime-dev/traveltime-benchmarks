@@ -22,6 +22,7 @@ docker run
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
+    -e DATE_TIME=2024-10-14T07:10:45.535Z //optional, departure/arrival time in ISO 8601 format. Default - current time
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
@@ -56,6 +57,7 @@ docker run
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_DISTANCE=2000 //optional
+    -e DATE_TIME=2024-10-14T07:10:45.535Z //optional, departure/arrival time in ISO 8601 format. Default - current time
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
@@ -72,6 +74,7 @@ docker run
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
+    -e DATE_TIME=2024-10-14T07:10:45.535Z //optional, departure/arrival time in ISO 8601 format. Default - current time
     -e DESTINATIONS=50 // optional
     -e RANGE=600 //optional
     -e RPM=60 // optional
@@ -89,6 +92,7 @@ docker run
     -e HOST=api.traveltimeapp.com
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
+    -e DATE_TIME=2024-10-14T07:10:45.535Z //optional, departure/arrival time in ISO 8601 format. Default - current time
     -e RPM=60 // optional
     -e USE_SHARC = true // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)

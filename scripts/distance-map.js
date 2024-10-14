@@ -44,6 +44,7 @@ export function setup () {
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelDistance = parseInt(__ENV.TRAVEL_DISTANCE || 2000)
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
+  const dateTime = __ENV.DATE_TIME || new Date().toISOString()
 
   const params = {
     headers: {
@@ -52,7 +53,6 @@ export function setup () {
       'X-Api-Key': apiKey
     }
   }
-  const dateTime = new Date().toISOString()
 
   const requestBodies = precomputedDataFile
     ? readRequestsBodies(travelDistance, transportation, dateTime, precomputedDataFile)
