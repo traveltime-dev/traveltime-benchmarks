@@ -44,8 +44,7 @@ export function setup () {
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const useSharc = __ENV.USE_SHARC === 'true'
-
-  const dateTime = new Date().toISOString()
+  const dateTime = __ENV.DATE_TIME || new Date().toISOString()
 
   const params = {
     headers: {

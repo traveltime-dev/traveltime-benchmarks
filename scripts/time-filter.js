@@ -51,7 +51,7 @@ export function setup () {
     max_results: 3,
     width: rangeWidth === 0 ? 1 : parseInt(rangeWidth)
   }
-  const dateTime = new Date().toISOString()
+  const dateTime = __ENV.DATE_TIME || new Date().toISOString()
 
   const params = {
     headers: {

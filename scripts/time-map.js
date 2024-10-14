@@ -45,6 +45,7 @@ export function setup () {
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const levelOfDetails = parseInt(__ENV.LEVEL_OF_DETAILS || -8)
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
+  const dateTime = __ENV.DATE_TIME || new Date().toISOString()
 
   const params = {
     headers: {
@@ -53,7 +54,6 @@ export function setup () {
       'X-Api-Key': apiKey
     }
   }
-  const dateTime = new Date().toISOString()
 
   const requestBodies = precomputedDataFile
     ? readRequestsBodies(travelTime, transportation, dateTime, levelOfDetails, precomputedDataFile)
