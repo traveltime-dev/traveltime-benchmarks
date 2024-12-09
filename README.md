@@ -133,7 +133,7 @@ docker run
     -e FORMAT_NAME='true' //optional, format the name field to a well formatted address
     -e FORMAT_EXCLUDE_COUNTRY='true' //optional, exclude the country from the formatted name field (used only if format.name is equal true).
     -e BOUNDS='54.16243,4.04297,71.18316,31.81641' //optional, limit the results to a bounding box
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/geocoding-search.js
 ```
 
 #### geocoding-reverse
@@ -145,7 +145,7 @@ docker run
     -e HOST=api.traveltimeapp.com 
     -e LAT='51.4952113' //optional, latitude
     -e LNG='-0.183122' //optional, longitude
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/geocoding-reverse.js
 ```
 
 ### Running K6 Tests Locally
