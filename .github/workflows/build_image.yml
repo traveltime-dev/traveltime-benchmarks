@@ -18,11 +18,9 @@ jobs:
         run: |
           docker build -t igeolise/traveltime-k6-benchmarks:${GITHUB_SHA::7} -t igeolise/traveltime-k6-benchmarks:latest .
 
-      - name: Login to DockerHub
-        run: docker login -u '${{secrets.DOCKER_HUB_USER}}' -p '${{secrets.DOCKER_HUB_PASSWORD}}'
-
-      - name: Push Docker
+      - name: Login and push DockerHub
         run: |
+          docker login -u '${{secrets.DOCKER_HUB_USER}}' -p '${{secrets.DOCKER_HUB_PASSWORD}}'
           docker push igeolise/traveltime-k6-benchmarks:${GITHUB_SHA::7}
           docker push igeolise/traveltime-k6-benchmarks:latest
 
