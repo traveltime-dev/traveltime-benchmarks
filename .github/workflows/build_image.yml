@@ -17,7 +17,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: igeolise/hubspot-data-importer
+          images: igeolise/traveltime-k6-benchmarks
           tags: |
             type=raw,value=latest
             type=sha
