@@ -20,7 +20,7 @@ jobs:
           images: igeolise/traveltime-k6-benchmarks
           tags: |
             type=raw,value=latest
-            type=sha
+            type=sha,prefix=
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
