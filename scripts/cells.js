@@ -41,8 +41,14 @@ export function setup () {
   const host = __ENV.HOST
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
-//  const url = `https://${host}/v4/${kind}`
-  const url = `http://api-dev.traveltimeapp.com/v4/${kind}`
+  const fullUrl = __ENV.FULL_URL || false
+  // if fullUrl is given, use it, otherwise build url with host etc
+  var url = ''
+  if (fullUrl) {
+    url = fullUrl
+  } else {
+    url = `https://${host}/v4/${kind}`
+  }
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
