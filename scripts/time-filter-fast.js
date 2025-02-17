@@ -111,8 +111,8 @@ function generateBody (
     one_to_many: [
       {
         id: 'Time filter benchmark',
-        arrival_location_id: 'destination1',
-        departure_location_ids: randomDestinations.map(destination => destination.id),
+        departure_location_id: 'destination1',
+        arrival_location_ids: randomDestinations.map(destination => destination.id),
         arrival_time_period: arrivalTimePeriod,
         travel_time: travelTime,
         properties: [
