@@ -3,6 +3,7 @@ FROM golang:1.24-alpine as builder
 WORKDIR /app
 
 ENV CGO_ENABLED 0
+RUN apk --no-cache add git=~2
 RUN go install go.k6.io/xk6/cmd/xk6@latest
 
 # Add here all extenstions
