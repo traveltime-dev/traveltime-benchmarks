@@ -98,6 +98,8 @@ export function handleSummary (data) {
 
 function generateBody (travelTime, transportation, coords, dateTime, cellResolution) {
   return JSON.stringify({
+    resolution: cellResolution,
+    properties: [ "mean" ],
     departure_searches: [{
       id: '${kind} benchmark',
       coords,
@@ -105,9 +107,7 @@ function generateBody (travelTime, transportation, coords, dateTime, cellResolut
       travel_time: travelTime,
       transportation: {
         type: transportation
-      },
-      resolution: cellResolution,
-      properties: [ "mean" ]
+      }
     }]
   })
 }
