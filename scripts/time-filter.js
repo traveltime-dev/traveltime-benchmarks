@@ -42,7 +42,7 @@ export function setup () {
   const locationCoords = getLocationCoordinates(location)
   const fullUrl = __ENV.FULL_URL || false
   // if fullUrl is given, use it, otherwise build url with host etc
-  const url = fullUrl ? fullUrl : `https://${host}/v4/time-filter`
+  const url = fullUrl || `https://${host}/v4/time-filter`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1900)
   const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
