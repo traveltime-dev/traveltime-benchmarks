@@ -40,7 +40,9 @@ export function setup () {
   const host = __ENV.HOST
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
-  const url = `https://${host}/v4/distance-map`
+  const fullUrl = __ENV.FULL_URL || false
+  // if fullUrl is given, use it, otherwise build url with host etc
+  const url = fullUrl ? fullUrl : `https://${host}/v4/distance-map`
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelDistance = parseInt(__ENV.TRAVEL_DISTANCE || 2000)
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)

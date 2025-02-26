@@ -32,7 +32,9 @@ export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST
-  const url = `https://${host}/v4/geocoding/search`
+  const fullUrl = __ENV.FULL_URL || false
+  // if fullUrl is given, use it, otherwise build url with host etc
+  const url = fullUrl ? fullUrl : `https://${host}/v4/geocoding/search`
 
   const query = __ENV.QUERY || 'Parliament square'
   const withinCountry = __ENV.WITHIN_COUNTRY
