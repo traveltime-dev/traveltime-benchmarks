@@ -44,9 +44,9 @@ export function setup () {
   // if fullUrl is given, use it, otherwise build url with host etc
   var url = ''
   if (fullUrl) {
-      url = fullUrl
+    url = fullUrl
   } else {
-      url = `https://${host}/v4/time-map`
+    url = `https://${host}/v4/time-map`
   }
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
