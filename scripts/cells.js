@@ -64,8 +64,8 @@ export function setup () {
   }
 
   const requestBodies = precomputedDataFile
-    ? readRequestsBodies(travelTime, transportation, dateTime, precomputedDataFile, cellResolution)
-    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, locationCoords, dateTime, cellResolution)
+    ? readRequestsBodies(travelTime, transportation, dateTime, precomputedDataFile, cellResolution, kind)
+    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, locationCoords, dateTime, cellResolution, kind)
 
   return { url, requestBodies, params }
 }
@@ -96,7 +96,7 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (travelTime, transportation, coords, dateTime, cellResolution) {
+function generateBody (travelTime, transportation, coords, dateTime, cellResolution, kind) {
   return JSON.stringify({
     resolution: cellResolution,
     properties: ['mean'],
@@ -112,7 +112,7 @@ function generateBody (travelTime, transportation, coords, dateTime, cellResolut
   })
 }
 
-function readRequestsBodies (travelTime, transportation, dateTime, precomputedDataFile, cellResolution) {
+function readRequestsBodies (travelTime, transportation, dateTime, precomputedDataFile, cellResolution, kind) {
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
@@ -122,14 +122,15 @@ function readRequestsBodies (travelTime, transportation, dateTime, precomputedDa
         transportation,
         { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
         dateTime,
-        cellResolution
+        cellResolution,
+        kind
       )
     )
   console.log('The amount of requests read: ' + data.length)
   return data
 }
 
-function generateRequestBodies (count, travelTime, transportation, locationCoords, dateTime, cellResolution) {
+function generateRequestBodies (count, travelTime, transportation, locationCoords, dateTime, cellResolution, kind) {
   console.log('The amount of requests generated: ' + count)
   const diff = 0.01
 
@@ -141,7 +142,8 @@ function generateRequestBodies (count, travelTime, transportation, locationCoord
         transportation,
         generateRandomCoordinate(locationCoords.lat, locationCoords.lng, diff),
         dateTime,
-        cellResolution
+        cellResolution,
+        kind
       )
     )
 }
