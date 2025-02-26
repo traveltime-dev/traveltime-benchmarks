@@ -32,9 +32,9 @@ export function setup () {
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const host = __ENV.HOST
-  const fullUrl = __ENV.FULL_URL || false
+  const endpointUrl = __ENV.FULL_URL || false
   // if fullUrl is given, use it, otherwise build url with host etc
-  const url = fullUrl || `https://${host}/v4/geocoding/reverse`
+  const url = endpointUrl || `https://${host}/v4/geocoding/reverse`
 
   const lat = __ENV.LAT || '51.4952113'
   const lng = __ENV.LNG || '-0.183122'
