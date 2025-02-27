@@ -36,7 +36,7 @@ randomSeed(__ENV.SEED || 1234567)
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
 export function setup () {
-  checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, `HOST and FULL_URL`)
+  checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
   const kind = __ENV.KIND || 'h3'
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY

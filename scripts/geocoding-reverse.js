@@ -30,7 +30,7 @@ setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
 
 export function setup () {
-  checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, `HOST and FULL_URL`)
+  checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/geocoding/reverse` : __ENV.FULL_URL

@@ -118,11 +118,10 @@ function encodeFixedPoint (sourcePoint, targetPoint) {
 }
 
 export function checkMutuallyExclusiveParams (a, b, message) {
-    if (typeof a === 'undefined' && typeof b === 'undefined') {
-      throw new Error(`Of ${message} none are provided. Provide exactly one of them.`)
-    }
-    if (typeof a !== 'undefined' && typeof b !== 'undefined') {
-      throw new Error(`Both ${message} are provided. Provide only one of them.`)
-    }
+  if (typeof a === 'undefined' && typeof b === 'undefined') {
+    throw new Error(`Of ${message} none are provided. Provide exactly one of them.`)
+  }
+  if (typeof a !== 'undefined' && typeof b !== 'undefined') {
+    throw new Error(`Both ${message} are provided. Provide only one of them.`)
+  }
 }
-
