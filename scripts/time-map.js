@@ -16,7 +16,8 @@ import {
   oneScenarioReport,
   getLocationCoordinates,
   summaryTrendStats,
-  randomIndex
+  randomIndex,
+  checkMutuallyExclusiveParams
 } from './common.js'
 
 export const options = {
@@ -35,12 +36,12 @@ randomSeed(__ENV.SEED || 1234567)
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
 export function setup () {
+  checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
-  const host = __ENV.HOST
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
-  const url = `https://${host}/v4/time-map`
+  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/time-map` : __ENV.FULL_URL
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const levelOfDetails = parseInt(__ENV.LEVEL_OF_DETAILS || -8)

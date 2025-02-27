@@ -12,7 +12,8 @@ import {
   setThresholdsForScenarios,
   deleteOneScenarioMetrics,
   oneScenarioReport,
-  summaryTrendStats
+  summaryTrendStats,
+  checkMutuallyExclusiveParams
 } from './common.js'
 
 export const options = {
@@ -29,10 +30,10 @@ setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
 
 export function setup () {
+  checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
-  const host = __ENV.HOST
-  const url = `https://${host}/v4/geocoding/reverse`
+  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/geocoding/reverse` : __ENV.FULL_URL
 
   const lat = __ENV.LAT || '51.4952113'
   const lng = __ENV.LNG || '-0.183122'

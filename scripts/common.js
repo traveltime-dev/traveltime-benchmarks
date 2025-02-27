@@ -116,3 +116,12 @@ export function destinationDeltas (departure, destinations) {
 function encodeFixedPoint (sourcePoint, targetPoint) {
   return Math.round((targetPoint - sourcePoint) * (10 ** 5))
 }
+
+export function checkMutuallyExclusiveParams (a, b, message) {
+  if (typeof a === 'undefined' && typeof b === 'undefined') {
+    throw new Error(`Of ${message} none are provided. Provide exactly one of them.`)
+  }
+  if (typeof a !== 'undefined' && typeof b !== 'undefined') {
+    throw new Error(`Both ${message} are provided. Provide only one of them.`)
+  }
+}
