@@ -38,12 +38,9 @@ export function setup () {
   const kind = __ENV.KIND || 'h3'
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
-  const host = __ENV.HOST
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
-  const fullUrl = __ENV.FULL_URL || false
-  // if fullUrl is given, use it, otherwise build url with host etc
-  const url = fullUrl || `https://${host}/v4/${kind}`
+  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/${kind}` : __ENV.FULL_URL
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
