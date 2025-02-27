@@ -18,8 +18,9 @@ The simplest way to run these benchmarks is to use docker:
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com 
-    -e FULL_URL='http://api-dev.traveltimeapp.com/v4/time-map' //optional - if provided fully overrides HOST/endpoint
+    -e HOST=api.traveltimeapp.com
+    // OR 
+    // -e FULL_URL='http://api-dev.traveltimeapp.com/v4/time-map' // if provided fully overrides HOST/endpoint
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional

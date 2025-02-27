@@ -35,6 +35,7 @@ randomSeed(__ENV.SEED || 1234567)
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
 export function setup () {
+  __ENV.HOST && __.FULL_URL && console.error('Both HOST and FULL_URL are provided. Provide only one of them.')
   const kind = __ENV.KIND || 'h3'
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
