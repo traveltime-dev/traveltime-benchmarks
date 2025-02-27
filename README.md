@@ -18,9 +18,7 @@ The simplest way to run these benchmarks is to use docker:
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com
-    // OR 
-    // -e FULL_URL='http://api-dev.traveltimeapp.com/v4/time-map' // if provided fully overrides HOST/endpoint
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='http://api-dev.traveltimeapp.com/v4/time-map' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
@@ -37,7 +35,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='http://api-dev.traveltimeapp.com/v4/time-map-fast' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
@@ -55,7 +53,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com 
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='http://api-dev.traveltimeapp.com/v4/distance-map' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_DISTANCE=2000 //optional
@@ -72,7 +70,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='http://api-dev.traveltimeapp.com/v4/time-filter' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
@@ -91,7 +89,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='http://api-dev.traveltimeapp.com/v4/time-filter/fast' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
@@ -109,7 +107,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='http://api-dev.traveltimeapp.com/v4/routes' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATE_TIME=2024-10-14T07:10:45.535Z //optional, departure/arrival time in ISO 8601 format. Default - current time
@@ -145,7 +143,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com 
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='http://api-dev.traveltimeapp.com/v4/geocoding/search' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e QUERY='Parliament square' //optional
     -e WITHIN_COUNTRY='gb' //optional, only return the results that are within the specified country
     -e LIMIT=50 //optional, limits amount of results returned to specified number (1 to 50)
@@ -162,7 +160,7 @@ docker run
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
-    -e HOST=api.traveltimeapp.com 
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='http://api-dev.traveltimeapp.com/v4/geocoding/reverse' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LAT='51.4952113' //optional, latitude
     -e LNG='-0.183122' //optional, longitude
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/geocoding-reverse.js
