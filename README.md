@@ -166,6 +166,23 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/geocoding-reverse.js
 ```
 
+#### cells (h3/geohash endpoints)
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e KIND=geohash // default is h3
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='http://api-dev.traveltimeapp.com/v4/geohash' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
+    -e LAT='51.4952113' //optional, latitude
+    -e LNG='-0.183122' //optional, longitude
+    -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
+    -e RPM=60 // optional
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells.js
+```
+
+
 ### Running K6 Tests Locally
 
 Install [K6](https://k6.io/docs/get-started/installation/)
