@@ -95,13 +95,13 @@ function generateBody (travelTime, transportation, coords, cellResolution, kind)
     properties: ['mean'],
     arrival_searches: {
       one_to_many: [{
-          id: `${kind} benchmark`,
-          coords,
-          arrival_time_period: 'weekday_morning',
-          travel_time: travelTime,
-          transportation: {
-            type: transportation
-          }
+        id: `${kind} benchmark`,
+        coords,
+        arrival_time_period: 'weekday_morning',
+        travel_time: travelTime,
+        transportation: {
+          type: transportation
+        }
       }]
     }
   })
