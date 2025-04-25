@@ -168,6 +168,8 @@ docker run
 
 #### cells (h3/geohash endpoints)
 
+For endpoints `v4/h3` or `v4/geohash`, you can use the following command to run the benchmark:
+
 ```bash
 docker run
     -e APP_ID={APP_ID}
@@ -182,6 +184,24 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells.js
 ```
 
+For endpoints `v4/h3/fast` or `v4/geohash/fast`, you can use the following command to run the benchmark:
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e KIND=geohash // default is h3
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/geohash' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
+    -e LAT='51.4952113' //optional, latitude
+    -e LNG='-0.183122' //optional, longitude
+    -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
+    -e RPM=60 // optional
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells-fast.js
+```
+
+
+```bash
 
 ### Running K6 Tests Locally
 
