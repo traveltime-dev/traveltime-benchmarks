@@ -78,7 +78,7 @@ export function setup () {
 export default function (data) {
   const index = randomIndex(data.requestBodies.length)
   const requestBodyEncoded = protobuf
-    .load('proto/TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
+    .load('TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
     .encode(data.requestBodies[index])
   const response = http.post(data.url, requestBodyEncoded, data.params)
 
@@ -91,7 +91,7 @@ export default function (data) {
   }
 
   if (!data.disableBodyDecoding) {
-    const decodedResponse = protobuf.load('proto/TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
+    const decodedResponse = protobuf.load('TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
 
     if (isBenchmarkStage) {
       check(decodedResponse, {
