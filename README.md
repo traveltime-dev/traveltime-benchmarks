@@ -200,8 +200,40 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells-fast.js
 ```
 
+#### h3-proto (the h3/proto version of cells h3 requests)
 
 ```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=example.org  // optional, defaults to proto.api.traveltimeapp.com
+    -e UNIQUE_REQUESTS=100 //optional, defaults to 100  the number of unique requests that should be generated
+    -e RPM=60 // optional, defaults to 60
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
+    -e LOCATION='DE/Berlin' // optional defaults to GB/London - see also locations/proto_locations_data.csv
+    -e MANY_TO_ONE // optional
+    -e RESOLUTION // optional, defaults to 6, h3 resolution
+    -e DISABLE_DECODING="true" // optional flag, skips proto response decoding if set to "true"
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/h3-proto.js
+```
+
+#### geohash-proto (the geohash/proto version of cells geohash requests)
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=example.org  // optional, defaults to proto.api.traveltimeapp.com
+    -e UNIQUE_REQUESTS=100 //optional, defaults to 100  the number of unique requests that should be generated
+    -e RPM=60 // optional, defaults to 60
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
+    -e LOCATION='DE/Berlin' // optional defaults to GB/London - see also locations/proto_locations_data.csv
+    -e MANY_TO_ONE // optional
+    -e RESOLUTION // optional, defaults to 6, h3 resolution
+    -e DISABLE_DECODING="true" // optional flag, skips proto response decoding if set to "true"
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/h3-proto.js
+```
+
 
 ### Running K6 Tests Locally
 
