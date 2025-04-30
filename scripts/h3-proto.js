@@ -22,7 +22,6 @@ import {
 } from './common.js'
 
 export const options = {
-  setupTimeout: '1000s',
   scenarios,
   summaryTrendStats,
 
@@ -39,19 +38,20 @@ const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 export function setup () {
   const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
   const mapDate = __ENV.MAP_DATE || 'unknown'
+  const protocol = __ENV.PROTOCOL || 'https'
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
-  const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
   const host = __ENV.HOST
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const protocol = __ENV.PROTOCOL || 'https'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
+  const resolution = parseInt(__ENV.RESOLUTION || 6)
 
   const location = __ENV.LOCATION || 'UK/London'
   const country = location.slice(0, 2).toLowerCase()
   const locationCoords = getProtoLocationCoordinates(location)
 
-  const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-filter/fast/${transportation}`
+  // TODO/FIXME - update the url once we have load balancer changes ready
+  const query = __ENV.QUERY || `api/v2/${countryCode(country)}/time-map/fast-h3/${transportation}`
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
@@ -63,15 +63,14 @@ export function setup () {
       'Content-Type': 'application/octet-stream'
     },
     tags: {
-      destinations: destinationsAmount,
       serviceImage,
       mapDate
     }
   }
 
   const requestBodies = precomputedDataFile
-    ? readRequestsBodies(destinationsAmount, transportation, travelTime, isManyToOne, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, destinationsAmount, locationCoords, transportation, travelTime, isManyToOne)
+    ? readRequestsBodies(transportation, travelTime, isManyToOne, precomputedDataFile, resolution)
+    : generateRequestBodies(uniqueRequestsAmount, locationCoords, transportation, travelTime, isManyToOne, resolution)
 
   return { url, requestBodies, params, disableBodyDecoding }
 }
@@ -79,12 +78,14 @@ export function setup () {
 export default function (data) {
   const index = randomIndex(data.requestBodies.length)
   const requestBodyEncoded = protobuf
-    .load('TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
+    .load('H3FastRequest.proto', 'H3FastRequest')
     .encode(data.requestBodies[index])
   const response = http.post(data.url, requestBodyEncoded, data.params)
+  if (response.status != 200) {
+    console.log(requestBodyEncoded)
+  }
 
   const isBenchmarkStage = getCurrentStageIndex() === 1
-
   if (isBenchmarkStage) {
     check(response, {
       'status is 200': (r) => r.status === 200
@@ -92,8 +93,7 @@ export default function (data) {
   }
 
   if (!data.disableBodyDecoding) {
-    const decodedResponse = protobuf.load('TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
-
+    const decodedResponse = protobuf.load('H3FastResponse.proto', 'H3FastResponse').decode(response.body)
     if (isBenchmarkStage) {
       check(decodedResponse, {
         'response body is not empty': (r) => r.length !== 0
@@ -120,72 +120,65 @@ function countryCode (country) {
   if (country.startsWith('us_')) { return 'us' } else { return country }
 }
 
-function generateBody (destinationsAmount, coord, transportation, travelTime, isManyToOne) {
-  const diff = 0.005
+function generateBody (coord, transportation, travelTime, isManyToOne, resolution) {
   const originLocation = coord
-  const destinations = generateDestinations(destinationsAmount, originLocation, diff)
   if (isManyToOne) {
     return JSON.stringify({
       manyToOneRequest: {
         arrivalLocation: originLocation,
-        locationDeltas: destinationDeltas(originLocation, destinations),
         transportation: {
           type: transportationType(transportation)
         },
-        travelTime
+        travelTime: travelTime,
+        resolution: resolution,
+	requestedProperties: ["MEAN"]
       }
     })
   } else {
     return JSON.stringify({
       oneToManyRequest: {
         departureLocation: originLocation,
-        locationDeltas: destinationDeltas(originLocation, destinations),
         transportation: {
           type: transportationType(transportation)
         },
-        travelTime
+	travelTime: travelTime,
+	resolution: resolution,
+	requestedProperties: ["MEAN"]
       }
     })
   }
 }
 
-function readRequestsBodies (destinationsAmount, transportation, travelTime, isManyToOne, precomputedDataFile) {
+function readRequestsBodies (transportation, travelTime, isManyToOne, precomputedDataFile, resolution) {
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
     .map(origins =>
       generateBody(
-        destinationsAmount,
         { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
         transportation,
         travelTime,
-        isManyToOne
+        isManyToOne,
+        resolution
       )
     )
   console.log('The amount of requests read: ' + data.length)
   return data
 }
 
-function generateRequestBodies (
-  count,
-  destinationsAmount,
-  coords,
-  transportation,
-  travelTime,
-  isManyToOne
-) {
+function generateRequestBodies (count, locationCoords, transportation, travelTime, isManyToOne, resolution) {
   console.log('The amount of requests generated: ' + count)
-  const diff = 0.005
+  const diff = 0.01
 
   return Array
     .from(
       { length: count },
       () => generateBody(
-        destinationsAmount,
-        generateRandomCoordinate(coords.lat, coords.lng, diff),
+        generateRandomCoordinate(locationCoords.lat, locationCoords.lng, diff),
         transportation,
         travelTime,
-        isManyToOne
+        isManyToOne,
+        resolution
       )
     )
 }
