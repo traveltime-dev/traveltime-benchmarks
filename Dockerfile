@@ -14,6 +14,7 @@ RUN xk6 build \
 FROM alpine
 
 COPY --from=builder /app/k6 /bin/
+COPY *.proto /
 COPY /scripts /scripts/
 COPY /locations /locations/
 COPY /precomputed /precomputed/
