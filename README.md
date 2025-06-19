@@ -6,7 +6,7 @@ This repository hosts benchmarks for measuring the performance of the TravelTime
 
 First, obtain an App ID and an API key from https://docs.traveltime.com/api/overview/getting-keys
 
-You will need to email sales@traveltime.com or book a demo at https://traveltime.com/book-demo to gain access to TimeFilterFast(Proto).
+If you are on a Trial plan and would like to test the performance of the API at higher rate limits, please contact support@traveltime.com.
 
 ### Running K6 Tests with Docker
 
