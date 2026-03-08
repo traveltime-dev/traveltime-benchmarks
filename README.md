@@ -200,6 +200,24 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells-fast.js
 ```
 
+For protobuffer endpoint version of `geohash` there is an available script:
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=proto.api.traveltimeapp.com
+    -e LOCATION='UK/London' //optional
+    -e TRANSPORTATION='driving+ferry' //optional
+    -e TRAVEL_TIME=3600 //optional
+    -e RESOLUTION=6 //optional, geohash cell resolution
+    -e RPM=60 // optional
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
+    -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
+    -e DISABLE_DECODING="true" // optional flag, skips proto response decoding if set to "true"
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/geohash-proto.js
+```
+
 
 ```bash
 
