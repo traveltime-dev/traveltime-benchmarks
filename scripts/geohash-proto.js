@@ -15,7 +15,9 @@ import {
   setThresholdsForScenarios,
   summaryTrendStats,
   getProtoLocationCoordinates,
-  randomIndex
+  randomIndex,
+  transportationTypeProto,
+  countryCodeProto
 } from './common.js'
 
 export const options = {
@@ -48,7 +50,7 @@ export function setup () {
   const country = location.slice(0, 2).toLowerCase()
   const locationCoords = getProtoLocationCoordinates(location)
 
-  const query = __ENV.QUERY || `api/v3/${countryCode(country)}/geohash/fast/${transportation}`
+  const query = __ENV.QUERY || `api/v3/${countryCodeProto(country)}/geohash/fast/${transportation}`
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
 
@@ -113,31 +115,12 @@ export function handleSummary (data) {
   }
 }
 
-function transportationType (transportation) {
-  switch (transportation) {
-    case 'driving+ferry':
-      return 'DRIVING_AND_FERRY'
-    case 'walking+ferry':
-      return 'WALKING_AND_FERRY'
-    case 'cycling+ferry':
-      return 'CYCLING_AND_FERRY'
-    case 'pt':
-      return 'PUBLIC_TRANSPORT'
-    default:
-      return null
-  }
-}
-
-function countryCode (country) {
-  if (country.startsWith('us_')) { return 'us' } else { return country }
-}
-
 function generateBody (coord, transportation, travelTime, cellResolution) {
   return JSON.stringify({
     oneToManyRequest: {
       departureLocation: coord,
       transportation: {
-        type: transportationType(transportation)
+        type: transportationTypeProto(transportation)
       },
       arrivalTimePeriod: 'WEEKDAY_MORNING',
       travelTime,
