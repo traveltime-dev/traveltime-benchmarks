@@ -117,6 +117,25 @@ function encodeFixedPoint (sourcePoint, targetPoint) {
   return Math.round((targetPoint - sourcePoint) * (10 ** 5))
 }
 
+export function transportationTypeProto (transportation) {
+  switch (transportation) {
+    case 'driving+ferry':
+      return 'DRIVING_AND_FERRY'
+    case 'walking+ferry':
+      return 'WALKING_AND_FERRY'
+    case 'cycling+ferry':
+      return 'CYCLING_AND_FERRY'
+    case 'pt':
+      return 'PUBLIC_TRANSPORT'
+    default:
+      return null
+  }
+}
+
+export function countryCodeProto (country) {
+  if (country.startsWith('us_')) { return 'us' } else { return country }
+}
+
 export function checkMutuallyExclusiveParams (a, b, message) {
   if (typeof a === 'undefined' && typeof b === 'undefined') {
     throw new Error(`Of ${message} none are provided. Provide exactly one of them.`)
