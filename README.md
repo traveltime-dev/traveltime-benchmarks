@@ -211,6 +211,7 @@ docker run
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=3600 //optional
     -e RESOLUTION=6 //optional, geohash cell resolution
+    -e DIRECTION='one-to-many' //optional, 'one-to-many' (default) or 'many-to-one'
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
