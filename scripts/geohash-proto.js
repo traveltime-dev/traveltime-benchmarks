@@ -50,6 +50,7 @@ export function setup () {
   const country = location.slice(0, 2).toLowerCase()
   const locationCoords = getProtoLocationCoordinates(location)
 
+  const direction = __ENV.DIRECTION || 'one-to-many'
   const query = __ENV.QUERY || `api/v3/${countryCodeProto(country)}/geohash/fast/${transportation}`
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
@@ -69,8 +70,8 @@ export function setup () {
   }
 
   const requestBodies = precomputedDataFile
-    ? readRequestsBodies(transportation, travelTime, cellResolution, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, locationCoords, transportation, travelTime, cellResolution)
+    ? readRequestsBodies(direction, transportation, travelTime, cellResolution, precomputedDataFile)
+    : generateRequestBodies(direction, uniqueRequestsAmount, locationCoords, transportation, travelTime, cellResolution)
 
   return { url, requestBodies, params, disableBodyDecoding }
 }
@@ -115,27 +116,41 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (coord, transportation, travelTime, cellResolution) {
+function generateBody (direction, coord, transportation, travelTime, cellResolution) {
+  const commonFields = {
+    transportation: {
+      type: transportationTypeProto(transportation)
+    },
+    arrivalTimePeriod: 'WEEKDAY_MORNING',
+    travelTime,
+    resolution: cellResolution,
+    properties: ['MEAN']
+  }
+
+  if (direction === 'many-to-one') {
+    return JSON.stringify({
+      manyToOneRequest: {
+        arrivalLocation: coord,
+        ...commonFields
+      }
+    })
+  }
+
   return JSON.stringify({
     oneToManyRequest: {
       departureLocation: coord,
-      transportation: {
-        type: transportationTypeProto(transportation)
-      },
-      arrivalTimePeriod: 'WEEKDAY_MORNING',
-      travelTime,
-      resolution: cellResolution,
-      properties: ['MEAN']
+      ...commonFields
     }
   })
 }
 
-function readRequestsBodies (transportation, travelTime, cellResolution, precomputedDataFile) {
+function readRequestsBodies (direction, transportation, travelTime, cellResolution, precomputedDataFile) {
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
     .map(origins =>
       generateBody(
+        direction,
         { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
         transportation,
         travelTime,
@@ -146,7 +161,7 @@ function readRequestsBodies (transportation, travelTime, cellResolution, precomp
   return data
 }
 
-function generateRequestBodies (count, coords, transportation, travelTime, cellResolution) {
+function generateRequestBodies (direction, count, coords, transportation, travelTime, cellResolution) {
   console.log('The amount of requests generated: ' + count)
   const diff = 0.005
 
@@ -154,6 +169,7 @@ function generateRequestBodies (count, coords, transportation, travelTime, cellR
     .from(
       { length: count },
       () => generateBody(
+        direction,
         generateRandomCoordinate(coords.lat, coords.lng, diff),
         transportation,
         travelTime,
