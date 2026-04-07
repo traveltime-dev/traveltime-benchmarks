@@ -42,7 +42,7 @@ export function setup () {
   const apiKey = __ENV.API_KEY
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
-  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/${kind}` : __ENV.FULL_URL
+  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/${kind}/fast` : __ENV.FULL_URL
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)

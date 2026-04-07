@@ -66,7 +66,7 @@ export function setup () {
       serviceImage,
       mapDate
     },
-    responseType: 'binary'
+    responseType: disableBodyDecoding ? 'none' : 'binary'
   }
 
   const requestBodies = precomputedDataFile
