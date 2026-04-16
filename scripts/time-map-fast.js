@@ -34,6 +34,7 @@ setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
 
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
+const isManyToOne = __ENV.MANY_TO_ONE !== undefined
 
 export function setup () {
   checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
@@ -44,9 +45,10 @@ export function setup () {
   const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/time-map/fast` : __ENV.FULL_URL
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
-  const levelOfDetails = parseInt(__ENV.LEVEL_OF_DETAILS || -8)
+  const levelOfDetail = parseInt(__ENV.LEVEL_OF_DETAIL || __ENV.LEVEL_OF_DETAILS || -8)
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
+  console.log(`time-map-fast: ${isManyToOne ? 'many_to_one' : 'one_to_many'} mode`)
 
   const params = {
     headers: {
@@ -57,8 +59,8 @@ export function setup () {
   }
 
   const requestBodies = precomputedDataFile
-    ? readRequestsBodies(travelTime, transportation, arrivalTimePeriod, levelOfDetails, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, locationCoords, arrivalTimePeriod, levelOfDetails)
+    ? readRequestsBodies(travelTime, transportation, arrivalTimePeriod, levelOfDetail, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, locationCoords, arrivalTimePeriod, levelOfDetail)
 
   return { url, requestBodies, params }
 }
@@ -89,29 +91,28 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (travelTime, transportation, coords, arrivalTimePeriod, levelOfDetails) {
-  return JSON.stringify({
-    arrival_searches: {
-      one_to_many: [
-        {
-          id: 'Time map fast benchmark',
-          coords,
-          arrival_time_period: arrivalTimePeriod,
-          travel_time: travelTime,
-          transportation: {
-            type: transportation
-          },
-          level_of_detail: {
-            scale_type: 'simple_numeric',
-            level: levelOfDetails
-          }
-        }
-      ]
+function generateBody (travelTime, transportation, coords, arrivalTimePeriod, levelOfDetail) {
+  const searchType = isManyToOne ? 'many_to_one' : 'one_to_many'
+  const searches = {}
+  searches[searchType] = [
+    {
+      id: 'Time map fast benchmark',
+      coords,
+      arrival_time_period: arrivalTimePeriod,
+      travel_time: travelTime,
+      transportation: {
+        type: transportation
+      },
+      level_of_detail: {
+        scale_type: 'simple_numeric',
+        level: levelOfDetail
+      }
     }
-  })
+  ]
+  return JSON.stringify({ arrival_searches: searches })
 }
 
-function readRequestsBodies (travelTime, transportation, arrivalTimePeriod, levelOfDetails, precomputedDataFile) {
+function readRequestsBodies (travelTime, transportation, arrivalTimePeriod, levelOfDetail, precomputedDataFile) {
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
@@ -121,14 +122,14 @@ function readRequestsBodies (travelTime, transportation, arrivalTimePeriod, leve
         transportation,
         { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
         arrivalTimePeriod,
-        levelOfDetails
+        levelOfDetail
       )
     )
   console.log('The amount of requests read: ' + data.length)
   return data
 }
 
-function generateRequestBodies (count, travelTime, transportation, locationCoords, arrivalTimePeriod, levelOfDetails) {
+function generateRequestBodies (count, travelTime, transportation, locationCoords, arrivalTimePeriod, levelOfDetail) {
   console.log('The amount of requests generated: ' + count)
   const diff = 0.01
 
@@ -140,7 +141,7 @@ function generateRequestBodies (count, travelTime, transportation, locationCoord
         transportation,
         generateRandomCoordinate(locationCoords.lat, locationCoords.lng, diff),
         arrivalTimePeriod,
-        levelOfDetails
+        levelOfDetail
       )
     )
 }

@@ -95,7 +95,8 @@ export default function (data) {
     const decodedResponse = protobuf.load('GeohashFastResponse.proto', 'GeohashFastResponse').decode(response.body)
 
     if (isBenchmarkStage) {
-      check(decodedResponse, {
+      const parsed = typeof decodedResponse === 'string' ? JSON.parse(decodedResponse) : decodedResponse
+      check(parsed, {
         'response body is not empty': (r) => r.cells && r.cells.ids && r.cells.ids.length !== 0
       })
     }
