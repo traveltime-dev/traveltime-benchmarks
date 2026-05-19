@@ -20,6 +20,27 @@ import {
   countryCodeProto
 } from './common.js'
 
+const KIND_CONFIG = {
+  h3: {
+    pathSegment: 'h3',
+    requestType: 'H3FastRequest',
+    responseType: 'H3FastResponse',
+    defaultResolution: 7
+  },
+  geohash: {
+    pathSegment: 'geohash',
+    requestType: 'GeohashFastRequest',
+    responseType: 'GeohashFastResponse',
+    defaultResolution: 6
+  }
+}
+
+const kind = __ENV.KIND || 'h3'
+const kindConfig = KIND_CONFIG[kind]
+if (!kindConfig) {
+  throw new Error(`Unknown KIND '${kind}'. Supported: ${Object.keys(KIND_CONFIG).join(', ')}`)
+}
+
 export const options = {
   setupTimeout: '1000s',
   scenarios,
@@ -44,14 +65,14 @@ export function setup () {
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 3600)
-  const cellResolution = parseInt(__ENV.RESOLUTION || 6)
+  const cellResolution = parseInt(__ENV.RESOLUTION || kindConfig.defaultResolution)
 
   const location = __ENV.LOCATION || 'UK/London'
   const country = location.slice(0, 2).toLowerCase()
   const locationCoords = getProtoLocationCoordinates(location)
 
   const direction = __ENV.DIRECTION || 'one-to-many'
-  const query = __ENV.QUERY || `api/v3/${countryCodeProto(country)}/geohash/fast/${transportation}`
+  const query = __ENV.QUERY || `api/v3/${countryCodeProto(country)}/${kindConfig.pathSegment}/fast/${transportation}`
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
 
@@ -79,7 +100,7 @@ export function setup () {
 export default function (data) {
   const index = randomIndex(data.requestBodies.length)
   const requestBodyEncoded = protobuf
-    .load('GeohashFastRequest.proto', 'GeohashFastRequest')
+    .load(`${kindConfig.requestType}.proto`, kindConfig.requestType)
     .encode(data.requestBodies[index])
   const response = http.post(data.url, requestBodyEncoded, data.params)
 
@@ -92,7 +113,7 @@ export default function (data) {
   }
 
   if (!data.disableBodyDecoding && response.status === 200) {
-    const decodedResponse = protobuf.load('GeohashFastResponse.proto', 'GeohashFastResponse').decode(response.body)
+    const decodedResponse = protobuf.load(`${kindConfig.responseType}.proto`, kindConfig.responseType).decode(response.body)
 
     if (isBenchmarkStage) {
       const parsed = typeof decodedResponse === 'string' ? JSON.parse(decodedResponse) : decodedResponse
