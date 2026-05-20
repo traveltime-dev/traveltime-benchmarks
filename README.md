@@ -178,6 +178,9 @@ docker run
     -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/geohash' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LAT='51.4952113' //optional, latitude
     -e LNG='-0.183122' //optional, longitude
+    -e TRANSPORTATION='driving+ferry' //optional
+    -e TRAVEL_TIME=1800 //optional, in seconds
+    -e RESOLUTION=7 //optional, cell resolution (defaults: h3=7, geohash=6)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
@@ -194,29 +197,33 @@ docker run
     -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/geohash' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LAT='51.4952113' //optional, latitude
     -e LNG='-0.183122' //optional, longitude
+    -e TRANSPORTATION='driving+ferry' //optional
+    -e TRAVEL_TIME=1800 //optional, in seconds
+    -e RESOLUTION=7 //optional, cell resolution (defaults: h3=7, geohash=6)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells-fast.js
 ```
 
-For protobuffer endpoint version of `geohash` there is an available script:
+For protobuffer endpoint versions of `h3/fast` or `geohash/fast` there is an available script:
 
 ```bash
 docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
+    -e KIND=geohash // optional, 'h3' (default) or 'geohash'
     -e HOST=proto.api.traveltimeapp.com
     -e LOCATION='UK/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=3600 //optional
-    -e RESOLUTION=6 //optional, geohash cell resolution
+    -e RESOLUTION=6 //optional, cell resolution (defaults: h3=8, geohash=6)
     -e DIRECTION='one-to-many' //optional, 'one-to-many' (default) or 'many-to-one'
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -e DISABLE_DECODING="true" // optional flag, skips proto response decoding if set to "true"
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/geohash-proto.js
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells-proto.js
 ```
 
 
