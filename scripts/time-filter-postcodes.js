@@ -12,10 +12,10 @@ import {
   generateRandomCoordinate,
   oneScenario as scenarios,
   setThresholdsForScenarios,
-  oneScenarioReport,
   deleteOneScenarioMetrics,
-  summaryTrendStats,
+  oneScenarioReport,
   getLocationCoordinates,
+  summaryTrendStats,
   randomIndex,
   checkMutuallyExclusiveParams
 } from './common.js'
@@ -41,17 +41,11 @@ export function setup () {
   const apiKey = __ENV.API_KEY
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
-  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/time-filter` : __ENV.FULL_URL
+  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/time-filter/postcodes` : __ENV.FULL_URL
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1800)
-  const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
-  const rangeWidth = __ENV.RANGE || 0
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
-  const rangeSettings = {
-    enabled: rangeWidth !== 0,
-    max_results: 3,
-    width: rangeWidth === 0 ? 1 : parseInt(rangeWidth)
-  }
+  const properties = (__ENV.PROPERTIES || 'travel_time,distance').split(',')
   const dateTime = __ENV.DATE_TIME || new Date().toISOString()
 
   const params = {
@@ -63,8 +57,8 @@ export function setup () {
   }
 
   const requestBodies = precomputedDataFile
-    ? readRequestsBodies(travelTime, transportation, destinationsAmount, rangeSettings, dateTime, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, destinationsAmount, rangeSettings, locationCoords, dateTime)
+    ? readRequestsBodies(travelTime, transportation, dateTime, properties, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, locationCoords, dateTime, properties)
 
   return { url, requestBodies, params }
 }
@@ -95,48 +89,22 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (
-  travelTime,
-  transportation,
-  destinationsAmount,
-  rangeSettings,
-  coords,
-  dateTime
-) {
-  const originLocation = {
-    id: 'destination1',
-    coords: { lat: coords.lat, lng: coords.lng }
-  }
-
-  const randomDestinations = Array.from({ length: destinationsAmount }, (_, i) => ({
-    id: `destination${i + 2}`,
-    coords: generateRandomCoordinate(coords.lat, coords.lng, 0.005)
-  }))
-
-  const allLocations = [originLocation, ...randomDestinations]
-
-  const departureSearches = [{
-    id: 'Time filter benchmark',
-    departure_location_id: 'destination1',
-    arrival_location_ids: randomDestinations.map(destination => destination.id),
-    departure_time: dateTime,
-    travel_time: travelTime,
-    properties: [
-      'travel_time'
-    ],
-    transportation: {
-      type: transportation
-    },
-    range: rangeSettings
-  }]
-
+function generateBody (travelTime, transportation, coords, dateTime, properties) {
   return JSON.stringify({
-    locations: allLocations,
-    departure_searches: departureSearches
+    departure_searches: [{
+      id: 'Postcodes benchmark',
+      coords,
+      departure_time: dateTime,
+      travel_time: travelTime,
+      transportation: {
+        type: transportation
+      },
+      properties
+    }]
   })
 }
 
-function readRequestsBodies (travelTime, transportation, destinationsAmount, rangeSettings, dateTime, precomputedDataFile) {
+function readRequestsBodies (travelTime, transportation, dateTime, properties, precomputedDataFile) {
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
@@ -144,27 +112,18 @@ function readRequestsBodies (travelTime, transportation, destinationsAmount, ran
       generateBody(
         travelTime,
         transportation,
-        destinationsAmount,
-        rangeSettings,
         { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
-        dateTime
+        dateTime,
+        properties
       )
     )
   console.log('The amount of requests read: ' + data.length)
   return data
 }
 
-function generateRequestBodies (
-  count,
-  travelTime,
-  transportation,
-  destinationsAmount,
-  rangeSettings,
-  locationCoords,
-  dateTime
-) {
+function generateRequestBodies (count, travelTime, transportation, locationCoords, dateTime, properties) {
   console.log('The amount of requests generated: ' + count)
-  const diff = 0.005
+  const diff = 0.01
 
   return Array
     .from(
@@ -172,10 +131,9 @@ function generateRequestBodies (
       () => generateBody(
         travelTime,
         transportation,
-        destinationsAmount,
-        rangeSettings,
         generateRandomCoordinate(locationCoords.lat, locationCoords.lng, diff),
-        dateTime
+        dateTime,
+        properties
       )
     )
 }

@@ -73,7 +73,7 @@ docker run
     -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/time-filter' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
-    -e TRAVEL_TIME=7200 //optional
+    -e TRAVEL_TIME=1800 //optional
     -e DATE_TIME=2024-10-14T07:10:45.535Z //optional, departure/arrival time in ISO 8601 format. Default - current time
     -e DESTINATIONS=50 // optional
     -e RANGE=600 //optional
@@ -92,13 +92,51 @@ docker run
     -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/time-filter/fast' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
-    -e TRAVEL_TIME=7200 //optional
+    -e TRAVEL_TIME=1800 //optional
     -e ARRIVAL_TIME_PERIOD='weekday_morning' //optional
     -e DESTINATIONS=50 // optional
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-fast.js
+```
+
+#### time-filter postcodes
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/time-filter/postcodes' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
+    -e LOCATION='GB/London' //optional
+    -e TRANSPORTATION='driving+ferry' //optional
+    -e TRAVEL_TIME=1800 //optional
+    -e DATE_TIME=2024-10-14T07:10:45.535Z //optional, departure time in ISO 8601 format. Default - current time
+    -e PROPERTIES='travel_time,distance' //optional, comma-separated list
+    -e RPM=60 // optional
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
+    -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-postcodes.js
+```
+
+#### time-filter postcode-zones (districts / sectors)
+
+```bash
+docker run
+    -e APP_ID={APP_ID}
+    -e API_KEY={API_KEY}
+    -e KIND=districts // optional, 'districts' (default) or 'sectors'
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/time-filter/postcode-districts' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
+    -e LOCATION='GB/London' //optional
+    -e TRANSPORTATION='driving+ferry' //optional
+    -e TRAVEL_TIME=1800 //optional
+    -e DATE_TIME=2024-10-14T07:10:45.535Z //optional, departure time in ISO 8601 format. Default - current time
+    -e REACHABLE_POSTCODES_THRESHOLD=0.1 //optional, 0.0-1.0
+    -e PROPERTIES='coverage,travel_time_reachable,travel_time_all' //optional, comma-separated list
+    -e RPM=60 // optional
+    -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
+    -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
+    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-postcode-zones.js
 ```
 
 #### routes

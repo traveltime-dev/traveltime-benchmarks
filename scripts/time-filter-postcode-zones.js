@@ -12,13 +12,15 @@ import {
   generateRandomCoordinate,
   oneScenario as scenarios,
   setThresholdsForScenarios,
-  oneScenarioReport,
   deleteOneScenarioMetrics,
-  summaryTrendStats,
+  oneScenarioReport,
   getLocationCoordinates,
+  summaryTrendStats,
   randomIndex,
   checkMutuallyExclusiveParams
 } from './common.js'
+
+const VALID_KINDS = ['districts', 'sectors']
 
 export const options = {
   setupTimeout: '1000s',
@@ -37,22 +39,22 @@ const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
 export function setup () {
   checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
+  const kind = __ENV.KIND || 'districts'
+  if (!VALID_KINDS.includes(kind)) {
+    throw new Error(`KIND must be one of ${VALID_KINDS.join(', ')}, got "${kind}".`)
+  }
   const appId = __ENV.APP_ID
   const apiKey = __ENV.API_KEY
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
-  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/time-filter` : __ENV.FULL_URL
+  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/time-filter/postcode-${kind}` : __ENV.FULL_URL
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1800)
-  const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
-  const rangeWidth = __ENV.RANGE || 0
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
-  const rangeSettings = {
-    enabled: rangeWidth !== 0,
-    max_results: 3,
-    width: rangeWidth === 0 ? 1 : parseInt(rangeWidth)
-  }
+  const threshold = parseFloat(__ENV.REACHABLE_POSTCODES_THRESHOLD || 0.1)
+  const properties = (__ENV.PROPERTIES || 'coverage,travel_time_reachable,travel_time_all').split(',')
   const dateTime = __ENV.DATE_TIME || new Date().toISOString()
+  const id = `Postcode ${kind} benchmark`
 
   const params = {
     headers: {
@@ -63,8 +65,8 @@ export function setup () {
   }
 
   const requestBodies = precomputedDataFile
-    ? readRequestsBodies(travelTime, transportation, destinationsAmount, rangeSettings, dateTime, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, destinationsAmount, rangeSettings, locationCoords, dateTime)
+    ? readRequestsBodies(id, travelTime, transportation, dateTime, threshold, properties, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, id, travelTime, transportation, locationCoords, dateTime, threshold, properties)
 
   return { url, requestBodies, params }
 }
@@ -95,87 +97,56 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (
-  travelTime,
-  transportation,
-  destinationsAmount,
-  rangeSettings,
-  coords,
-  dateTime
-) {
-  const originLocation = {
-    id: 'destination1',
-    coords: { lat: coords.lat, lng: coords.lng }
-  }
-
-  const randomDestinations = Array.from({ length: destinationsAmount }, (_, i) => ({
-    id: `destination${i + 2}`,
-    coords: generateRandomCoordinate(coords.lat, coords.lng, 0.005)
-  }))
-
-  const allLocations = [originLocation, ...randomDestinations]
-
-  const departureSearches = [{
-    id: 'Time filter benchmark',
-    departure_location_id: 'destination1',
-    arrival_location_ids: randomDestinations.map(destination => destination.id),
-    departure_time: dateTime,
-    travel_time: travelTime,
-    properties: [
-      'travel_time'
-    ],
-    transportation: {
-      type: transportation
-    },
-    range: rangeSettings
-  }]
-
+function generateBody (id, travelTime, transportation, coords, dateTime, threshold, properties) {
   return JSON.stringify({
-    locations: allLocations,
-    departure_searches: departureSearches
+    departure_searches: [{
+      id,
+      coords,
+      departure_time: dateTime,
+      travel_time: travelTime,
+      reachable_postcodes_threshold: threshold,
+      transportation: {
+        type: transportation
+      },
+      properties
+    }]
   })
 }
 
-function readRequestsBodies (travelTime, transportation, destinationsAmount, rangeSettings, dateTime, precomputedDataFile) {
+function readRequestsBodies (id, travelTime, transportation, dateTime, threshold, properties, precomputedDataFile) {
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
     .map(origins =>
       generateBody(
+        id,
         travelTime,
         transportation,
-        destinationsAmount,
-        rangeSettings,
         { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
-        dateTime
+        dateTime,
+        threshold,
+        properties
       )
     )
   console.log('The amount of requests read: ' + data.length)
   return data
 }
 
-function generateRequestBodies (
-  count,
-  travelTime,
-  transportation,
-  destinationsAmount,
-  rangeSettings,
-  locationCoords,
-  dateTime
-) {
+function generateRequestBodies (count, id, travelTime, transportation, locationCoords, dateTime, threshold, properties) {
   console.log('The amount of requests generated: ' + count)
-  const diff = 0.005
+  const diff = 0.01
 
   return Array
     .from(
       { length: count },
       () => generateBody(
+        id,
         travelTime,
         transportation,
-        destinationsAmount,
-        rangeSettings,
         generateRandomCoordinate(locationCoords.lat, locationCoords.lng, diff),
-        dateTime
+        dateTime,
+        threshold,
+        properties
       )
     )
 }
