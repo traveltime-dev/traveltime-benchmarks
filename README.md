@@ -261,6 +261,7 @@ docker run
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -e DISABLE_DECODING="true" // optional flag, skips proto response decoding if set to "true"
+    -e REMOVE_WATER_BODIES="false" // optional flag, default "true"; set to "false" to keep water-body cells in the response
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells-proto.js
 ```
 
