@@ -12,6 +12,7 @@ message H3FastRequest {
     sint32 travelTime = 4;
     uint32 resolution = 5;
     repeated CellPropertyType properties = 6;
+    bool removeWaterBodies = 7;
   }
 
   message ManyToOne {
@@ -21,6 +22,7 @@ message H3FastRequest {
     sint32 travelTime = 4;
     uint32 resolution = 5;
     repeated CellPropertyType properties = 6;
+    bool removeWaterBodies = 7;
   }
 
   OneToMany oneToManyRequest = 1;

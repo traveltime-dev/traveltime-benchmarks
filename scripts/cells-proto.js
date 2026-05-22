@@ -75,6 +75,7 @@ export function setup () {
   const query = __ENV.QUERY || `api/v3/${countryCodeProto(country)}/${kindConfig.pathSegment}/fast/${transportation}`
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
+  const removeWaterBodies = __ENV.REMOVE_WATER_BODIES !== 'false'
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
@@ -91,8 +92,8 @@ export function setup () {
   }
 
   const requestBodies = precomputedDataFile
-    ? readRequestsBodies(direction, transportation, travelTime, cellResolution, precomputedDataFile)
-    : generateRequestBodies(direction, uniqueRequestsAmount, locationCoords, transportation, travelTime, cellResolution)
+    ? readRequestsBodies(direction, transportation, travelTime, cellResolution, removeWaterBodies, precomputedDataFile)
+    : generateRequestBodies(direction, uniqueRequestsAmount, locationCoords, transportation, travelTime, cellResolution, removeWaterBodies)
 
   return { url, requestBodies, params, disableBodyDecoding }
 }
@@ -138,7 +139,7 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (direction, coord, transportation, travelTime, cellResolution) {
+function generateBody (direction, coord, transportation, travelTime, cellResolution, removeWaterBodies) {
   const commonFields = {
     transportation: {
       type: transportationTypeProto(transportation)
@@ -146,7 +147,8 @@ function generateBody (direction, coord, transportation, travelTime, cellResolut
     arrivalTimePeriod: 'WEEKDAY_MORNING',
     travelTime,
     resolution: cellResolution,
-    properties: ['MEAN']
+    properties: ['MEAN'],
+    removeWaterBodies
   }
 
   if (direction === 'many-to-one') {
@@ -166,7 +168,7 @@ function generateBody (direction, coord, transportation, travelTime, cellResolut
   })
 }
 
-function readRequestsBodies (direction, transportation, travelTime, cellResolution, precomputedDataFile) {
+function readRequestsBodies (direction, transportation, travelTime, cellResolution, removeWaterBodies, precomputedDataFile) {
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
@@ -176,14 +178,15 @@ function readRequestsBodies (direction, transportation, travelTime, cellResoluti
         { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
         transportation,
         travelTime,
-        cellResolution
+        cellResolution,
+        removeWaterBodies
       )
     )
   console.log('The amount of requests read: ' + data.length)
   return data
 }
 
-function generateRequestBodies (direction, count, coords, transportation, travelTime, cellResolution) {
+function generateRequestBodies (direction, count, coords, transportation, travelTime, cellResolution, removeWaterBodies) {
   console.log('The amount of requests generated: ' + count)
   const diff = 0.005
 
@@ -195,7 +198,8 @@ function generateRequestBodies (direction, count, coords, transportation, travel
         generateRandomCoordinate(coords.lat, coords.lng, diff),
         transportation,
         travelTime,
-        cellResolution
+        cellResolution,
+        removeWaterBodies
       )
     )
 }
