@@ -127,6 +127,8 @@ function generateBody (direction, coord, transportation, travelTime, cellResolut
     resolution: cellResolution,
     properties: ['MEAN']
   }
+  // Field absent from the k6 image's bundled schema; only include (and use the CM-patched proto) when set.
+  if (__ENV.REMOVE_WATER === 'true') commonFields.removeWaterBodies = true
 
   if (direction === 'many-to-one') {
     return JSON.stringify({
