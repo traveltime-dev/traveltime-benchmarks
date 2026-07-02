@@ -44,10 +44,10 @@ export function setup () {
   const locationCoords = getLocationCoordinates(location)
   const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/${kind}` : __ENV.FULL_URL
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
-  const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
+  const travelTime = parseInt(__ENV.TRAVEL_TIME || 1800)
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const dateTime = __ENV.DATE_TIME || new Date().toISOString()
-  const cellResolution = parseInt(__ENV.RESOLUTION || 8)
+  const cellResolution = parseInt(__ENV.RESOLUTION || (kind === 'geohash' ? 6 : 7))
 
   const params = {
     headers: {

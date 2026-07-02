@@ -20,6 +20,27 @@ import {
   countryCodeProto
 } from './common.js'
 
+const KIND_CONFIG = {
+  h3: {
+    pathSegment: 'h3',
+    requestType: 'H3FastRequest',
+    responseType: 'H3FastResponse',
+    defaultResolution: 7
+  },
+  geohash: {
+    pathSegment: 'geohash',
+    requestType: 'GeohashFastRequest',
+    responseType: 'GeohashFastResponse',
+    defaultResolution: 6
+  }
+}
+
+const kind = __ENV.KIND || 'h3'
+const kindConfig = KIND_CONFIG[kind]
+if (!kindConfig) {
+  throw new Error(`Unknown KIND '${kind}'. Supported: ${Object.keys(KIND_CONFIG).join(', ')}`)
+}
+
 export const options = {
   setupTimeout: '1000s',
   scenarios,
@@ -44,16 +65,17 @@ export function setup () {
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 3600)
-  const cellResolution = parseInt(__ENV.RESOLUTION || 6)
+  const cellResolution = parseInt(__ENV.RESOLUTION || kindConfig.defaultResolution)
 
   const location = __ENV.LOCATION || 'UK/London'
   const country = location.slice(0, 2).toLowerCase()
   const locationCoords = getProtoLocationCoordinates(location)
 
   const direction = __ENV.DIRECTION || 'one-to-many'
-  const query = __ENV.QUERY || `api/v3/${countryCodeProto(country)}/geohash/fast/${transportation}`
+  const query = __ENV.QUERY || `api/v3/${countryCodeProto(country)}/${kindConfig.pathSegment}/fast/${transportation}`
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
+  const removeWaterBodies = __ENV.REMOVE_WATER_BODIES !== 'false'
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
 
@@ -70,8 +92,8 @@ export function setup () {
   }
 
   const requestBodies = precomputedDataFile
-    ? readRequestsBodies(direction, transportation, travelTime, cellResolution, precomputedDataFile)
-    : generateRequestBodies(direction, uniqueRequestsAmount, locationCoords, transportation, travelTime, cellResolution)
+    ? readRequestsBodies(direction, transportation, travelTime, cellResolution, removeWaterBodies, precomputedDataFile)
+    : generateRequestBodies(direction, uniqueRequestsAmount, locationCoords, transportation, travelTime, cellResolution, removeWaterBodies)
 
   return { url, requestBodies, params, disableBodyDecoding }
 }
@@ -79,7 +101,7 @@ export function setup () {
 export default function (data) {
   const index = randomIndex(data.requestBodies.length)
   const requestBodyEncoded = protobuf
-    .load('GeohashFastRequest.proto', 'GeohashFastRequest')
+    .load(`${kindConfig.requestType}.proto`, kindConfig.requestType)
     .encode(data.requestBodies[index])
   const response = http.post(data.url, requestBodyEncoded, data.params)
 
@@ -92,7 +114,7 @@ export default function (data) {
   }
 
   if (!data.disableBodyDecoding && response.status === 200) {
-    const decodedResponse = protobuf.load('GeohashFastResponse.proto', 'GeohashFastResponse').decode(response.body)
+    const decodedResponse = protobuf.load(`${kindConfig.responseType}.proto`, kindConfig.responseType).decode(response.body)
 
     if (isBenchmarkStage) {
       const parsed = typeof decodedResponse === 'string' ? JSON.parse(decodedResponse) : decodedResponse
@@ -117,7 +139,7 @@ export function handleSummary (data) {
   }
 }
 
-function generateBody (direction, coord, transportation, travelTime, cellResolution) {
+function generateBody (direction, coord, transportation, travelTime, cellResolution, removeWaterBodies) {
   const commonFields = {
     transportation: {
       type: transportationTypeProto(transportation)
@@ -125,7 +147,8 @@ function generateBody (direction, coord, transportation, travelTime, cellResolut
     arrivalTimePeriod: 'WEEKDAY_MORNING',
     travelTime,
     resolution: cellResolution,
-    properties: ['MEAN']
+    properties: ['MEAN'],
+    removeWaterBodies
   }
   // Field absent from the k6 image's bundled schema; only include (and use the CM-patched proto) when set.
   if (__ENV.REMOVE_WATER === 'true') commonFields.removeWaterBodies = true
@@ -147,7 +170,7 @@ function generateBody (direction, coord, transportation, travelTime, cellResolut
   })
 }
 
-function readRequestsBodies (direction, transportation, travelTime, cellResolution, precomputedDataFile) {
+function readRequestsBodies (direction, transportation, travelTime, cellResolution, removeWaterBodies, precomputedDataFile) {
   const data = papaparse
     .parse(precomputedDataFile, { header: true, skipEmptyLines: true })
     .data
@@ -157,14 +180,15 @@ function readRequestsBodies (direction, transportation, travelTime, cellResoluti
         { lat: parseFloat(origins.lat), lng: parseFloat(origins.lng) },
         transportation,
         travelTime,
-        cellResolution
+        cellResolution,
+        removeWaterBodies
       )
     )
   console.log('The amount of requests read: ' + data.length)
   return data
 }
 
-function generateRequestBodies (direction, count, coords, transportation, travelTime, cellResolution) {
+function generateRequestBodies (direction, count, coords, transportation, travelTime, cellResolution, removeWaterBodies) {
   console.log('The amount of requests generated: ' + count)
   const diff = 0.005
 
@@ -176,7 +200,8 @@ function generateRequestBodies (direction, count, coords, transportation, travel
         generateRandomCoordinate(coords.lat, coords.lng, diff),
         transportation,
         travelTime,
-        cellResolution
+        cellResolution,
+        removeWaterBodies
       )
     )
 }
