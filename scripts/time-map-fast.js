@@ -45,7 +45,9 @@ export function setup () {
   const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/time-map/fast` : __ENV.FULL_URL
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
-  const levelOfDetail = parseInt(__ENV.LEVEL_OF_DETAIL || __ENV.LEVEL_OF_DETAILS || -8)
+  const levelOfDetail = __ENV.SCALE_TYPE === 'geohash'
+    ? { scale_type: 'geohash', resolution: parseInt(__ENV.GEOHASH_RESOLUTION || 6) }
+    : { scale_type: 'simple_numeric', level: parseInt(__ENV.LEVEL_OF_DETAIL || __ENV.LEVEL_OF_DETAILS || -8) }
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   console.log(`time-map-fast: ${isManyToOne ? 'many_to_one' : 'one_to_many'} mode`)
@@ -103,10 +105,7 @@ function generateBody (travelTime, transportation, coords, arrivalTimePeriod, le
       transportation: {
         type: transportation
       },
-      level_of_detail: {
-        scale_type: 'simple_numeric',
-        level: levelOfDetail
-      }
+      level_of_detail: levelOfDetail
     }
   ]
   return JSON.stringify({ arrival_searches: searches })
