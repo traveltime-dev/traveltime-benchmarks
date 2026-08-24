@@ -3,6 +3,7 @@ import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
 import protobuf from 'k6/x/protobuf'
+import { SharedArray } from 'k6/data'
 import {
   check,
   randomSeed
@@ -37,6 +38,22 @@ randomSeed(__ENV.SEED || 1234567)
 
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
+const requestBodies = new SharedArray('requestBodies', function () {
+  const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
+  const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
+  const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
+
+  const location = __ENV.LOCATION || 'UK/London'
+  const locationCoords = getProtoLocationCoordinates(location)
+
+  const isManyToOne = __ENV.MANY_TO_ONE !== undefined
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
+
+  return precomputedDataFile
+    ? readRequestsBodies(destinationsAmount, transportation, travelTime, isManyToOne, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, destinationsAmount, locationCoords, transportation, travelTime, isManyToOne)
+})
+
 export function setup () {
   const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
   const mapDate = __ENV.MAP_DATE || 'unknown'
@@ -46,15 +63,11 @@ export function setup () {
   const host = __ENV.HOST
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
-  const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
 
   const location = __ENV.LOCATION || 'UK/London'
   const country = location.slice(0, 2).toLowerCase()
-  const locationCoords = getProtoLocationCoordinates(location)
 
   const query = __ENV.QUERY || `api/v2/${countryCodeProto(country)}/time-filter/fast/${transportation}`
-  const isManyToOne = __ENV.MANY_TO_ONE !== undefined
-  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
@@ -70,18 +83,14 @@ export function setup () {
     }
   }
 
-  const requestBodies = precomputedDataFile
-    ? readRequestsBodies(destinationsAmount, transportation, travelTime, isManyToOne, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, destinationsAmount, locationCoords, transportation, travelTime, isManyToOne)
-
-  return { url, requestBodies, params, disableBodyDecoding }
+  return { url, params, disableBodyDecoding }
 }
 
 export default function (data) {
-  const index = randomIndex(data.requestBodies.length)
+  const index = randomIndex(requestBodies.length)
   const requestBodyEncoded = protobuf
     .load('TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
-    .encode(data.requestBodies[index])
+    .encode(requestBodies[index])
   const response = http.post(data.url, requestBodyEncoded, data.params)
 
   const isBenchmarkStage = getCurrentStageIndex() === 1
