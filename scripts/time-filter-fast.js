@@ -36,9 +36,7 @@ randomSeed(__ENV.SEED || 1234567)
 
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
-// SharedArray keeps one copy of the bodies per pod; building them in setup()
-// gets the whole array copied into every VU, which OOMs on large bodies
-// (200k destinations x hundreds of VUs).
+// Built at init via SharedArray: setup() return data is copied into every VU.
 const requestBodies = new SharedArray('requestBodies', function () {
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
