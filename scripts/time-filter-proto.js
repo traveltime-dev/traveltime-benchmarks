@@ -127,7 +127,7 @@ export function handleSummary (data) {
 }
 
 function generateBody (destinationsAmount, coord, transportation, travelTime, isManyToOne) {
-  const diff = 0.005
+  const diff = parseFloat(__ENV.DESTINATIONS_SPREAD || 0.005)
   const originLocation = coord
   const destinations = generateDestinations(destinationsAmount, originLocation, diff)
   if (isManyToOne) {
