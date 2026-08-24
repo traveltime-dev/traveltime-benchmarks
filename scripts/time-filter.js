@@ -4,6 +4,7 @@ import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
+import { SharedArray } from 'k6/data'
 import {
   check,
   randomSeed
@@ -35,13 +36,9 @@ randomSeed(__ENV.SEED || 1234567)
 
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
-export function setup () {
-  checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
-  const appId = __ENV.APP_ID
-  const apiKey = __ENV.API_KEY
+const requestBodies = new SharedArray('requestBodies', function () {
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
-  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/time-filter` : __ENV.FULL_URL
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1800)
   const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
@@ -54,6 +51,17 @@ export function setup () {
   }
   const dateTime = __ENV.DATE_TIME || new Date().toISOString()
 
+  return precomputedDataFile
+    ? readRequestsBodies(travelTime, transportation, destinationsAmount, rangeSettings, dateTime, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, destinationsAmount, rangeSettings, locationCoords, dateTime)
+})
+
+export function setup () {
+  checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
+  const appId = __ENV.APP_ID
+  const apiKey = __ENV.API_KEY
+  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/time-filter` : __ENV.FULL_URL
+
   const params = {
     headers: {
       'Content-Type': 'application/json',
@@ -62,16 +70,12 @@ export function setup () {
     }
   }
 
-  const requestBodies = precomputedDataFile
-    ? readRequestsBodies(travelTime, transportation, destinationsAmount, rangeSettings, dateTime, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, destinationsAmount, rangeSettings, locationCoords, dateTime)
-
-  return { url, requestBodies, params }
+  return { url, params }
 }
 
 export default function (data) {
-  const index = randomIndex(data.requestBodies.length)
-  const response = http.post(data.url, data.requestBodies[index], data.params)
+  const index = randomIndex(requestBodies.length)
+  const response = http.post(data.url, requestBodies[index], data.params)
 
   if (getCurrentStageIndex() === 1) { // Ignoring results from warm-up stage
     check(response, {
