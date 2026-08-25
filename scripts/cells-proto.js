@@ -3,6 +3,7 @@ import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
 import protobuf from 'k6/x/protobuf'
+import encoding from 'k6/encoding'
 import { SharedArray } from 'k6/data'
 import {
   check,
@@ -69,10 +70,17 @@ const requestBodies = new SharedArray('requestBodies', function () {
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const removeWaterBodies = __ENV.REMOVE_WATER_BODIES !== 'false'
 
-  return precomputedDataFile
+  const bodies = precomputedDataFile
     ? readRequestsBodies(direction, transportation, travelTime, cellResolution, removeWaterBodies, precomputedDataFile)
     : generateRequestBodies(direction, uniqueRequestsAmount, locationCoords, transportation, travelTime, cellResolution, removeWaterBodies)
+
+  // Encode once here: per-request encode of large bodies made k6 the bottleneck.
+  // Base64 because raw encoded bytes don't survive SharedArray storage.
+  const requestProto = protobuf.load(`${kindConfig.requestType}.proto`, kindConfig.requestType)
+  return bodies.map(body => requestProto.encodeBase64(body))
 })
+
+const responseProto = protobuf.load(`${kindConfig.responseType}.proto`, kindConfig.responseType)
 
 export function setup () {
   const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
@@ -109,10 +117,7 @@ export function setup () {
 
 export default function (data) {
   const index = randomIndex(requestBodies.length)
-  const requestBodyEncoded = protobuf
-    .load(`${kindConfig.requestType}.proto`, kindConfig.requestType)
-    .encode(requestBodies[index])
-  const response = http.post(data.url, requestBodyEncoded, data.params)
+  const response = http.post(data.url, encoding.b64decode(requestBodies[index]), data.params)
 
   const isBenchmarkStage = getCurrentStageIndex() === 1
 
@@ -123,7 +128,7 @@ export default function (data) {
   }
 
   if (!data.disableBodyDecoding && response.status === 200) {
-    const decodedResponse = protobuf.load(`${kindConfig.responseType}.proto`, kindConfig.responseType).decode(response.body)
+    const decodedResponse = responseProto.decode(response.body)
 
     if (isBenchmarkStage) {
       const parsed = typeof decodedResponse === 'string' ? JSON.parse(decodedResponse) : decodedResponse

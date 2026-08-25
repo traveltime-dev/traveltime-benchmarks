@@ -3,6 +3,8 @@ import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
 import protobuf from 'k6/x/protobuf'
+import encoding from 'k6/encoding'
+import exec from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import {
   check,
@@ -18,7 +20,6 @@ import {
   setThresholdsForScenarios,
   summaryTrendStats,
   getProtoLocationCoordinates,
-  randomIndex,
   transportationTypeProto,
   countryCodeProto
 } from './common.js'
@@ -49,10 +50,17 @@ const requestBodies = new SharedArray('requestBodies', function () {
   const isManyToOne = __ENV.MANY_TO_ONE !== undefined
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
 
-  return precomputedDataFile
+  const bodies = precomputedDataFile
     ? readRequestsBodies(destinationsAmount, transportation, travelTime, isManyToOne, precomputedDataFile)
     : generateRequestBodies(uniqueRequestsAmount, destinationsAmount, locationCoords, transportation, travelTime, isManyToOne)
+
+  // Encode once here: per-request encode of large bodies made k6 the bottleneck.
+  // Base64 because raw encoded bytes don't survive SharedArray storage.
+  const requestProto = protobuf.load('TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
+  return bodies.map(body => requestProto.encodeBase64(body))
 })
+
+const responseProto = protobuf.load('TimeFilterFastResponse.proto', 'TimeFilterFastResponse')
 
 export function setup () {
   const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
@@ -86,12 +94,14 @@ export function setup () {
   return { url, params, disableBodyDecoding }
 }
 
+let vuBody = null
+
 export default function (data) {
-  const index = randomIndex(requestBodies.length)
-  const requestBodyEncoded = protobuf
-    .load('TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
-    .encode(requestBodies[index])
-  const response = http.post(data.url, requestBodyEncoded, data.params)
+  // One body per VU, decoded once: a SharedArray read is a full parse of the element.
+  if (vuBody === null) {
+    vuBody = encoding.b64decode(requestBodies[(exec.vu.idInTest - 1) % requestBodies.length])
+  }
+  const response = http.post(data.url, vuBody, data.params)
 
   const isBenchmarkStage = getCurrentStageIndex() === 1
 
@@ -102,7 +112,7 @@ export default function (data) {
   }
 
   if (!data.disableBodyDecoding) {
-    const decodedResponse = protobuf.load('TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
+    const decodedResponse = responseProto.decode(response.body)
 
     if (isBenchmarkStage) {
       check(decodedResponse, {
