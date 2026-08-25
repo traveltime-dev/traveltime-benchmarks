@@ -3,6 +3,9 @@ import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
 import protobuf from 'k6/x/protobuf'
+import encoding from 'k6/encoding'
+import exec from 'k6/execution'
+import { SharedArray } from 'k6/data'
 import {
   check,
   randomSeed
@@ -17,7 +20,6 @@ import {
   setThresholdsForScenarios,
   summaryTrendStats,
   getProtoLocationCoordinates,
-  randomIndex,
   transportationTypeProto,
   countryCodeProto
 } from './common.js'
@@ -37,6 +39,29 @@ randomSeed(__ENV.SEED || 1234567)
 
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
+const requestBodies = new SharedArray('requestBodies', function () {
+  const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
+  const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
+  const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
+
+  const location = __ENV.LOCATION || 'UK/London'
+  const locationCoords = getProtoLocationCoordinates(location)
+
+  const isManyToOne = __ENV.MANY_TO_ONE !== undefined
+  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
+
+  const bodies = precomputedDataFile
+    ? readRequestsBodies(destinationsAmount, transportation, travelTime, isManyToOne, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, destinationsAmount, locationCoords, transportation, travelTime, isManyToOne)
+
+  // Encode once here: per-request encode of large bodies made k6 the bottleneck.
+  // Base64 because raw encoded bytes don't survive SharedArray storage.
+  const requestProto = protobuf.load('TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
+  return bodies.map(body => requestProto.encodeBase64(body))
+})
+
+const responseProto = protobuf.load('TimeFilterFastResponse.proto', 'TimeFilterFastResponse')
+
 export function setup () {
   const serviceImage = __ENV.SERVICE_IMAGE || 'unknown'
   const mapDate = __ENV.MAP_DATE || 'unknown'
@@ -46,15 +71,11 @@ export function setup () {
   const host = __ENV.HOST
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const protocol = __ENV.PROTOCOL || 'https'
-  const travelTime = parseInt(__ENV.TRAVEL_TIME || 7200)
 
   const location = __ENV.LOCATION || 'UK/London'
   const country = location.slice(0, 2).toLowerCase()
-  const locationCoords = getProtoLocationCoordinates(location)
 
   const query = __ENV.QUERY || `api/v2/${countryCodeProto(country)}/time-filter/fast/${transportation}`
-  const isManyToOne = __ENV.MANY_TO_ONE !== undefined
-  const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
 
   const url = `${protocol}://${appId}:${apiKey}@${host}/${query}`
@@ -70,19 +91,17 @@ export function setup () {
     }
   }
 
-  const requestBodies = precomputedDataFile
-    ? readRequestsBodies(destinationsAmount, transportation, travelTime, isManyToOne, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, destinationsAmount, locationCoords, transportation, travelTime, isManyToOne)
-
-  return { url, requestBodies, params, disableBodyDecoding }
+  return { url, params, disableBodyDecoding }
 }
 
+let vuBody = null
+
 export default function (data) {
-  const index = randomIndex(data.requestBodies.length)
-  const requestBodyEncoded = protobuf
-    .load('TimeFilterFastRequest.proto', 'TimeFilterFastRequest')
-    .encode(data.requestBodies[index])
-  const response = http.post(data.url, requestBodyEncoded, data.params)
+  // One body per VU, decoded once: a SharedArray read is a full parse of the element.
+  if (vuBody === null) {
+    vuBody = encoding.b64decode(requestBodies[(exec.vu.idInTest - 1) % requestBodies.length])
+  }
+  const response = http.post(data.url, vuBody, data.params)
 
   const isBenchmarkStage = getCurrentStageIndex() === 1
 
@@ -93,7 +112,7 @@ export default function (data) {
   }
 
   if (!data.disableBodyDecoding) {
-    const decodedResponse = protobuf.load('TimeFilterFastResponse.proto', 'TimeFilterFastResponse').decode(response.body)
+    const decodedResponse = responseProto.decode(response.body)
 
     if (isBenchmarkStage) {
       check(decodedResponse, {
@@ -118,7 +137,7 @@ export function handleSummary (data) {
 }
 
 function generateBody (destinationsAmount, coord, transportation, travelTime, isManyToOne) {
-  const diff = 0.005
+  const diff = parseFloat(__ENV.DESTINATIONS_SPREAD || 0.005)
   const originLocation = coord
   const destinations = generateDestinations(destinationsAmount, originLocation, diff)
   if (isManyToOne) {
