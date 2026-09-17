@@ -10,7 +10,20 @@ If you are on a Trial plan and would like to test the performance of the API at 
 
 ### Running K6 Tests with Docker
 
-The simplest way to run these benchmarks is to use docker:
+The simplest way to run these benchmarks is to use docker.
+
+The blocks below list the parameters each benchmark accepts. The `//` notes in them are
+documentation, not shell comments — pasting a block verbatim will fail. A runnable
+invocation looks like this:
+
+```bash
+docker run --rm \
+    -e APP_ID={APP_ID} \
+    -e API_KEY={API_KEY} \
+    -e HOST=api.traveltimeapp.com \
+    -e LOCATION='GB/London' \
+    igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
+```
 
 #### time-map
 
@@ -150,7 +163,7 @@ docker run
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATE_TIME=2024-10-14T07:10:45.535Z //optional, departure/arrival time in ISO 8601 format. Default - current time
     -e RPM=60 // optional
-    -e USE_SHARC = true // optional
+    -e USE_SHARC=true // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
@@ -163,7 +176,7 @@ docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e DESTINATIONS=50 // optional
-    -e MANY_TO_ONE // optional
+    -e MANY_TO_ONE=true // optional, any value (even "false") enables many-to-one; omit for one-to-many
     -e HOST=proto.api.traveltimeapp.com 
     -e TRANSPORTATION=driving+ferry // optional
     -e LOCATION='UK/London' // optional
@@ -214,8 +227,7 @@ docker run
     -e API_KEY={API_KEY}
     -e KIND=geohash // default is h3
     -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/geohash' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
-    -e LAT='51.4952113' //optional, latitude
-    -e LNG='-0.183122' //optional, longitude
+    -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=1800 //optional, in seconds
     -e RESOLUTION=7 //optional, cell resolution (defaults: h3=7, geohash=6)
@@ -232,9 +244,8 @@ docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e KIND=geohash // default is h3
-    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/geohash' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
-    -e LAT='51.4952113' //optional, latitude
-    -e LNG='-0.183122' //optional, longitude
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/geohash/fast' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
+    -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=1800 //optional, in seconds
     -e RESOLUTION=7 //optional, cell resolution (defaults: h3=7, geohash=6)
@@ -255,7 +266,7 @@ docker run
     -e LOCATION='UK/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=3600 //optional
-    -e RESOLUTION=6 //optional, cell resolution (defaults: h3=8, geohash=6)
+    -e RESOLUTION=6 //optional, cell resolution (defaults: h3=7, geohash=6)
     -e DIRECTION='one-to-many' //optional, 'one-to-many' (default) or 'many-to-one'
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
@@ -264,9 +275,6 @@ docker run
     -e REMOVE_WATER_BODIES="false" // optional flag, default "true"; set to "false" to keep water-body cells in the response
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells-proto.js
 ```
-
-
-```bash
 
 ### Running K6 Tests Locally
 
