@@ -1,4 +1,3 @@
-import { getCurrentStageIndex } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js'
 import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
@@ -8,6 +7,7 @@ import {
   randomSeed
 } from 'k6'
 import {
+  isMeasuredScenario,
   oneScenario as scenarios,
   setThresholdsForScenarios,
   deleteOneScenarioMetrics,
@@ -59,7 +59,7 @@ export function setup () {
 export default function (data) {
   const response = http.get(data.fullUrl, data.params)
 
-  if (getCurrentStageIndex() === 1) { // Ignoring results from warm-up stage
+  if (isMeasuredScenario()) {
     check(response, {
       'status is 200': (r) => r.status === 200,
       'response body is not empty': (r) => r.body.length > 0
