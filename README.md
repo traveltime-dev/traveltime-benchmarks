@@ -304,7 +304,7 @@ https://k6.io/docs/using-k6/metrics/
 
 If you want to add a new location, simply append the csv files. 
 
-**NOTE 1:** When adding a new proto location, please specify the ISO2 country code in the beginning, like it's done everywhere else. It's neccessary for the request. Example: 'GB/London'.
+**NOTE 1:** The prefix of a proto location becomes the country segment of the request URL, so it must be the code the API serves that country under — the UK is `UK`, not ISO2 `GB`. Example: 'UK/London'.
 
 **NOTE 2:** Proto requests support a much more limited amount of countries.
 
@@ -334,6 +334,8 @@ driving+ferry
 cycling+ferry
 walking+ferry
 ```
+
+**NOTE:** for public transport, `v4/h3` and `v4/geohash` (including `/fast`) take `public_transport`, while the proto cell paths take `pt`.
 
 ### Running proto benchmarks locally
 
