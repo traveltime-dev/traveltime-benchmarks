@@ -21,7 +21,6 @@ docker run --rm \
     -e APP_ID={APP_ID} \
     -e API_KEY={API_KEY} \
     -e HOST=api.traveltimeapp.com \
-    -e LOCATION='GB/London' \
     igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
 ```
 
@@ -276,6 +275,24 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells-proto.js
 ```
 
+### Options shared by every benchmark
+
+`SEED` (default `1234567`) seeds the generated coordinates. Left unchanged, two runs with the same settings use identical coordinates - useful when comparing endpoints, but repeat runs are then not independent samples.
+
+The warmup that precedes each run's `TEST_DURATION` measured window is 2 minutes long.
+
+#### Benchmarking your own origins
+
+Generated coordinates are scattered within a fraction of a degree of `LOCATION`. `DATA_PATH` reads coordinates from a CSV instead, and is supported by every script except the two geocoding ones. The header must be `lat,lng`, except for `routes.js`, which needs `origin_lat,origin_lng,dest_lat,dest_lng`. `precomputed/origins.csv` and `precomputed/routes.csv` are minimal examples.
+
+k6 reads the file from inside the container, so add `-v "$PWD/my-origins.csv":/data/origins.csv:ro -e DATA_PATH=/data/origins.csv` to the invocation.
+
+`UNIQUE_REQUESTS` is ignored when `DATA_PATH` is set - the number of requests is the number of rows.
+
+#### Sending metrics to Prometheus
+
+The image includes `xk6-output-prometheus-remote`, so metrics can go to a remote-write endpoint instead of stdout with `k6 run --out xk6-prometheus-rw`. That endpoint is configured with the extension's `K6_PROMETHEUS_RW_*` variables, documented at https://github.com/grafana/xk6-output-prometheus-remote
+
 ### Running K6 Tests Locally
 
 Install [K6](https://k6.io/docs/get-started/installation/)
@@ -296,6 +313,19 @@ https://k6.io/docs/using-k6/metrics/
 * http_req_duration - Total time for the request (how long did the remote server take to process the request and respond, without the initial DNS lookup/connection times)
 * http_req_sending - Time spent sending data to the remote host
 * http_req_receiving - Time spent receiving response data from the remote host
+
+### Troubleshooting
+
+| Response | Cause |
+|---|---|
+| 401 | Bad or missing App ID / API key. |
+| 404 | Wrong URL path. On the proto hosts the country code and the transport mode are both part of the path - check both. |
+| 422 | The path is right but the body is not, most often a transport mode that endpoint does not support. |
+| 429 | Over your rate limit. Lower `RPM`, or ask support@traveltime.com to raise it. |
+
+Failures show up as `checks` below 100% - read that line first.
+
+Sending an empty body to a proto endpoint returns 200 whatever credentials you use, so it confirms only that the path exists. Check credentials against a JSON endpoint.
 
 ### Supported Countries
 
