@@ -175,7 +175,7 @@ docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e DESTINATIONS=50 // optional
-    -e MANY_TO_ONE=true // optional, any value (even "false") enables many-to-one; omit for one-to-many
+    -e MANY_TO_ONE=true // optional
     -e HOST=proto.api.traveltimeapp.com 
     -e TRANSPORTATION=driving+ferry // optional
     -e LOCATION='UK/London' // optional
