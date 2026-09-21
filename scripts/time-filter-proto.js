@@ -53,7 +53,7 @@ export function setup () {
   const locationCoords = getProtoLocationCoordinates(location)
 
   const query = __ENV.QUERY || `api/v2/${countryCodeProto(country)}/time-filter/fast/${transportation}`
-  const isManyToOne = __ENV.MANY_TO_ONE !== undefined
+  const isManyToOne = __ENV.MANY_TO_ONE === 'true'
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
 

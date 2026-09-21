@@ -34,7 +34,7 @@ setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
 
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
-const isManyToOne = __ENV.MANY_TO_ONE !== undefined
+const isManyToOne = __ENV.MANY_TO_ONE === 'true'
 
 export function setup () {
   checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
