@@ -1,4 +1,3 @@
-import { getCurrentStageIndex } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js'
 import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
@@ -8,6 +7,7 @@ import {
   randomSeed
 } from 'k6'
 import {
+  isMeasuredScenario,
   destinationDeltas,
   generateDestinations,
   generateRandomCoordinate,
@@ -53,7 +53,7 @@ export function setup () {
   const locationCoords = getProtoLocationCoordinates(location)
 
   const query = __ENV.QUERY || `api/v2/${countryCodeProto(country)}/time-filter/fast/${transportation}`
-  const isManyToOne = __ENV.MANY_TO_ONE !== undefined
+  const isManyToOne = __ENV.MANY_TO_ONE === 'true'
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
   const disableBodyDecoding = __ENV.DISABLE_DECODING === 'true'
 
@@ -84,7 +84,7 @@ export default function (data) {
     .encode(data.requestBodies[index])
   const response = http.post(data.url, requestBodyEncoded, data.params)
 
-  const isBenchmarkStage = getCurrentStageIndex() === 1
+  const isBenchmarkStage = isMeasuredScenario()
 
   if (isBenchmarkStage) {
     check(response, {

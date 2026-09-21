@@ -1,4 +1,3 @@
-import { getCurrentStageIndex } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js'
 import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import {
   textSummary
@@ -9,6 +8,7 @@ import {
   randomSeed
 } from 'k6'
 import {
+  isMeasuredScenario,
   generateRandomCoordinate,
   summaryTrendStats,
   oneScenario as scenarios,
@@ -34,7 +34,7 @@ setThresholdsForScenarios(options)
 randomSeed(__ENV.SEED || 1234567)
 
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
-const isManyToOne = __ENV.MANY_TO_ONE !== undefined
+const isManyToOne = __ENV.MANY_TO_ONE === 'true'
 
 export function setup () {
   checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
@@ -69,7 +69,7 @@ export default function (data) {
   const index = randomIndex(data.requestBodies.length)
   const response = http.post(data.url, data.requestBodies[index], data.params)
 
-  if (getCurrentStageIndex() === 1) { // Ignoring results from warm-up stage
+  if (isMeasuredScenario()) {
     check(response, {
       'status is 200': (r) => r.status === 200,
       'response body is not empty': (r) => r.body.length > 0

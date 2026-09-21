@@ -1,3 +1,4 @@
+import exec from 'k6/execution'
 import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 
 export const summaryTrendStats = ['avg', 'min', 'max', 'p(90)', 'p(95)']
@@ -6,30 +7,43 @@ export const durationInMinutes = parseInt(__ENV.TEST_DURATION || '3')
 const warmupDurationInMinutes = 2
 
 export const oneScenario = {
-  mainScenario: {
+  // Separate scenario so its samples aren't tagged scenario:mainScenario; gracefulStop 0
+  // keeps in-flight warm-up requests out of the measured window.
+  warmup: {
     executor: 'ramping-arrival-rate',
     startRate: 0,
     timeUnit: '1m',
-    gracefulStop: '15s',
+    gracefulStop: '0s',
     preAllocatedVUs: 10,
     maxVUs: 1000,
     stages: [
-      { target: rpm, duration: warmupDurationInMinutes + 'm' },
-      { target: rpm, duration: durationInMinutes + 'm' }
+      { target: rpm, duration: warmupDurationInMinutes + 'm' }
     ]
+  },
+  mainScenario: {
+    executor: 'constant-arrival-rate',
+    rate: rpm,
+    timeUnit: '1m',
+    duration: durationInMinutes + 'm',
+    startTime: warmupDurationInMinutes + 'm',
+    gracefulStop: '15s',
+    preAllocatedVUs: 10,
+    maxVUs: 1000
   }
+}
+
+export function isMeasuredScenario () {
+  return exec.scenario.name === 'mainScenario'
 }
 
 export function deleteOneScenarioMetrics (data) {
   delete data.metrics.http_req_blocked
   delete data.metrics['http_req_duration{expected_response:true}']
-  delete data.metrics.http_req_waiting
   delete data.metrics.http_reqs
   delete data.metrics.iteration_duration
   delete data.metrics.iterations
   delete data.metrics.vus
   delete data.metrics.http_req_connecting
-  delete data.metrics.http_req_failed
   delete data.metrics.http_req_tls_handshaking
 }
 
@@ -43,15 +57,19 @@ export function oneScenarioReport (data) {
   data.metrics.http_req_receiving =
     data.metrics['http_req_receiving{scenario:mainScenario}']
   delete data.metrics['http_req_receiving{scenario:mainScenario}']
+  data.metrics.http_req_waiting =
+    data.metrics['http_req_waiting{scenario:mainScenario}']
+  delete data.metrics['http_req_waiting{scenario:mainScenario}']
   return data
 }
 
 export function setThresholdsForScenarios (options) {
-  for (const key in options.scenarios) {
-    options.thresholds[`http_req_duration{scenario:${key}}`] = ['max>=0']
-    options.thresholds[`http_req_receiving{scenario:${key}}`] = ['max>=0']
-    options.thresholds[`http_req_sending{scenario:${key}}`] = ['max>=0']
-  }
+  options.thresholds.checks = ['rate==1.00']
+  // These cannot fail; they exist solely to generate the per-scenario sub-metrics.
+  options.thresholds['http_req_duration{scenario:mainScenario}'] = ['max>=0']
+  options.thresholds['http_req_receiving{scenario:mainScenario}'] = ['max>=0']
+  options.thresholds['http_req_sending{scenario:mainScenario}'] = ['max>=0']
+  options.thresholds['http_req_waiting{scenario:mainScenario}'] = ['max>=0']
 }
 
 function getLocation (location, locationsMap) {
