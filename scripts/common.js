@@ -39,13 +39,11 @@ export function isMeasuredScenario () {
 export function deleteOneScenarioMetrics (data) {
   delete data.metrics.http_req_blocked
   delete data.metrics['http_req_duration{expected_response:true}']
-  delete data.metrics.http_req_waiting
   delete data.metrics.http_reqs
   delete data.metrics.iteration_duration
   delete data.metrics.iterations
   delete data.metrics.vus
   delete data.metrics.http_req_connecting
-  delete data.metrics.http_req_failed
   delete data.metrics.http_req_tls_handshaking
 }
 
@@ -59,6 +57,9 @@ export function oneScenarioReport (data) {
   data.metrics.http_req_receiving =
     data.metrics['http_req_receiving{scenario:mainScenario}']
   delete data.metrics['http_req_receiving{scenario:mainScenario}']
+  data.metrics.http_req_waiting =
+    data.metrics['http_req_waiting{scenario:mainScenario}']
+  delete data.metrics['http_req_waiting{scenario:mainScenario}']
   return data
 }
 
@@ -66,6 +67,7 @@ export function setThresholdsForScenarios (options) {
   options.thresholds['http_req_duration{scenario:mainScenario}'] = ['max>=0']
   options.thresholds['http_req_receiving{scenario:mainScenario}'] = ['max>=0']
   options.thresholds['http_req_sending{scenario:mainScenario}'] = ['max>=0']
+  options.thresholds['http_req_waiting{scenario:mainScenario}'] = ['max>=0']
 }
 
 function getLocation (location, locationsMap) {
