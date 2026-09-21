@@ -64,6 +64,8 @@ export function oneScenarioReport (data) {
 }
 
 export function setThresholdsForScenarios (options) {
+  options.thresholds.checks = ['rate==1.00']
+  // These cannot fail; they exist solely to generate the per-scenario sub-metrics.
   options.thresholds['http_req_duration{scenario:mainScenario}'] = ['max>=0']
   options.thresholds['http_req_receiving{scenario:mainScenario}'] = ['max>=0']
   options.thresholds['http_req_sending{scenario:mainScenario}'] = ['max>=0']
