@@ -10,7 +10,19 @@ If you are on a Trial plan and would like to test the performance of the API at 
 
 ### Running K6 Tests with Docker
 
-The simplest way to run these benchmarks is to use docker:
+The simplest way to run these benchmarks is to use docker.
+
+The blocks below list the parameters each benchmark accepts. The `//` notes in them are
+documentation, not shell comments — pasting a block verbatim will fail. A runnable
+invocation looks like this:
+
+```bash
+docker run --rm \
+    -e APP_ID={APP_ID} \
+    -e API_KEY={API_KEY} \
+    -e HOST=api.traveltimeapp.com \
+    igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
+```
 
 #### time-map
 
@@ -150,7 +162,7 @@ docker run
     -e TRANSPORTATION='driving+ferry' //optional
     -e DATE_TIME=2024-10-14T07:10:45.535Z //optional, departure/arrival time in ISO 8601 format. Default - current time
     -e RPM=60 // optional
-    -e USE_SHARC = true // optional
+    -e USE_SHARC=true // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
@@ -163,7 +175,7 @@ docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e DESTINATIONS=50 // optional
-    -e MANY_TO_ONE // optional
+    -e MANY_TO_ONE=true // optional
     -e HOST=proto.api.traveltimeapp.com 
     -e TRANSPORTATION=driving+ferry // optional
     -e LOCATION='UK/London' // optional
@@ -214,8 +226,7 @@ docker run
     -e API_KEY={API_KEY}
     -e KIND=geohash // default is h3
     -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/geohash' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
-    -e LAT='51.4952113' //optional, latitude
-    -e LNG='-0.183122' //optional, longitude
+    -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=1800 //optional, in seconds
     -e RESOLUTION=7 //optional, cell resolution (defaults: h3=7, geohash=6)
@@ -232,9 +243,8 @@ docker run
     -e APP_ID={APP_ID}
     -e API_KEY={API_KEY}
     -e KIND=geohash // default is h3
-    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/geohash' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
-    -e LAT='51.4952113' //optional, latitude
-    -e LNG='-0.183122' //optional, longitude
+    -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/geohash/fast' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
+    -e LOCATION='GB/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=1800 //optional, in seconds
     -e RESOLUTION=7 //optional, cell resolution (defaults: h3=7, geohash=6)
@@ -255,7 +265,7 @@ docker run
     -e LOCATION='UK/London' //optional
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=3600 //optional
-    -e RESOLUTION=6 //optional, cell resolution (defaults: h3=8, geohash=6)
+    -e RESOLUTION=6 //optional, cell resolution (defaults: h3=7, geohash=6)
     -e DIRECTION='one-to-many' //optional, 'one-to-many' (default) or 'many-to-one'
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
@@ -265,8 +275,23 @@ docker run
     -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells-proto.js
 ```
 
+### Options shared by every benchmark
 
-```bash
+`SEED` (default `1234567`) seeds the generated coordinates. Left unchanged, two runs with the same settings use identical coordinates - useful when comparing endpoints, but repeat runs are then not independent samples.
+
+The warmup that precedes each run's `TEST_DURATION` measured window is 2 minutes long.
+
+#### Benchmarking your own origins
+
+Generated coordinates are scattered within a fraction of a degree of `LOCATION`. `DATA_PATH` reads coordinates from a CSV instead, and is supported by every script except the two geocoding ones. The header must be `lat,lng`, except for `routes.js`, which needs `origin_lat,origin_lng,dest_lat,dest_lng`. `precomputed/origins.csv` and `precomputed/routes.csv` are minimal examples.
+
+k6 reads the file from inside the container, so add `-v "$PWD/my-origins.csv":/data/origins.csv:ro -e DATA_PATH=/data/origins.csv` to the invocation.
+
+`UNIQUE_REQUESTS` is ignored when `DATA_PATH` is set - the number of requests is the number of rows.
+
+#### Sending metrics to Prometheus
+
+The image includes `xk6-output-prometheus-remote`, so metrics can go to a remote-write endpoint instead of stdout with `k6 run --out xk6-prometheus-rw`. That endpoint is configured with the extension's `K6_PROMETHEUS_RW_*` variables, documented at https://github.com/grafana/xk6-output-prometheus-remote
 
 ### Running K6 Tests Locally
 
@@ -289,6 +314,19 @@ https://k6.io/docs/using-k6/metrics/
 * http_req_sending - Time spent sending data to the remote host
 * http_req_receiving - Time spent receiving response data from the remote host
 
+### Troubleshooting
+
+| Response | Cause |
+|---|---|
+| 401 | Bad or missing App ID / API key. |
+| 404 | Wrong URL path. On the proto hosts the country code and the transport mode are both part of the path - check both. |
+| 422 | The path is right but the body is not, most often a transport mode that endpoint does not support. |
+| 429 | Over your rate limit. Lower `RPM`, or ask support@traveltime.com to raise it. |
+
+Failures show up as `checks` below 100% - read that line first.
+
+Sending an empty body to a proto endpoint returns 200 whatever credentials you use, so it confirms only that the path exists. Check credentials against a JSON endpoint.
+
 ### Supported Countries
 
 - Supported locations for normal requests are listed in the `locations/locations_data.csv` file.
@@ -296,7 +334,7 @@ https://k6.io/docs/using-k6/metrics/
 
 If you want to add a new location, simply append the csv files. 
 
-**NOTE 1:** When adding a new proto location, please specify the ISO2 country code in the beginning, like it's done everywhere else. It's neccessary for the request. Example: 'GB/London'.
+**NOTE 1:** The prefix of a proto location becomes the country segment of the request URL, so it must be the code the API serves that country under — the UK is `UK`, not ISO2 `GB`. Example: 'UK/London'.
 
 **NOTE 2:** Proto requests support a much more limited amount of countries.
 
@@ -326,6 +364,8 @@ driving+ferry
 cycling+ferry
 walking+ferry
 ```
+
+**NOTE:** for public transport, `v4/h3` and `v4/geohash` (including `/fast`) take `public_transport`, while the proto cell paths take `pt`.
 
 ### Running proto benchmarks locally
 
