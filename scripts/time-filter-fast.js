@@ -4,6 +4,7 @@ import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.3/index.js'
 import http from 'k6/http'
+import { SharedArray } from 'k6/data'
 import {
   check,
   randomSeed
@@ -35,18 +36,26 @@ randomSeed(__ENV.SEED || 1234567)
 
 const precomputedDataFile = __ENV.DATA_PATH ? open(__ENV.DATA_PATH) : undefined
 
-export function setup () {
-  checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
-  const appId = __ENV.APP_ID
-  const apiKey = __ENV.API_KEY
+// Built at init via SharedArray: setup() return data is copied into every VU.
+const requestBodies = new SharedArray('requestBodies', function () {
   const location = __ENV.LOCATION || 'GB/London'
   const locationCoords = getLocationCoordinates(location)
-  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/time-filter/fast` : __ENV.FULL_URL
   const transportation = __ENV.TRANSPORTATION || 'driving+ferry'
   const travelTime = parseInt(__ENV.TRAVEL_TIME || 1800)
   const destinationsAmount = parseInt(__ENV.DESTINATIONS || 50)
   const arrivalTimePeriod = __ENV.ARRIVAL_TIME_PERIOD || 'weekday_morning'
   const uniqueRequestsAmount = parseInt(__ENV.UNIQUE_REQUESTS || 100)
+
+  return precomputedDataFile
+    ? readRequestsBodies(travelTime, transportation, arrivalTimePeriod, destinationsAmount, precomputedDataFile)
+    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, arrivalTimePeriod, destinationsAmount, locationCoords)
+})
+
+export function setup () {
+  checkMutuallyExclusiveParams(__ENV.HOST, __ENV.FULL_URL, 'HOST and FULL_URL')
+  const appId = __ENV.APP_ID
+  const apiKey = __ENV.API_KEY
+  const url = __ENV.HOST ? `https://${__ENV.HOST}/v4/time-filter/fast` : __ENV.FULL_URL
 
   const params = {
     headers: {
@@ -56,16 +65,12 @@ export function setup () {
     }
   }
 
-  const requestBodies = precomputedDataFile
-    ? readRequestsBodies(travelTime, transportation, arrivalTimePeriod, destinationsAmount, precomputedDataFile)
-    : generateRequestBodies(uniqueRequestsAmount, travelTime, transportation, arrivalTimePeriod, destinationsAmount, locationCoords)
-
-  return { url, requestBodies, params }
+  return { url, params }
 }
 
 export default function (data) {
-  const index = randomIndex(data.requestBodies.length)
-  const response = http.post(data.url, data.requestBodies[index], data.params)
+  const index = randomIndex(requestBodies.length)
+  const response = http.post(data.url, requestBodies[index], data.params)
 
   if (getCurrentStageIndex() === 1) { // Ignoring results from warm-up stage
     check(response, {
@@ -101,9 +106,10 @@ function generateBody (
     coords: { lat: coords.lat, lng: coords.lng }
   }
 
+  const destinationsSpread = parseFloat(__ENV.DESTINATIONS_SPREAD || 0.005)
   const randomDestinations = Array.from({ length: destinationsAmount }, (_, i) => ({
     id: `destination${i + 2}`,
-    coords: generateRandomCoordinate(coords.lat, coords.lng, 0.005)
+    coords: generateRandomCoordinate(coords.lat, coords.lng, destinationsSpread)
   }))
 
   const allLocations = [originLocation, ...randomDestinations]

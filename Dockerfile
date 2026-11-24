@@ -10,8 +10,9 @@ RUN apk --no-cache add git=~2
 RUN go install go.k6.io/xk6/cmd/xk6@v1.3.7
 
 # Add here all extenstions
+# xk6-protobuf pinned to the EncodeBase64 commit; back to @latest once merged.
 RUN xk6 build \
-    --with github.com/traveltime-dev/xk6-protobuf@latest \
+    --with github.com/traveltime-dev/xk6-protobuf@5bb5503186d0b94ff5a32d2b5b0c6a7e99a8faff \
     --with github.com/grafana/xk6-output-prometheus-remote@latest
 
 FROM alpine
