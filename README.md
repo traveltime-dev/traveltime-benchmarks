@@ -12,6 +12,9 @@ If you are on a Trial plan and would like to test the performance of the API at 
 
 The simplest way to run these benchmarks is to use docker:
 
+Images are published for each [release](https://github.com/traveltime-dev/traveltime-benchmarks/releases), tagged with
+its version without the `v` (release `v1.0.0` is `igeolise/traveltime-k6-benchmarks:1.0.0`).
+
 #### time-map
 
 ```bash
@@ -26,7 +29,7 @@ docker run
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/time-map.js
 ```
 
 #### time-map-fast
@@ -44,7 +47,7 @@ docker run
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e ARRIVAL_TIME_PERIOD='weekday_morning' //optional
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-map-fast.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/time-map-fast.js
 ```
 
 #### distance-map
@@ -61,7 +64,7 @@ docker run
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/distance-map.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/distance-map.js
 ```
 
 #### time-filter
@@ -80,7 +83,7 @@ docker run
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/time-filter.js
 ```
 
 #### time-filter-fast
@@ -98,7 +101,7 @@ docker run
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-fast.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/time-filter-fast.js
 ```
 
 #### time-filter postcodes
@@ -116,7 +119,7 @@ docker run
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-postcodes.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/time-filter-postcodes.js
 ```
 
 #### time-filter postcode-zones (districts / sectors)
@@ -136,7 +139,7 @@ docker run
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-postcode-zones.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/time-filter-postcode-zones.js
 ```
 
 #### routes
@@ -153,7 +156,7 @@ docker run
     -e USE_SHARC = true // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/routes.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/routes.js
 ```
 
 #### time-filter-proto
@@ -172,7 +175,7 @@ docker run
     -e TRAVEL_TIME=7200 // optional
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -e DISABLE_DECODING="true" // optional flag, skips proto response decoding if set to "true"
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/time-filter-proto.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/time-filter-proto.js
 ```
 
 #### geocoding-search
@@ -189,7 +192,7 @@ docker run
     -e FORMAT_NAME='true' //optional, format the name field to a well formatted address
     -e FORMAT_EXCLUDE_COUNTRY='true' //optional, exclude the country from the formatted name field (used only if format.name is equal true).
     -e BOUNDS='54.16243,4.04297,71.18316,31.81641' //optional, limit the results to a bounding box
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/geocoding-search.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/geocoding-search.js
 ```
 
 #### geocoding-reverse
@@ -201,7 +204,7 @@ docker run
     -e HOST=api.traveltimeapp.com // OR -e FULL_URL='https://api.traveltimeapp.com/v4/geocoding/reverse' ; if provided fully overrides HOST/endpoint, mutually exclusive with HOST
     -e LAT='51.4952113' //optional, latitude
     -e LNG='-0.183122' //optional, longitude
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/geocoding-reverse.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/geocoding-reverse.js
 ```
 
 #### cells (h3/geohash endpoints)
@@ -222,7 +225,7 @@ docker run
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/cells.js
 ```
 
 For endpoints `v4/h3/fast` or `v4/geohash/fast`, you can use the following command to run the benchmark:
@@ -241,7 +244,7 @@ docker run
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells-fast.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/cells-fast.js
 ```
 
 For protobuffer endpoint versions of `h3/fast` or `geohash/fast` there is an available script:
@@ -262,7 +265,7 @@ docker run
     -e UNIQUE_REQUESTS=100 //optional int, the number of unique requests that should be generated
     -e DISABLE_DECODING="true" // optional flag, skips proto response decoding if set to "true"
     -e REMOVE_WATER_BODIES="false" // optional flag, default "true"; set to "false" to keep water-body cells in the response
-    -ti igeolise/traveltime-k6-benchmarks:latest k6 run scripts/cells-proto.js
+    -ti igeolise/traveltime-k6-benchmarks:<version> k6 run scripts/cells-proto.js
 ```
 
 
