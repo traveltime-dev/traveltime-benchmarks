@@ -40,6 +40,8 @@ docker run
     -e TRANSPORTATION='driving+ferry' //optional
     -e TRAVEL_TIME=7200 //optional
     -e LEVEL_OF_DETAILS=2 // optional
+    -e SCALE_TYPE=geohash // optional, switches level_of_detail to the geohash scale type
+    -e GEOHASH_RESOLUTION=6 // optional, only used with SCALE_TYPE=geohash
     -e RPM=60 // optional
     -e TEST_DURATION=3 //optional, benchmark duration in minutes (not including warmup)
     -e ARRIVAL_TIME_PERIOD='weekday_morning' //optional
