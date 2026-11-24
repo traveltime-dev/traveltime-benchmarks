@@ -20,6 +20,7 @@ import {
   setThresholdsForScenarios,
   summaryTrendStats,
   getProtoLocationCoordinates,
+  randomIndex,
   transportationTypeProto,
   countryCodeProto
 } from './common.js'
@@ -94,14 +95,22 @@ export function setup () {
   return { url, params, disableBodyDecoding }
 }
 
-let vuBody = null
+const decodedBodies = new Map()
+
+// A SharedArray read is a full parse of the element, so each VU decodes only its own
+// slice of the bodies, once each; together the VUs still cover all of them.
+function pickBody () {
+  const stride = exec.instance.vusInitialized
+  const offset = (exec.vu.idInTest - 1) % requestBodies.length
+  const index = offset + randomIndex(Math.ceil((requestBodies.length - offset) / stride)) * stride
+  if (!decodedBodies.has(index)) {
+    decodedBodies.set(index, encoding.b64decode(requestBodies[index]))
+  }
+  return decodedBodies.get(index)
+}
 
 export default function (data) {
-  // One body per VU, decoded once: a SharedArray read is a full parse of the element.
-  if (vuBody === null) {
-    vuBody = encoding.b64decode(requestBodies[(exec.vu.idInTest - 1) % requestBodies.length])
-  }
-  const response = http.post(data.url, vuBody, data.params)
+  const response = http.post(data.url, pickBody(), data.params)
 
   const isBenchmarkStage = getCurrentStageIndex() === 1
 
